@@ -1,4 +1,0 @@
-templateScript: /form-core/templates/components/forms/form.ftl
-dialog: form-core:components/forms/form
-renderType: freemarker
-title: Form Auto

@@ -1,2 +1,0 @@
-class: info.magnolia.rest.service.node.definition.ConfiguredNodeEndpointDefinition
-implementationClass: info.magnolia.form.endpoints.v1.FormEndpoint

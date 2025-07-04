@@ -1,4 +1,0 @@
-templateScript: /form-core/templates/components/forms/form-manual.ftl
-dialog: form-core:components/forms/form-manual
-renderType: freemarker
-title: Form Manual

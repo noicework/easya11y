@@ -1,5 +1,0 @@
-x-entity-packages: info.magnolia.form
-profile-location: true
-entity-packages: info.magnolia.shop.form.domain
-transactional-packages: info.magnolia.form
-querybean-packages: info.magnolia.form
