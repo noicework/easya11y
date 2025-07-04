@@ -1,0 +1,20 @@
+title: Form Container
+renderType: freemarker
+templateScript: /easya11y/templates/components/container.ftl
+dialog: easya11y:components/container
+areas:
+  items:
+    title: Form Items
+    availableComponents:
+      row:
+        id: easya11y:components/row
+      button:
+        id: easya11y:components/button
+      text:
+        id: easya11y:components/text
+      options:
+        id: easya11y:components/options
+      hidden:
+        id: easya11y:components/hidden
+      conditional:
+        id: easya11y:components/conditional

@@ -1,0 +1,19 @@
+commit:
+  class: info.magnolia.form.action.SaveDatabaseActionDefinition
+  availability:
+    root: true
+    nodes: true
+    multiple: true
+    rules:
+      alwaysAvailable:
+        $type: alwaysAvailable
+
+cancel:
+  class: info.magnolia.form.action.CancelDatabaseEditActionDefinition
+  availability:
+    root: true
+    nodes: true
+    multiple: true
+    rules:
+      alwaysAvailable:
+        $type: alwaysAvailable

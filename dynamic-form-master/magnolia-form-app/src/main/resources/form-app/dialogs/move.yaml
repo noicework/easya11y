@@ -1,0 +1,80 @@
+class: info.magnolia.ui.chooser.definition.SingleItemWorkbenchChooserDefinition
+
+actions:
+  choose:
+    $type: chooseAction
+    availability:
+      root: false
+      rules:
+        CanMoveTopBottomRuleDefinition:
+          class: info.magnolia.form.action.availability.CanMoveTopBottomRuleDefinition
+  above:
+    name: above
+    $type: chooseAction
+    availability:
+      root: false
+      rules:
+        CanMoveAboveBelowRuleDefinition:
+          class: info.magnolia.form.action.availability.CanMoveAboveBelowRuleDefinition
+  below:
+    name: below
+    $type: chooseAction
+    availability:
+      root: false
+      rules:
+        CanMoveAboveBelowRuleDefinition:
+          class: info.magnolia.form.action.availability.CanMoveAboveBelowRuleDefinition
+  cancel:
+    $type: closeAction
+
+footerLayout:
+  $type: defaultEditorActionLayout
+  primaryActions:
+    - choose
+    - cancel
+  secondaryActions:
+    - above
+    - below
+
+workbenchChooser:
+  workbench:
+    contentViews:
+      - name: tree
+        $type: treeView
+        multiSelect: false
+        readOnly: true
+        columns:
+
+          - name: "title"
+            width: 400
+            class: info.magnolia.form.column.DbFormsTitleColumnDefinition
+
+          - name: "details"
+            width: 800
+            class: info.magnolia.form.column.DbFormsDetailsColumnDefinition
+
+          - name: "modifiedBy"
+            width: 200
+            editable: false
+            sortable: true
+
+          - name: "modified"
+            $type: dateColumn
+            width: 220
+            editable: false
+            sortable: true
+
+          - name: "createdBy"
+            width: 200
+            editable: false
+            sortable: true
+
+          - name: "created"
+            $type: dateColumn
+            width: 220
+            editable: false
+            sortable: true
+
+          - name: "empty"
+            editable: false
+            sortable: false

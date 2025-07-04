@@ -1,0 +1,45 @@
+{
+  "name": "easya11y",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test-all-endpoints.js",
+    "test:quick": "./test-quick.sh",
+    "test:shell": "./test-all-endpoints.sh",
+    "test:submit": "node test-submit-urlencoded.js",
+    "test:submissions": "node test-submissions-simple.js",
+    "test:forms": "node list-forms.js",
+    "dev": "webpack --mode=development --watch",
+    "build": "webpack --mode=production",
+    "build:dev": "webpack --mode=development",
+    "clean": "rm -rf src/main/resources/easya11y/webresources/js/*.js src/main/resources/easya11y/webresources/css/*.css",
+    "deploy": "./rebuild-and-deploy.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@babel/core": "^7.27.1",
+    "@babel/preset-env": "^7.27.2",
+    "@babel/preset-react": "^7.22.5",
+    "axios": "^1.9.0",
+    "babel-loader": "^10.0.0",
+    "copy-webpack-plugin": "^13.0.0",
+    "css-loader": "^7.1.2",
+    "mini-css-extract-plugin": "^2.9.2",
+    "style-loader": "^4.0.0",
+    "terser-webpack-plugin": "^5.3.14",
+    "webpack": "^5.99.8",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "@magnolia-services/mgnl-ds-react": "^2.0.0",
+    "axe-core": "^4.8.3",
+    "form-data": "^4.0.0",
+    "node-fetch": "^2.6.7",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "yup": "^1.6.1"
+  }
+}

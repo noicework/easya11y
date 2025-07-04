@@ -1,0 +1,36 @@
+= Prerequisites
+
+Because this module doesn't actually create the database, you need to create the database beforehand. 
+Depending on the external database where you want to store the forms, add the chosen database JDBC drivers.
+
+[tabs]
+==== 
+MySQL:: 
++ 
+-- 
+.v1
+[source,xml]
+----
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>${mysql.version}</version>
+</dependency>
+----
+-- 
+Postgres::
++
+--
+.v2
+[source,xml]
+----
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <version>${postgresql.version}</version>
+ </dependency>
+----
+--
+==== 
+
+TIP: If you want to use an IDE like Eclipse or IntelliJ, you will need to configure the `useragent` due to the ebean framework as described in the following link:https://ebean.io/docs/getting-started/eclipse-ide[link^].

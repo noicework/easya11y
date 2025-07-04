@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply">
+        <createTable name="answer_options" identityType="external" pkName="pk_answer_options">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="title" type="varchar"/>
+            <column name="label" type="varchar(2000)"/>
+            <column name="value" type="varchar(2000)"/>
+            <column name="image" type="varchar"/>
+            <column name="free_text" type="varchar"/>
+            <column name="free_text_label" type="varchar"/>
+            <column name="question_id" type="uuid" notnull="true" references="questions.id" foreignKeyName="fk_answer_options_question_id" foreignKeyIndex="ix_answer_options_question_id"/>
+            <column name="order_index" type="integer" notnull="true"/>
+            <column name="content" type="json"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="created_by" type="varchar" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+            <column name="modified_by" type="varchar" notnull="true"/>
+        </createTable>
+        <createTable name="answer_options_localized" identityType="external" pkName="pk_answer_options_localized">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="title" type="varchar"/>
+            <column name="label" type="varchar(2000)"/>
+            <column name="free_text_label" type="varchar"/>
+            <column name="locale" type="varchar" notnull="true"/>
+            <column name="parent_id" type="uuid" notnull="true" references="answer_options.id" foreignKeyName="fk_answer_options_localized_parent_id" foreignKeyIndex="ix_answer_options_localized_parent_id"/>
+            <column name="content" type="json"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="created_by" type="varchar" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+            <column name="modified_by" type="varchar" notnull="true"/>
+            <uniqueConstraint name="uq_answer_options_localized_locale_parent_id" columnNames="locale,parent_id" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="forms" identityType="external" pkName="pk_forms">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="title" type="varchar"/>
+            <column name="description" type="varchar(2000)"/>
+            <column name="anonymize" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="only_authenticated" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="public_results" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="order_index" type="integer" notnull="true"/>
+            <column name="image" type="varchar"/>
+            <column name="rules" type="varchar(2000)"/>
+            <column name="content" type="json"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="created_by" type="varchar" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+            <column name="modified_by" type="varchar" notnull="true"/>
+        </createTable>
+        <createTable name="forms_localized" identityType="external" pkName="pk_forms_localized">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="title" type="varchar"/>
+            <column name="description" type="varchar(2000)"/>
+            <column name="locale" type="varchar" notnull="true"/>
+            <column name="parent_id" type="uuid" notnull="true" references="forms.id" foreignKeyName="fk_forms_localized_parent_id" foreignKeyIndex="ix_forms_localized_parent_id"/>
+            <column name="content" type="json"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="created_by" type="varchar" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+            <column name="modified_by" type="varchar" notnull="true"/>
+            <uniqueConstraint name="uq_forms_localized_locale_parent_id" columnNames="locale,parent_id" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="questions" identityType="external" pkName="pk_questions">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="title" type="varchar"/>
+            <column name="question" type="varchar(2000)"/>
+            <column name="question_type" type="varchar"/>
+            <column name="image" type="varchar"/>
+            <column name="range_from" type="bigint"/>
+            <column name="range_from_label" type="varchar"/>
+            <column name="range_from_image" type="varchar"/>
+            <column name="range_to" type="bigint"/>
+            <column name="range_to_label" type="varchar"/>
+            <column name="range_to_image" type="varchar"/>
+            <column name="custom_chart_id" type="varchar"/>
+            <column name="section_id" type="uuid" references="sections.id" foreignKeyName="fk_questions_section_id" foreignKeyIndex="ix_questions_section_id"/>
+            <column name="form_id" type="uuid" references="forms.id" foreignKeyName="fk_questions_form_id" foreignKeyIndex="ix_questions_form_id"/>
+            <column name="order_index" type="integer" notnull="true"/>
+            <column name="content" type="json"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="created_by" type="varchar" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+            <column name="modified_by" type="varchar" notnull="true"/>
+        </createTable>
+        <createTable name="questions_localized" identityType="external" pkName="pk_questions_localized">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="title" type="varchar"/>
+            <column name="question" type="varchar(2000)"/>
+            <column name="locale" type="varchar" notnull="true"/>
+            <column name="parent_id" type="uuid" notnull="true" references="questions.id" foreignKeyName="fk_questions_localized_parent_id" foreignKeyIndex="ix_questions_localized_parent_id"/>
+            <column name="content" type="json"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="created_by" type="varchar" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+            <column name="modified_by" type="varchar" notnull="true"/>
+            <uniqueConstraint name="uq_questions_localized_locale_parent_id" columnNames="locale,parent_id" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="responses" identityType="external" pkName="pk_responses">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="form_id" type="uuid" notnull="true" references="forms.id" foreignKeyName="fk_responses_form_id" foreignKeyIndex="ix_responses_form_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="created_by" type="varchar" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+            <column name="modified_by" type="varchar" notnull="true"/>
+        </createTable>
+        <createTable name="response_items" identityType="external" pkName="pk_response_items">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="question_id" type="uuid" notnull="true" references="questions.id" foreignKeyName="fk_response_items_question_id" foreignKeyIndex="ix_response_items_question_id"/>
+            <column name="value" type="varchar(2000)"/>
+            <column name="free_text_value" type="varchar(2000)"/>
+            <column name="response_id" type="uuid" notnull="true" references="responses.id" foreignKeyName="fk_response_items_response_id" foreignKeyIndex="ix_response_items_response_id"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="created_by" type="varchar" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+            <column name="modified_by" type="varchar" notnull="true"/>
+        </createTable>
+        <createTable name="sections" identityType="external" pkName="pk_sections">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="title" type="varchar"/>
+            <column name="description" type="varchar(2000)"/>
+            <column name="form_id" type="uuid" notnull="true" references="forms.id" foreignKeyName="fk_sections_form_id" foreignKeyIndex="ix_sections_form_id"/>
+            <column name="order_index" type="integer" notnull="true"/>
+            <column name="content" type="json"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="created_by" type="varchar" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+            <column name="modified_by" type="varchar" notnull="true"/>
+        </createTable>
+        <createTable name="sections_localized" identityType="external" pkName="pk_sections_localized">
+            <column name="id" type="uuid" primaryKey="true" identity="true"/>
+            <column name="title" type="varchar"/>
+            <column name="description" type="varchar(2000)"/>
+            <column name="locale" type="varchar" notnull="true"/>
+            <column name="parent_id" type="uuid" notnull="true" references="sections.id" foreignKeyName="fk_sections_localized_parent_id" foreignKeyIndex="ix_sections_localized_parent_id"/>
+            <column name="content" type="json"/>
+            <column name="version" type="bigint" notnull="true"/>
+            <column name="created" type="timestamp" notnull="true"/>
+            <column name="created_by" type="varchar" notnull="true"/>
+            <column name="modified" type="timestamp" notnull="true"/>
+            <column name="modified_by" type="varchar" notnull="true"/>
+            <uniqueConstraint name="uq_sections_localized_locale_parent_id" columnNames="locale,parent_id" oneToOne="false" nullableColumns=""/>
+        </createTable>
+    </changeSet>
+</migration>

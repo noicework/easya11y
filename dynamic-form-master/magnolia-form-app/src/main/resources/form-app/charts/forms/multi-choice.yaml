@@ -1,0 +1,39 @@
+class: info.magnolia.analytics.amcharts.data.AmChartDefinition
+label: dashboard.chart.simple-column
+chartTypeConfigurationName: multi-choice
+# Here is sample config for https://www.amcharts.com/demos/simple-column-chart/
+chartType:
+  class: info.magnolia.analytics.amcharts.data.configuration.AmChartType
+  type: XYChart
+  series:
+    - name: series
+      type: ColumnSeries
+      dataFields:
+        - name: categoryX
+          value: answer
+          jsonPath: $.[*].answer
+        - name: valueY
+          value: count
+          jsonPath: $.[*].count
+      tooltipText: '"{categoryX}: [bold]{valueY}[/]"'
+      columns:
+        fillOpacity: 1
+        strokeOpacity: 0
+  xAxes:
+    - name: xaxe
+      type: CATEGORY_AXIS
+      renderer:
+        minGridDistance: 30
+        grid:
+          location: 0
+        labels:
+          truncate: true
+          maxWidth: 150
+      dataFields:
+        category: answer
+
+  yAxes:
+    - name: yaxe
+      type: VALUE_AXIS
+  cursor:
+    type: XYCursor

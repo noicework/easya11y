@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>magnolia-form-reactor</artifactId>
+    <groupId>info.magnolia.form</groupId>
+    <version>2.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <artifactId>magnolia-form-app</artifactId>
+  <packaging>jar</packaging>
+  <name>form-app Magnolia Module</name>
+  <description>Provides magnolia sub application for forms browsing/management</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>info.magnolia</groupId>
+      <artifactId>magnolia-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>info.magnolia</groupId>
+      <artifactId>magnolia-rendering</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-compatibility-server</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>info.magnolia.ui</groupId>
+      <artifactId>magnolia-ui-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>info.magnolia.ui</groupId>
+      <artifactId>magnolia-ui-framework</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>info.magnolia.multisite</groupId>
+      <artifactId>magnolia-module-multisite</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>info.magnolia.multisite</groupId>
+      <artifactId>magnolia-module-multisite-jcr</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>info.magnolia.ui</groupId>
+      <artifactId>magnolia-ui-framework-javascript</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>info.magnolia.site</groupId>
+      <artifactId>magnolia-site</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>info.magnolia.site</groupId>
+      <artifactId>magnolia-site-jcr</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>info.magnolia.analytics</groupId>
+      <artifactId>magnolia-analytics</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>info.magnolia.analytics</groupId>
+      <artifactId>magnolia-analytics-ui</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>info.magnolia.analytics</groupId>
+      <artifactId>magnolia-analytics-amcharts</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>info.magnolia.form</groupId>
+      <artifactId>magnolia-form-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jodd</groupId>
+      <artifactId>jodd-bean</artifactId>
+      <version>${jodd.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- TEST -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

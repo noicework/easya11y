@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Checker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 24px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #068449;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-stats {
+            font-size: 0.5em;
+            color: #7f8c8d;
+            font-weight: normal;
+        }
+        
+        .controls {
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr auto auto auto auto;
+            gap: 12px;
+            align-items: center;
+            background-color: #f8faf9;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #e8e8e8;
+        }
+        
+        .search-container {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: #fff;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #068449;
+            box-shadow: 0 0 0 2px rgba(6, 132, 73, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+        
+        .form-select, .sort-select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: #fff;
+            cursor: pointer;
+            min-width: 200px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-select:focus, .sort-select:focus {
+            outline: none;
+            border-color: #068449;
+            box-shadow: 0 0 0 2px rgba(6, 132, 73, 0.1);
+        }
+        
+        .form-select:hover, .sort-select:hover {
+            border-color: #068449;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            font-weight: 500;
+            letter-spacing: 0.025em;
+        }
+        
+        .btn-primary {
+            background-color: #068449;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #056b3b;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .btn-success {
+            background-color: #068449;
+            color: white;
+            border: 1px solid #068449;
+        }
+        
+        .btn-success:hover {
+            background-color: #fff;
+            color: #068449;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border-color: #068449;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .filters {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .filters.active {
+            display: block;
+        }
+        
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #068449;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .scan-result {
+            animation: fadeIn 0.3s ease-out;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .scan-result:hover {
+            box-shadow: 0 4px 12px rgba(6, 132, 73, 0.15);
+            transform: translateY(-2px);
+            border-color: rgba(6, 132, 73, 0.3);
+        }
+        
+        .scan-result.expanded {
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .result-meta {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .result-score {
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        .score-perfect { background-color: #d4edda; color: #155724; }
+        .score-good { background-color: #cce5ff; color: #004085; }
+        .score-fair { background-color: #fff3cd; color: #856404; }
+        .score-poor { background-color: #f8d7da; color: #721c24; }
+        
+        .error {
+            background-color: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #fcc;
+        }
+        
+        .info {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #bbdefb;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #fff 0%, #f8faf9 100%);
+            padding: 24px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(6, 132, 73, 0.12);
+            border-color: rgba(6, 132, 73, 0.2);
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: 600;
+            color: #068449;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .results-container {
+            margin-top: 20px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+            stroke: #068449;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .pagination-btn:hover:not(:disabled) {
+            background-color: #f8f9fa;
+            border-color: #068449;
+        }
+        
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-info {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            Accessibility Checker
+            <span class="header-stats" id="headerStats"></span>
+        </h1>
+        
+        <div class="controls">
+            <div class="search-container">
+                <span class="search-icon">⌕</span>
+                <input type="text" 
+                       id="searchInput" 
+                       class="search-input" 
+                       placeholder="Search pages or issues...">
+            </div>
+            <select id="pageSelect" class="form-select">
+                <option value="">Select a page to scan</option>
+            </select>
+            <button id="scanBtn" class="btn btn-primary" disabled>
+                <span>▶</span> Scan Page
+            </button>
+            <button id="scanAllBtn" class="btn btn-primary">
+                <span>⊞</span> Scan All
+            </button>
+            <button id="filterBtn" class="btn btn-primary">
+                <span>⊙</span> Filters
+            </button>
+            <button id="exportBtn" class="btn btn-success">
+                <span>⤓</span> Export Report
+            </button>
+        </div>
+        
+        <div id="filters" class="filters">
+            <div class="filter-row">
+                <select id="severityFilter" class="form-select">
+                    <option value="">All Severities</option>
+                    <option value="critical">Critical</option>
+                    <option value="serious">Serious</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="minor">Minor</option>
+                </select>
+                <select id="wcagFilter" class="form-select">
+                    <option value="">All WCAG Levels</option>
+                    <option value="A">Level A</option>
+                    <option value="AA">Level AA</option>
+                    <option value="AAA">Level AAA</option>
+                </select>
+                <button id="applyFilters" class="btn btn-primary">Apply Filters</button>
+            </div>
+        </div>
+        
+        <div id="statsContainer" class="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-label">Total Pages</div>
+                <div class="stat-value" id="totalPages">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pages Scanned</div>
+                <div class="stat-value" id="scannedPages">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Average Score</div>
+                <div class="stat-value" id="averageScore">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Critical Issues</div>
+                <div class="stat-value" id="criticalIssues" style="color: #dc3545;">0</div>
+            </div>
+        </div>
+        
+        <div id="messageContainer"></div>
+        
+        <div id="resultsContainer" class="results-container">
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 16v-4"></path>
+                    <path d="M12 8h.01"></path>
+                </svg>
+                <p>Select a page to scan for accessibility issues</p>
+            </div>
+        </div>
+        
+        <div id="pagination" class="pagination" style="display: none;">
+            <button id="prevPage" class="pagination-btn">Previous</button>
+            <span class="pagination-info">
+                Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+            </span>
+            <button id="nextPage" class="pagination-btn">Next</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const baseUrl = window.location.origin;
+        const pathParts = window.location.pathname.split('/');
+        const contextPath = pathParts[1] === 'magnoliaAuthor' ? '/magnoliaAuthor' : '';
+        const apiBase = `${baseUrl}${contextPath}/.rest`;
+        
+        // State
+        let allPages = [];
+        let scanResults = [];
+        let filteredResults = [];
+        let currentPagePath = '';
+        let currentPage = 1;
+        const itemsPerPage = 20;
+        let searchTerm = '';
+        let severityFilter = '';
+        let wcagFilter = '';
+        let isScanning = false;
+        
+        // DOM elements
+        const pageSelect = document.getElementById('pageSelect');
+        const searchInput = document.getElementById('searchInput');
+        const scanBtn = document.getElementById('scanBtn');
+        const scanAllBtn = document.getElementById('scanAllBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const filterBtn = document.getElementById('filterBtn');
+        const filters = document.getElementById('filters');
+        const severityFilterSelect = document.getElementById('severityFilter');
+        const wcagFilterSelect = document.getElementById('wcagFilter');
+        const applyFiltersBtn = document.getElementById('applyFilters');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const messageContainer = document.getElementById('messageContainer');
+        const statsContainer = document.getElementById('statsContainer');
+        const headerStats = document.getElementById('headerStats');
+        const pagination = document.getElementById('pagination');
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Accessibility Checker initialized');
+            console.log('Context path:', contextPath);
+            console.log('API base:', apiBase);
+            
+            loadPages();
+            loadScanResults();
+            setupEventListeners();
+        });
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            pageSelect.addEventListener('change', (e) => {
+                currentPagePath = e.target.value;
+                updateScanButtonState();
+            });
+            
+            searchInput.addEventListener('input', debounce((e) => {
+                searchTerm = e.target.value.toLowerCase();
+                filterAndDisplayResults();
+            }, 300));
+            
+            scanBtn.addEventListener('click', () => {
+                if (currentPagePath && !isScanning) {
+                    scanPage(currentPagePath);
+                }
+            });
+            
+            scanAllBtn.addEventListener('click', () => {
+                if (confirm('This will scan all pages. This may take a while. Continue?')) {
+                    scanAllPages();
+                }
+            });
+            
+            exportBtn.addEventListener('click', () => {
+                exportReport();
+            });
+            
+            filterBtn.addEventListener('click', () => {
+                filters.classList.toggle('active');
+            });
+            
+            applyFiltersBtn.addEventListener('click', () => {
+                severityFilter = severityFilterSelect.value;
+                wcagFilter = wcagFilterSelect.value;
+                filterAndDisplayResults();
+            });
+            
+            document.getElementById('prevPage').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayResults();
+                }
+            });
+            
+            document.getElementById('nextPage').addEventListener('click', () => {
+                const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayResults();
+                }
+            });
+        }
+        
+        // Load available pages
+        async function loadPages() {
+            try {
+                const response = await fetch(`${apiBase}/easya11y/pages?includeStatus=true`, {
+                    credentials: 'same-origin'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load pages: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                allPages = data.items || [];
+                populatePageSelect(allPages);
+                updatePageStats();
+            } catch (error) {
+                showMessage(`Error loading pages: ${error.message}`, 'error');
+                console.error('Error loading pages:', error);
+            }
+        }
+        
+        // Populate page select dropdown
+        function populatePageSelect(pages) {
+            pageSelect.innerHTML = '<option value="">Select a page to scan</option>';
+            
+            pages.forEach(page => {
+                const option = document.createElement('option');
+                option.value = page.path;
+                const scanStatus = page.scanStatus && page.scanStatus.scanned ? ' ✓' : '';
+                option.textContent = (page.title || page.name || page.path) + scanStatus;
+                if (page.scanStatus && page.scanStatus.scanned) {
+                    option.style.color = '#068449';
+                }
+                pageSelect.appendChild(option);
+            });
+        }
+        
+        // Load scan results
+        async function loadScanResults() {
+            try {
+                const response = await fetch(`${apiBase}/easya11y/results`, {
+                    credentials: 'same-origin'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load scan results: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                scanResults = data.results || [];
+                filterAndDisplayResults();
+                updateStats(data.summary);
+            } catch (error) {
+                showMessage(`Error loading scan results: ${error.message}`, 'error');
+                console.error('Error loading scan results:', error);
+            }
+        }
+        
+        // Scan a single page
+        async function scanPage(pagePath) {
+            if (isScanning) return;
+            
+            try {
+                isScanning = true;
+                scanBtn.disabled = true;
+                showMessage('Initiating scan...', 'info');
+                
+                // First, initiate the scan
+                const initResponse = await fetch(`${apiBase}/easya11y/scan/initiate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pagePath }),
+                    credentials: 'same-origin'
+                });
+                
+                if (!initResponse.ok) {
+                    throw new Error(`Failed to initiate scan: ${initResponse.status}`);
+                }
+                
+                const initData = await initResponse.json();
+                
+                showMessage(`Scanning ${initData.pageTitle}... This feature requires axe-core integration.`, 'info');
+                
+                // TODO: Implement actual axe-core scanning here
+                // For now, just show a message
+                setTimeout(() => {
+                    showMessage('Scanning complete! (Demo mode - no actual scan performed)', 'info');
+                    loadScanResults();
+                    loadPages();
+                }, 2000);
+                
+            } catch (error) {
+                showMessage(`Error scanning page: ${error.message}`, 'error');
+                console.error('Error scanning page:', error);
+            } finally {
+                isScanning = false;
+                updateScanButtonState();
+            }
+        }
+        
+        // Scan all pages
+        async function scanAllPages() {
+            showMessage('Batch scanning not yet implemented', 'info');
+        }
+        
+        // Filter and display results
+        function filterAndDisplayResults() {
+            filteredResults = scanResults.filter(result => {
+                // Search filter
+                if (searchTerm) {
+                    const searchableText = `${result.pageTitle} ${result.pagePath}`.toLowerCase();
+                    if (!searchableText.includes(searchTerm)) {
+                        return false;
+                    }
+                }
+                
+                // Severity filter
+                if (severityFilter) {
+                    const count = result[`${severityFilter}Count`];
+                    if (!count || count === 0) {
+                        return false;
+                    }
+                }
+                
+                // WCAG filter
+                if (wcagFilter && result.wcagLevel !== wcagFilter) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            currentPage = 1;
+            displayResults();
+        }
+        
+        // Display results
+        function displayResults() {
+            if (!filteredResults || filteredResults.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <p>${searchTerm || severityFilter || wcagFilter ? 'No results match your filters' : 'No scan results yet'}</p>
+                    </div>
+                `;
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageResults = filteredResults.slice(startIndex, endIndex);
+            
+            resultsContainer.innerHTML = pageResults.map(result => {
+                const scoreClass = getScoreClass(result.score);
+                return `
+                    <div class="scan-result" onclick="toggleResult(this)">
+                        <div class="result-header">
+                            <div class="result-meta">
+                                <div class="result-score ${scoreClass}">${result.score.toFixed(1)}</div>
+                                <div>
+                                    <strong>${result.pageTitle}</strong><br>
+                                    <small>${result.pagePath}</small>
+                                </div>
+                            </div>
+                            <div>
+                                <span style="color: #dc3545;">Critical: ${result.criticalCount}</span> |
+                                <span style="color: #fd7e14;">Serious: ${result.seriousCount}</span> |
+                                <span style="color: #ffc107;">Moderate: ${result.moderateCount}</span> |
+                                <span style="color: #28a745;">Minor: ${result.minorCount}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Update pagination
+            if (totalPages > 1) {
+                pagination.style.display = 'flex';
+                document.getElementById('currentPage').textContent = currentPage;
+                document.getElementById('totalPages').textContent = totalPages;
+                document.getElementById('prevPage').disabled = currentPage === 1;
+                document.getElementById('nextPage').disabled = currentPage === totalPages;
+            } else {
+                pagination.style.display = 'none';
+            }
+        }
+        
+        // Get score class for styling
+        function getScoreClass(score) {
+            if (score === 100) return 'score-perfect';
+            if (score >= 90) return 'score-good';
+            if (score >= 70) return 'score-fair';
+            return 'score-poor';
+        }
+        
+        // Toggle result expansion
+        function toggleResult(element) {
+            element.classList.toggle('expanded');
+        }
+        
+        // Update statistics
+        function updateStats(summary) {
+            if (summary) {
+                statsContainer.style.display = 'grid';
+                document.getElementById('averageScore').textContent = summary.averageScore.toFixed(1);
+                document.getElementById('criticalIssues').textContent = summary.totalCritical || 0;
+            }
+        }
+        
+        // Update page statistics
+        function updatePageStats() {
+            const scannedCount = allPages.filter(p => p.scanStatus && p.scanStatus.scanned).length;
+            document.getElementById('totalPages').textContent = allPages.length;
+            document.getElementById('scannedPages').textContent = scannedCount;
+            
+            if (allPages.length > 0) {
+                headerStats.textContent = `${scannedCount} of ${allPages.length} pages scanned`;
+            }
+        }
+        
+        // Update scan button state
+        function updateScanButtonState() {
+            scanBtn.disabled = !currentPagePath || isScanning;
+        }
+        
+        // Export report
+        function exportReport() {
+            window.open(`${apiBase}/easya11y/results/export/csv`, '_blank');
+        }
+        
+        // Show message
+        function showMessage(message, type = 'info') {
+            messageContainer.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+        
+        // Clear message
+        function clearMessage() {
+            messageContainer.innerHTML = '';
+        }
+        
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    </script>
+</body>
+</html>

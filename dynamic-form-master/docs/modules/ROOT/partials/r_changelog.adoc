@@ -1,0 +1,10 @@
+= Changelog
+ 
+[cols="2a,8a"]
+|===
+|Version |Notes
+
+|2.0.0
+|Initial release for Magnolia 6.3 compatibility.
+
+|===

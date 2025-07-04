@@ -1,0 +1,18 @@
+!page-editor-app:easya11y
+name: easya11y
+label: Accessibility Checker
+icon: easya11y-icon
+
+datasource:
+  workspace: easya11y
+  rootPath: /easya11y/
+
+
+# Extend the browser subapp with our custom actions
+subApps:
+  # Add our custom accessibility checker subapp
+  accessibilityChecker:
+    label: Home
+    class: work.noice.easya11y.ui.AccessibilityCheckerSubAppDescriptor
+    closable: false
+    htmlPath: .resources/easya11y/webresources/accessibility-checker.html

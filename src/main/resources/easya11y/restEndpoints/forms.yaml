@@ -1,0 +1,14 @@
+# REST endpoint configuration for Forms
+$type: jcrDeliveryEndpoint_v2
+workspace: easya11y
+depth: 10
+referenceDepth: 10
+systemProperties:
+  - mgnl:template
+nodeTypes:
+  - mgnl:page
+  - mgnl:area
+childNodeTypes:
+  - mgnl:area
+  - mgnl:component
+  - mgnl:contentNode  

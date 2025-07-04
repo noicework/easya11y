@@ -1,0 +1,51 @@
+[#-- Display editor info --]
+[#macro displayEditorInfo message]
+	[#if cmsfn.editMode]
+	<div style="background-color: #f9f9f9; border: 1px dashed #d8d8d8; color: #333; padding: 8px; font-size: 14px; border-radius: 8px;">
+		${message}
+	</div>
+	[/#if]
+[/#macro]
+
+[#-- Simplified form embed component --]
+[#if cmsfn.editMode]
+	[@displayEditorInfo "-- Form embed --"/]
+[/#if]
+
+[#if content.formId?has_content]
+	[#-- Get the form by ID directly from the easya11y workspace --]
+	[#assign formNode = cmsfn.contentById(content.formId, "easya11y")!]
+
+	[#if formNode?has_content]
+		[#-- Check if the form is of the correct template type --]
+		[#assign formTemplate = formNode["mgnl:template"]!]
+
+		[#if formTemplate?has_content && formTemplate == "easya11y:pages/form"]
+			[#-- Display the form content in a div --]
+			<div class="form-embed-container" data-form-container>
+				[#-- Render the form's main area components directly --]
+				[#if formNode.main?has_content]
+					[#list cmsfn.children(formNode.main) as component]
+						[@cms.component content=component editable=false /]
+					[/#list]
+				[#else]
+					[#if cmsfn.editMode]
+						[@displayEditorInfo "-- Selected form has no components in main area --"/]
+					[/#if]
+				[/#if]
+			</div>
+		[#else]
+			[#if cmsfn.editMode]
+				[@displayEditorInfo "-- Selected content is not a form (template: ${formTemplate!'unknown'}) --"/]
+			[/#if]
+		[/#if]
+	[#else]
+		[#if cmsfn.editMode]
+			[@displayEditorInfo "-- No form found with ID: ${content.formId} --"/]
+		[/#if]
+	[/#if]
+[#else]
+	[#if cmsfn.editMode]
+		[@displayEditorInfo "-- Please select a form to display --"/]
+	[/#if]
+[/#if]

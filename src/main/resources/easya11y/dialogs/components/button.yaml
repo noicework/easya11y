@@ -1,0 +1,34 @@
+label: Form Button
+width: medium
+form:
+  implementationClass: info.magnolia.ui.javascript.form.FormViewWithChangeListener
+  name: Form Button
+  properties:
+  - !include:/easya11y/includes/dialogs/btnVariant.yaml
+  - !include:/easya11y/includes/dialogs/btnOutline.yaml
+  - !include:/easya11y/includes/dialogs/btnSize.yaml
+  - !include:/easya11y/includes/dialogs/btnType.yaml
+  - !include:/easya11y/includes/dialogs/link.yaml
+  - !include:/easya11y/includes/dialogs/btnText.yaml
+    required: true
+  - !include:/easya11y/includes/dialogs/class.yaml
+  - !include:/easya11y/includes/dialogs/css.yaml
+
+  layout:
+    $type: tabbedLayout
+    tabs:
+      firstTab:
+        label: Main
+        fields:
+          - name: btnType
+          - name: btnText
+          - name: link
+      secondTab:
+        label: Style
+        fields:
+          - name: btnVariant
+          - name: btnOutline
+          - name: btnSize
+          - name: class
+          - name: css
+

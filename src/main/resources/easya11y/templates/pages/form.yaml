@@ -1,0 +1,10 @@
+templateScript: /easya11y/templates/pages/form.ftl
+renderType: freemarker
+visible: true
+title: Form
+dialog: easya11y:pages/form
+areas:
+  main:
+    availableComponents:
+      container:
+        id: easya11y:components/container

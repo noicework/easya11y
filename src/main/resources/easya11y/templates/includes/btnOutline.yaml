@@ -1,0 +1,35 @@
+name: btnOutline
+label: Button Outline
+defaultValue: none
+$type: comboBoxField
+datasource:
+  $type: optionListDatasource
+  options:
+    - value: none
+      name: -1
+      label: None
+      selected: true
+    - value: primary
+      name: 0
+      label: Primary
+    - value: secondary
+      name: 1
+      label: Secondary
+    - value: success
+      name: 2
+      label: Success
+    - value: danger
+      name: 3
+      label: Danger
+    - value: warning
+      name: 4
+      label: Warning
+    - value: info
+      name: 5
+      label: Info
+    - value: light
+      name: 6
+      label: Light
+    - value: dark
+      name: 7
+      label: Dark

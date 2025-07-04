@@ -1,0 +1,216 @@
+label: Form
+form:
+  properties:
+    - name: formId
+      label: Form Identifier
+      $type: textField
+      description: Unique ID to identify this form
+      required: true
+
+    - name: formName
+      label: Form Name
+      $type: textField
+      description: Provide a descriptive name for easy reference
+
+    - name: submissionType
+      label: How to Handle Submissions
+      $type: radioButtonGroupField
+      defaultValue: url
+      datasource:
+        $type: optionListDatasource
+        options:
+          - value: url
+            label: Submit via URL/API
+          - value: email
+            label: Send via Email
+      description: Choose how you would like to receive the form submissions
+
+    - name: method
+      label: Submission Method
+      defaultValue: post
+      $type: comboBoxField
+      datasource:
+        $type: optionListDatasource
+        options:
+          - value: post
+            label: POST (recommended)
+          - value: get
+            label: GET
+      description: Choose how the form data is sent (usually "POST")
+
+    - name: action
+      label: Submission URL
+      $type: textField
+      description: Enter the web address to send submissions
+
+    - name: enctype
+      label: Encoding Method
+      defaultValue: application/x-www-form-urlencoded
+      $type: comboBoxField
+      datasource:
+        $type: optionListDatasource
+        options:
+          - value: application/x-www-form-urlencoded
+            label: Standard Submission
+          - value: multipart/form-data
+            label: File Upload Submission
+          - value: text/plain
+            label: Plain Text Submission
+
+    - name: emailRoutingType
+      label: Email Destination
+      $type: radioButtonGroupField
+      defaultValue: static
+      datasource:
+        $type: optionListDatasource
+        options:
+          - value: static
+            label: Fixed Email Address
+          - value: dynamic
+            label: Email from Form Input
+      description: Choose how the email recipient is determined
+
+    - name: emailTo
+      label: Recipient Email
+      $type: textField
+      description: Email address receiving form submissions
+
+    - name: emailFieldKey
+      label: Email Field in Form
+      $type: textField
+      description: Specify the form field containing recipient email
+
+    - name: emailSubject
+      label: Email Subject
+      $type: textField
+      defaultValue: New Form Submission
+
+    - name: emailFrom
+      label: Sender Email Address
+      $type: textField
+      description: Email address sending the submission notification
+
+    - name: useMailchimp
+      label: Integrate with Mailchimp
+      $type: checkBoxField
+      defaultValue: false
+      buttonLabel: Enable Mailchimp
+      description: Automatically add contacts to your Mailchimp list
+
+    - name: mailchimpAudienceId
+      label: Mailchimp Audience ID
+      $type: textField
+      description: Find this ID in your Mailchimp account
+
+    - name: mailchimpApiKey
+      label: Mailchimp API Key
+      $type: textField
+      description: Your unique API key from Mailchimp
+
+    - name: mailchimpDataCenter
+      label: Mailchimp Data Center
+      $type: textField
+      description: Data center code (e.g., us1, us2)
+
+    - name: mailchimpEmailField
+      label: Email Field Name
+      $type: textField
+      defaultValue: email
+      description: Name of email input field in your form
+
+    - name: useRecaptcha
+      label: Enable Spam Protection
+      $type: checkBoxField
+      defaultValue: false
+      buttonLabel: Enable reCAPTCHA v3
+      description: Protect your form from spam submissions
+
+    - name: recaptchaSiteKey
+      label: reCAPTCHA Site Key
+      $type: textField
+      description: Your reCAPTCHA site key provided by Google
+
+    - name: recaptchaAction
+      label: reCAPTCHA Action Name
+      $type: textField
+      description: Usually "form_submit" or similar
+      defaultValue: form_submit
+
+    - name: successMessage
+      label: Success Message
+      $type: textField
+      rows: 5
+      description: Message shown after successful form submission
+
+    - name: errorMessage
+      label: Error Message
+      $type: textField
+      rows: 5
+      description: Message displayed if there's an error
+
+    - name: redirectUrl
+      label: Redirect URL
+      $type: textField
+      description: Optional page URL to redirect to after submission
+
+    - name: redirectDelay
+      label: Delay Before Redirect (seconds)
+      $type: textField
+      description: Wait time before redirecting (optional)
+
+    - name: submitButtonText
+      label: Submit Button Label
+      $type: textField
+      defaultValue: Submit
+      description: Text displayed on the submit button
+
+  layout:
+    $type: tabbedLayout
+    tabs:
+      formSetup:
+        label: Form Details
+        fields:
+          - name: formId
+          - name: formName
+          - name: submissionType
+
+      submissionSettings:
+        label: Submission Options
+        fields:
+          - name: method
+          - name: action
+          - name: enctype
+
+      emailSettings:
+        label: Email Notifications
+        fields:
+          - name: emailRoutingType
+          - name: emailTo
+          - name: emailFieldKey
+          - name: emailSubject
+          - name: emailFrom
+
+      mailchimpIntegration:
+        label: Mailchimp Integration
+        fields:
+          - name: useMailchimp
+          - name: mailchimpAudienceId
+          - name: mailchimpApiKey
+          - name: mailchimpDataCenter
+          - name: mailchimpEmailField
+
+      spamProtection:
+        label: Spam Protection
+        fields:
+          - name: useRecaptcha
+          - name: recaptchaSiteKey
+          - name: recaptchaAction
+
+      formResponses:
+        label: Response Messages
+        fields:
+          - name: successMessage
+          - name: errorMessage
+          - name: redirectUrl
+          - name: redirectDelay
+          - name: submitButtonText

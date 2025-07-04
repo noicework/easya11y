@@ -1,0 +1,20 @@
+= {page-component-title}
+:page-aliases: poll:ROOT:index.adoc, form:ROOT:index.adoc
+
+[.category-label]#{useCase-category}# [.category-label]#{module-type}# [.category-label]#Version {modules-version}# [.category-label]#xref:6.3@product-docs:ROOT:index.adoc[Magnolia {version-compatible}] compatible#
+
+// module overview
+include::partial$c_module-overview.adoc[tag="noTitle"]
+
+// prerequisites
+include::partial$r_prerequisites.adoc[leveloffset=+1]
+
+// install with maven
+include::partial$r_install-with-maven.adoc[leveloffset=+1]
+
+// use the module
+include::partial$r_usage.adoc[leveloffset=+1]
+
+// changelog
+include::partial$r_changelog.adoc[leveloffset=+1]
+

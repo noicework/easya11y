@@ -1,0 +1,59 @@
+label: Form Conditional
+width: medium
+form:
+  implementationClass: info.magnolia.ui.javascript.form.FormViewWithChangeListener
+  name: Form Conditional
+  properties:
+  - name: fieldToCheck
+    label: Field to check
+    $type: textField
+    i18n: true
+    required: true
+  - name: valueToMatch
+    label: Value to match
+    $type: textField
+    i18n: true
+    required: true
+  - name: operator
+    label: Operator
+    defaultValue: equals
+    $type: comboBoxField
+    required: true
+    datasource:
+      $type: optionListDatasource
+      options:
+      - value: equals
+        name: 0
+        label: Equals
+      - value: notEquals
+        name: 1
+        label: Not equals
+      - value: contains
+        name: 2
+        label: Contains
+      - value: notContains
+        name: 3
+        label: Does not contain
+      - value: greaterThan
+        name: 4
+        label: Greater than
+      - value: lessThan
+        name: 5
+        label: Less than
+  - !include:/mmp/includes/dialogs/class.yaml
+  - !include:/mmp/includes/dialogs/css.yaml
+
+  layout:
+    $type: tabbedLayout
+    tabs:
+      firstTab:
+        label: Main
+        fields:
+          - name: fieldToCheck
+          - name: valueToMatch
+          - name: operator
+      secondTab:
+        label: Style
+        fields:
+          - name: class
+          - name: css

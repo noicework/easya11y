@@ -1,0 +1,8 @@
+datasource:
+  url: '<<db-connection-string>>'
+  username: '<<username>>'
+  password: '<<password>>'
+  driver: 'com.mysql.cj.jdbc.Driver'
+  migration:
+    path: 'form-core/dbmigration/mysql'
+    run: true

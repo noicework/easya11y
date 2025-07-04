@@ -1,0 +1,11 @@
+label: Form Container
+width: large
+form:
+  implementationClass: info.magnolia.ui.javascript.form.FormViewWithChangeListener
+  name: Form Container
+  properties:
+    - name: formNote
+      label: Form Configuration
+      $type: staticField
+      value: Edit the form properties in the Form Container component
+      description: This page template uses a Form Container component. All form settings such as form ID, method, action URL, success messages, and integrations should be configured in the Form Container component itself.

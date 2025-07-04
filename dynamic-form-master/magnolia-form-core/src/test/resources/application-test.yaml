@@ -1,0 +1,21 @@
+ebean:
+  dumpMetricsOnShutdown: true
+  dumpMetricsOptions: loc,sql,hash
+  currentUserProvider: info.magnolia.form.provider.TestCurrentUserProvider
+
+  ddl:
+    generate: true
+    run: true
+    seedSql: seed.sql
+
+datasource:
+
+  # use named database
+  default: form
+
+  # example named database
+  form:
+    username: sa
+    password: sa
+    url: jdbc:h2:mem:tests
+    driver: org.h2.Driver

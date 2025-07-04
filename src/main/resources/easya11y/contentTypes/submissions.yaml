@@ -1,0 +1,14 @@
+datasource:
+  workspace: easya11y
+  autoCreate: false
+  
+nodeType:
+  name: mgnl:submission
+  primaryType: nt:base
+  supertypes:
+    - mgnl:content
+  properties:
+    - name: timestamp
+      type: Date
+    - name: formPath
+      type: String

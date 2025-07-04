@@ -1,0 +1,1 @@
+magnoliaDefaultPipeline(jdk: 'JDK17')

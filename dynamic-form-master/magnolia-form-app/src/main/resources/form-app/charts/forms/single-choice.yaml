@@ -1,0 +1,18 @@
+class: info.magnolia.analytics.amcharts.data.AmChartDefinition
+label: dashboard.chart.pie
+chartTypeConfigurationName: single-choice
+chartType:
+  class: info.magnolia.analytics.amcharts.data.configuration.AmChartType
+  type: PieChart
+  series:
+    - name: series
+      type: PieSeries
+      dataFields:
+        - name: category
+          value: answer
+          jsonPath: $.[*].answer
+        - name: value
+          value: count
+          jsonPath: $.[*].count
+  legend:
+    position: bottom

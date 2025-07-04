@@ -1,0 +1,4 @@
+templateScript: /form-core/templates/components/forms/results-manual.ftl
+dialog: form-core:components/forms/results-manual
+renderType: freemarker
+title: Form Results Manual

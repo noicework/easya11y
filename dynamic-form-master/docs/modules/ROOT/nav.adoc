@@ -1,0 +1,2 @@
+* link:javascript:history.back(-1)[icon:arrow-left[] Go back]
+* xref:index.adoc[]

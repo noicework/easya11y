@@ -1,0 +1,3 @@
+# REST endpoint configuration for ComponentsEndpoint
+class: info.magnolia.rest.endpoint.EndpointDefinition
+implementationClass: com.example.simple.ComponentsEndpoint

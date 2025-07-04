@@ -1,0 +1,138 @@
+label: Form Row
+width: medium
+form:
+  name: Form Row
+  properties:
+    - name: layout
+      label: Layout
+      defaultValue: 12
+      $type: comboBoxField
+      datasource:
+        $type: optionListDatasource
+        options:
+          - name: 0
+            label: 100%
+            value: 12
+          - name: 1
+            label: 66% + 33%
+            value: 8 4
+          - name: 2
+            label: 33% + 66%
+            value: 4 8
+          - name: 3
+            label: 50% + 50%
+            value: 6 6
+          - name: 4
+            label: 33% + 33% + 33%
+            value: 4 4 4
+          - name: 5
+            label: 25% + 25% + 25% + 25%
+            value: 3 3 3 3
+    - !include:/mmp/includes/dialogs/class.yaml
+    - !include:/mmp/includes/dialogs/css.yaml
+    - name: columnClass
+      label: Column Class
+      $type: textField
+    - name: columnCss
+      label: Column CSS
+      $type: textField
+      rows: 8
+    - name: fullWidth
+      label: Full width
+      $type: checkBoxField
+      defaultValue: true
+    - name: backgroundImage
+      label: Background Image
+      $type: damLinkField
+    - name: backgroundColor
+      label: Background Color
+      $type: textField
+    - name: textAlign
+      label: Text Alignment
+      $type: comboBoxField
+      datasource:
+        $type: optionListDatasource
+        options:
+          - name: left
+            label: Left
+            value: left
+          - name: center
+            label: Center
+            value: center
+          - name: right
+            label: Right
+            value: right
+    - name: paddingTop
+      label: Padding Top
+      $type: comboBoxField
+      datasource:
+        $type: optionListDatasource
+        options:
+          - name: none
+            label: None
+            value: pt-0
+          - name: extraSmall
+            label: Extra Small
+            value: pt-xs
+          - name: small
+            label: Small
+            value: pt-sm
+          - name: medium
+            label: Medium
+            value: pt-md
+          - name: large
+            label: Large
+            value: pt-lg
+          - name: xlarge
+            label: Extra Large
+            value: pt-xl
+          - name: xxlarge
+            label: Extra Extra Large
+            value: pt-xxl
+    - name: paddingBottom
+      label: Padding Bottom
+      $type: comboBoxField
+      datasource:
+        $type: optionListDatasource
+        options:
+          - name: none
+            label: None
+            value: pb-0
+          - name: extraSmall
+            label: Extra Small
+            value: pb-xs
+          - name: small
+            label: Small
+            value: pb-sm
+          - name: medium
+            label: Medium
+            value: pb-md
+          - name: large
+            label: Large
+            value: pb-lg
+          - name: xlarge
+            label: Extra Large
+            value: pb-xl
+          - name: xxlarge
+            label: Extra Extra Large
+            value: pb-xxl
+  layout:
+    $type: tabbedLayout
+    tabs:
+      firstTab:
+        label: Main
+        fields:
+          - name: layout
+          - name: fullWidth
+      secondTab:
+        label: Style
+        fields:
+          - name: backgroundImage
+          - name: backgroundColor
+          - name: textAlign
+          - name: paddingTop
+          - name: paddingBottom
+          - name: class
+          - name: css
+          - name: columnClass
+          - name: columnCss

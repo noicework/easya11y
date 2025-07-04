@@ -1,0 +1,29 @@
+label: Form Hidden Field
+width: medium
+form:
+  implementationClass: info.magnolia.ui.javascript.form.FormViewWithChangeListener
+  name: Form Hidden Field
+  properties:
+  - name: name
+    label: Field Name
+    $type: textField
+    i18n: true
+    required: true
+  - name: value
+    label: Value
+    $type: textField
+    i18n: true
+
+  layout:
+    $type: tabbedLayout
+    tabs:
+      firstTab:
+        label: Main
+        fields:
+          - name: name
+          - name: value
+      secondTab:
+        label: Style
+        fields:
+          - name: class
+          - name: css

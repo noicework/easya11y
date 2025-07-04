@@ -1,0 +1,4 @@
+title: Button
+renderType: freemarker
+templateScript: /mmp/templates/components/button/button.ftl
+dialog: mmp:components/button

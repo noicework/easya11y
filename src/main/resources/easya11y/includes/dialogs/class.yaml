@@ -1,0 +1,5 @@
+name: class
+label: CSS Class
+$type: textField
+description: Additional CSS class names to apply to this component
+placeholder: e.g., my-custom-class

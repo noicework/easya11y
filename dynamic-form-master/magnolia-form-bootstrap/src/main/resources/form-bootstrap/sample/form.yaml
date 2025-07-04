@@ -1,0 +1,943 @@
+---
+id: "2ccd98a1-9081-4beb-a954-c2aa2b3b4248"
+title: "Example form bootstrap"
+description: "Poll with different types of questions.\nPlease answer the questions\
+  \ bellow!"
+sections:
+- id: "3fc5f7ea-4991-4731-8cc3-2e359aac25de"
+  title: "Word cloud"
+  description: "Section of free text questions."
+  questions:
+  - id: "837025e9-4002-4943-9d0c-e35c62f92942"
+    title: "Grateful for update 002"
+    question: "What are you most grateful for?"
+    questionType: "text"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions: []
+    form: null
+    localisations: []
+    orderIndex: 4
+    content: {}
+    version: 1
+    created: "2022-10-07T08:07:21.265Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:07:21.265Z"
+    modifiedBy: "superuser"
+  - id: "ae27d6ef-d0c9-48b8-bc4f-a621930f36b5"
+    title: "Inspires you"
+    question: "Which industry figure inspires you?"
+    questionType: "text"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions: []
+    form: null
+    localisations: []
+    orderIndex: 2
+    content: {}
+    version: 1
+    created: "2022-10-07T08:06:40.349Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:06:40.349Z"
+    modifiedBy: "superuser"
+  - id: "c75790a6-6f74-4a1c-8508-5f0bdca4c1dc"
+    title: "State of mind"
+    question: "Using one word, what’s your state of mind right now?"
+    questionType: "text"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions: []
+    form: null
+    localisations: []
+    orderIndex: 1
+    content: {}
+    version: 1
+    created: "2022-10-07T08:05:01.926Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:05:01.926Z"
+    modifiedBy: "superuser"
+  - id: "d712ca28-b50a-4302-b692-483e67617365"
+    title: "Tech invention"
+    question: "What’s the best tech invention of the 21st Century?"
+    questionType: "text"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions: []
+    form: null
+    localisations: []
+    orderIndex: 5
+    content: {}
+    version: 1
+    created: "2022-10-07T08:07:43.992Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:07:43.992Z"
+    modifiedBy: "superuser"
+  - id: "d8b56533-2391-423a-950a-a19b40a8b1bc"
+    title: "Role model"
+    question: "Who is your role model?"
+    questionType: "text"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions: []
+    form: null
+    localisations: []
+    orderIndex: 3
+    content: {}
+    version: 1
+    created: "2022-10-07T08:07:03.942Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:07:03.942Z"
+    modifiedBy: "superuser"
+  localisations: []
+  orderIndex: 1
+  content: {}
+  version: 1
+  created: "2022-10-07T08:03:04.542Z"
+  createdBy: "superuser"
+  modified: "2022-10-07T08:03:52.878Z"
+  modifiedBy: "superuser"
+- id: "462e65cd-336f-42c4-8e51-d26dc7097089"
+  title: "Multi option"
+  description: "Section of multi choice questions."
+  questions:
+  - id: "00687337-f69a-4b0b-a2b4-60b69eae01cf"
+    title: "Project priority"
+    question: "Which projects should we prioritize this quarter?"
+    questionType: "multi"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions:
+    - id: "93cfd18f-86d0-485e-bccc-48e68f090bb3"
+      title: "WTF Update"
+      label: "WTF"
+      value: "WTF"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 4
+      content: {}
+      version: 1
+      created: "2022-10-07T08:36:32.359Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:36:32.359Z"
+      modifiedBy: "superuser"
+    - id: "993ee94a-1224-4fa4-ad82-7fd7a05997fe"
+      title: "ASM"
+      label: "ASM"
+      value: "ASM"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 1
+      content: {}
+      version: 1
+      created: "2022-10-07T08:34:30.776Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:34:30.776Z"
+      modifiedBy: "superuser"
+    - id: "e5af63dd-54d5-4705-9ce4-2f36d22963b6"
+      title: "SOS"
+      label: "SOS"
+      value: "SOS"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 3
+      content: {}
+      version: 1
+      created: "2022-10-07T08:36:21.848Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:36:21.848Z"
+      modifiedBy: "superuser"
+    - id: "f705a819-1a1c-435f-abc9-21966ed918bc"
+      title: "MMF"
+      label: "MMF"
+      value: "MMF"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 2
+      content: {}
+      version: 1
+      created: "2022-10-07T08:36:11.784Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:36:11.784Z"
+      modifiedBy: "superuser"
+    form: null
+    localisations: []
+    orderIndex: 1
+    content: {}
+    version: 1
+    created: "2022-10-07T08:10:23.963Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:10:23.963Z"
+    modifiedBy: "superuser"
+  - id: "04fd750f-b958-4f08-bf6b-622b6c87ef52"
+    title: "Improving areas"
+    question: "Which of these areas should we focus on improving?"
+    questionType: "multi"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions:
+    - id: "14c67460-c848-4524-8c05-f07949c536ad"
+      title: "Technical development"
+      label: "Technical development"
+      value: "dev"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 2
+      content: {}
+      version: 1
+      created: "2022-10-07T08:38:58.397Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:38:58.397Z"
+      modifiedBy: "superuser"
+    - id: "8420e8f0-3ea6-4e53-a30f-2ae40e280733"
+      title: "Project management"
+      label: "Project management"
+      value: "pm"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 1
+      content: {}
+      version: 2
+      created: "2022-10-07T08:37:43.482Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:38:08.253Z"
+      modifiedBy: "superuser"
+    - id: "a2218f48-e9ad-44f6-a195-89292564d7be"
+      title: "Strategic planning"
+      label: "Strategic planning"
+      value: "plan"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 4
+      content: {}
+      version: 1
+      created: "2022-10-07T08:39:29.028Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:39:29.028Z"
+      modifiedBy: "superuser"
+    - id: "d8d65309-d64d-4d72-982d-06b8779df7f9"
+      title: "Human resources"
+      label: "Human resources"
+      value: "hr"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 3
+      content: {}
+      version: 1
+      created: "2022-10-07T08:39:12.210Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:39:12.210Z"
+      modifiedBy: "superuser"
+    form: null
+    localisations: []
+    orderIndex: 5
+    content: {}
+    version: 1
+    created: "2022-10-07T08:12:06.389Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:12:06.389Z"
+    modifiedBy: "superuser"
+  - id: "502a3270-3e81-45a2-a4d4-b81571c20150"
+    title: "State of mind"
+    question: "If age is only a state of mind, which category best describes your\
+      \ state of mind right now?"
+    questionType: "multi"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions:
+    - id: "0160fa8d-fd7d-4010-adc8-f38a4e5397d1"
+      title: "Groovy grandparent"
+      label: "Groovy grandparent"
+      value: "grandparent"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 4
+      content: {}
+      version: 1
+      created: "2022-10-07T08:42:43.449Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:42:43.449Z"
+      modifiedBy: "superuser"
+    - id: "0df9c286-713f-4844-b22e-17d8d516d6a9"
+      title: "Cheeky child"
+      label: "Cheeky child"
+      value: "child"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 1
+      content: {}
+      version: 1
+      created: "2022-10-07T08:41:54.114Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:41:54.114Z"
+      modifiedBy: "superuser"
+    - id: "48c8b848-c6b4-4e35-98ab-e90012f06269"
+      title: "Tormented teenager"
+      label: "Tormented teenager"
+      value: "teenager"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 2
+      content: {}
+      version: 1
+      created: "2022-10-07T08:42:08.613Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:42:08.613Z"
+      modifiedBy: "superuser"
+    - id: "60836904-168d-43e7-8831-8e4a00114176"
+      title: "Mad mid-lifer"
+      label: "Mad mid-lifer"
+      value: "mid-lifer"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 3
+      content: {}
+      version: 1
+      created: "2022-10-07T08:42:24.060Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:42:24.060Z"
+      modifiedBy: "superuser"
+    form: null
+    localisations: []
+    orderIndex: 4
+    content: {}
+    version: 1
+    created: "2022-10-07T08:11:41.525Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:11:41.525Z"
+    modifiedBy: "superuser"
+  - id: "e2440662-89d8-4eaa-adcd-3d65df31b757"
+    title: "Strangest thing"
+    question: "What’s the strangest thing you did while attending a meeting online?"
+    questionType: "multi"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions:
+    - id: "0b96c0d5-4864-42d6-a442-88aa331afc53"
+      title: "Wore pajamas"
+      label: "Wore pajamas"
+      value: "pajamas"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 2
+      content: {}
+      version: 1
+      created: "2022-10-07T08:40:11.202Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:40:11.202Z"
+      modifiedBy: "superuser"
+    - id: "66c2831f-3282-4fb0-b00c-8257d4a9e893"
+      title: "Ate breakfast"
+      label: "Ate breakfast"
+      value: "ate"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 1
+      content: {}
+      version: 1
+      created: "2022-10-07T08:39:56.861Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:39:56.861Z"
+      modifiedBy: "superuser"
+    - id: "8d4c7ea6-8a27-4ced-9db7-95c753473f8d"
+      title: "Cooked lunch/dinner"
+      label: "Cooked lunch/dinner"
+      value: "cooked"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 3
+      content: {}
+      version: 1
+      created: "2022-10-07T08:40:30.536Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:40:30.536Z"
+      modifiedBy: "superuser"
+    - id: "948d5889-3459-41b0-964f-17d0fa47f80b"
+      title: "Watched Netflix"
+      label: "Watched Netflix"
+      value: "netflix"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 4
+      content: {}
+      version: 1
+      created: "2022-10-07T08:40:45.712Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:40:45.712Z"
+      modifiedBy: "superuser"
+    - id: "ce1f934f-f70f-49e9-9504-a25294bb99e0"
+      title: "Other, but my lips are sealed"
+      label: "Other, but my lips are sealed"
+      value: "other"
+      image: null
+      freeText: "showFreeText"
+      freeTextLabel: "We would not tell anyone ..."
+      localisations: []
+      orderIndex: 5
+      content: {}
+      version: 1
+      created: "2022-10-07T08:41:34.201Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:41:34.201Z"
+      modifiedBy: "superuser"
+    form: null
+    localisations: []
+    orderIndex: 3
+    content: {}
+    version: 1
+    created: "2022-10-07T08:11:13.614Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:11:13.614Z"
+    modifiedBy: "superuser"
+  - id: "e77aed2e-494c-4e6f-8bd6-9a647bbf42e1"
+    title: "Responsible for L&D"
+    question: "Who should be responsible for L&D?"
+    questionType: "multi"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions:
+    - id: "0930595f-63dc-43cd-bb79-eec13c30d37a"
+      title: "Team lead"
+      label: "Team lead"
+      value: "team-lead"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 2
+      content: {}
+      version: 1
+      created: "2022-10-07T08:37:13.713Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:37:13.713Z"
+      modifiedBy: "superuser"
+    - id: "22cef728-0b30-4c04-ae6d-d0847173366c"
+      title: "HR"
+      label: "HR"
+      value: "hr"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 3
+      content: {}
+      version: 1
+      created: "2022-10-07T08:37:28.835Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:37:28.835Z"
+      modifiedBy: "superuser"
+    - id: "5f7f57ce-e394-4a51-82cd-85eb88e8e132"
+      title: "Individual"
+      label: "Individual"
+      value: "individual"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 1
+      content: {}
+      version: 1
+      created: "2022-10-07T08:36:54.973Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:36:54.973Z"
+      modifiedBy: "superuser"
+    form: null
+    localisations: []
+    orderIndex: 2
+    content: {}
+    version: 1
+    created: "2022-10-07T08:10:40.755Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:10:40.755Z"
+    modifiedBy: "superuser"
+  localisations: []
+  orderIndex: 3
+  content: {}
+  version: 1
+  created: "2022-10-07T08:03:46.705Z"
+  createdBy: "superuser"
+  modified: "2022-10-07T08:03:46.705Z"
+  modifiedBy: "superuser"
+- id: "873aff85-1b08-463f-941b-a960bb37eb05"
+  title: "Single option"
+  description: "Section of single choice questions."
+  questions:
+  - id: "380e4c1c-6858-4842-b76e-8d7279b6f318"
+    title: "Time-travel"
+    question: "If you could time-travel, which period would you go to?"
+    questionType: "single"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions:
+    - id: "28fddbbc-c13c-4326-875b-8a20c986ac8e"
+      title: "I’m good where I am"
+      label: "I’m good where I am"
+      value: "present"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 3
+      content: {}
+      version: 1
+      created: "2022-10-07T08:16:39.810Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:16:39.810Z"
+      modifiedBy: "superuser"
+    - id: "5e5716e4-7221-4c16-8edd-997a9a3d452c"
+      title: "The future"
+      label: "The future"
+      value: "future"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 2
+      content: {}
+      version: 1
+      created: "2022-10-07T08:16:22.395Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:16:22.395Z"
+      modifiedBy: "superuser"
+    - id: "eb2ee5c7-0880-4d48-a8f2-a8809d38df80"
+      title: "The past"
+      label: "The past"
+      value: "past"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 1
+      content: {}
+      version: 1
+      created: "2022-10-07T08:16:05.505Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:16:05.505Z"
+      modifiedBy: "superuser"
+    form: null
+    localisations: []
+    orderIndex: 3
+    content: {}
+    version: 1
+    created: "2022-10-07T08:09:07.558Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:09:07.558Z"
+    modifiedBy: "superuser"
+  - id: "b5ad27d4-9570-4226-aa4f-f7976ed27f3b"
+    title: "Superpower"
+    question: "Which superpower would you like to have?"
+    questionType: "single"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions:
+    - id: "42a63f4d-abe7-400f-84d1-2fd6d161ddd8"
+      title: "Mind reading"
+      label: "Mind reading"
+      value: "mind-reading"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 1
+      content: {}
+      version: 1
+      created: "2022-10-07T08:14:47.265Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:14:47.265Z"
+      modifiedBy: "superuser"
+    - id: "5e74e34f-36ec-4518-91df-0344dbd098b5"
+      title: "Teleportation"
+      label: "Teleportation"
+      value: "teleportation"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 3
+      content: {}
+      version: 1
+      created: "2022-10-07T08:15:16.988Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:15:16.988Z"
+      modifiedBy: "superuser"
+    - id: "db3749e3-0a46-448d-bcc8-0d4fe8b5ee3c"
+      title: "Flying"
+      label: "Flying"
+      value: "flying"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 4
+      content: {}
+      version: 1
+      created: "2022-10-07T08:15:32.309Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:15:32.309Z"
+      modifiedBy: "superuser"
+    - id: "f68210aa-cd69-4b4a-83fb-4232e16aae5d"
+      title: "Invisibility"
+      label: "Invisibility"
+      value: "invisibility"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 2
+      content: {}
+      version: 1
+      created: "2022-10-07T08:15:02.708Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:15:02.708Z"
+      modifiedBy: "superuser"
+    form: null
+    localisations: []
+    orderIndex: 2
+    content: {}
+    version: 1
+    created: "2022-10-07T08:08:48.741Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:08:48.741Z"
+    modifiedBy: "superuser"
+  - id: "c23458d4-80bb-4e74-bb05-4dc1c2ccd105"
+    title: "Multitask"
+    question: "Do you multitask when attending a meeting online?"
+    questionType: "single"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions:
+    - id: "38b48c42-73cb-4216-8191-510d52e7e03d"
+      title: "My mind tends to wander"
+      label: "My mind tends to wander"
+      value: "wander"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 2
+      content: {}
+      version: 1
+      created: "2022-10-07T08:17:43.532Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:17:43.532Z"
+      modifiedBy: "superuser"
+    - id: "5511ff2f-2059-4063-b5b9-36d4dfdd18a0"
+      title: "Sometimes"
+      label: "Sometimes"
+      value: "sometimes"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 4
+      content: {}
+      version: 1
+      created: "2022-10-07T08:18:13.982Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:18:13.982Z"
+      modifiedBy: "superuser"
+    - id: "a20b4acb-d2ef-4f28-ae22-ec1e09b9809a"
+      title: "No, I’m 100% focused"
+      label: "No, I’m 100% focused"
+      value: "no"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 3
+      content: {}
+      version: 1
+      created: "2022-10-07T08:17:59.474Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:17:59.474Z"
+      modifiedBy: "superuser"
+    - id: "c39ff731-dc70-4b29-a3ea-0222eecc3cd4"
+      title: "Yes, I’m guilty"
+      label: "Yes, I’m guilty"
+      value: "yes"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 1
+      content: {}
+      version: 1
+      created: "2022-10-07T08:17:25.057Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:17:25.057Z"
+      modifiedBy: "superuser"
+    form: null
+    localisations: []
+    orderIndex: 4
+    content: {}
+    version: 1
+    created: "2022-10-07T08:09:27.073Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:09:27.073Z"
+    modifiedBy: "superuser"
+  - id: "dfc8a09b-1112-4f4f-a618-2a9255496d31"
+    title: "Early bird"
+    question: "Are you an early bird or a night owl?"
+    questionType: "single"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions:
+    - id: "6c95d101-be7f-439e-bf24-d92087a90a3b"
+      title: "Early bird"
+      label: "Early bird"
+      value: "early-bird"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 1
+      content: {}
+      version: 1
+      created: "2022-10-07T08:13:47.711Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:13:47.711Z"
+      modifiedBy: "superuser"
+    - id: "cfdc681c-d6c8-48a2-af5d-4e5d6eb26fe1"
+      title: "Night owl"
+      label: "Night owl"
+      value: "night-owl"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 2
+      content: {}
+      version: 1
+      created: "2022-10-07T08:14:09.863Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:14:09.863Z"
+      modifiedBy: "superuser"
+    form: null
+    localisations: []
+    orderIndex: 1
+    content: {}
+    version: 1
+    created: "2022-10-07T08:08:25.462Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:08:25.462Z"
+    modifiedBy: "superuser"
+  - id: "ea13f315-3988-4511-981f-981aedb0229e"
+    title: "Hours online"
+    question: "How many hours a day do you spend online?"
+    questionType: "single"
+    image: null
+    rangeFrom: null
+    rangeFromLabel: null
+    rangeFromImage: null
+    rangeTo: null
+    rangeToLabel: null
+    rangeToImage: null
+    customChartId: null
+    answerOptions:
+    - id: "213d5934-eea1-45d8-bd94-b64027a4e7be"
+      title: "1-2 hours"
+      label: "1-2 hours"
+      value: "1-2"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 1
+      content: {}
+      version: 1
+      created: "2022-10-07T08:18:48.687Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:18:48.687Z"
+      modifiedBy: "superuser"
+    - id: "3b7fd10a-cfb6-4668-8261-d15c4b2c8197"
+      title: "I lost count"
+      label: "I lost count"
+      value: "8>"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 4
+      content: {}
+      version: 1
+      created: "2022-10-07T08:19:35.553Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:19:35.553Z"
+      modifiedBy: "superuser"
+    - id: "99b0c7c1-47f5-4658-8aa4-810176556dca"
+      title: "2-5 hours"
+      label: "2-5 hours"
+      value: "2-5"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 2
+      content: {}
+      version: 1
+      created: "2022-10-07T08:19:02.051Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:19:02.051Z"
+      modifiedBy: "superuser"
+    - id: "c4057cc5-2121-41de-a2c6-33c376831708"
+      title: "5-8 hours"
+      label: "5-8 hours"
+      value: "5-8"
+      image: null
+      freeText: "dontShowFreeText"
+      freeTextLabel: null
+      localisations: []
+      orderIndex: 3
+      content: {}
+      version: 1
+      created: "2022-10-07T08:19:19.686Z"
+      createdBy: "superuser"
+      modified: "2022-10-07T08:19:19.686Z"
+      modifiedBy: "superuser"
+    form: null
+    localisations: []
+    orderIndex: 5
+    content: {}
+    version: 1
+    created: "2022-10-07T08:09:51.350Z"
+    createdBy: "superuser"
+    modified: "2022-10-07T08:09:51.350Z"
+    modifiedBy: "superuser"
+  localisations: []
+  orderIndex: 2
+  content: {}
+  version: 1
+  created: "2022-10-07T08:03:26.567Z"
+  createdBy: "superuser"
+  modified: "2022-10-07T08:03:26.567Z"
+  modifiedBy: "superuser"
+questions: []
+anonymize: false
+onlyAuthenticated: false
+publicResults: true
+localisations: []
+orderIndex: 1
+image: null
+rules: "[]"
+content: {}
+version: 1
+created: "2022-10-07T08:02:47.045Z"
+createdBy: "superuser"
+modified: "2022-10-07T08:02:47.045Z"
+modifiedBy: "superuser"
+entityType: "Form"

@@ -1,0 +1,30 @@
+form:
+  properties:
+    contentStream:
+      $type: uploadField
+      required: true
+    behaviour :
+      label: Behaviour
+      $type: comboBoxField
+      required: true
+      datasource:
+        $type: optionListDatasource
+        options:
+          - name: no-existing
+            value: no-existing
+            label: Only import if no existing node
+          - name: generate-new
+            value: generate-new
+            label: Generate a new id for imported nodes
+          - name: replace-existing
+            value: replace-existing
+            label: Replace existing nodes with the same id
+actions:
+  commit:
+    class: info.magnolia.form.action.ImportDatabaseActionDefinition
+    availability:
+      root: true
+  cancel:
+    $type: closeAction
+    availability:
+      root: true

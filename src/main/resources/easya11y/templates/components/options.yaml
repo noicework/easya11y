@@ -1,0 +1,4 @@
+title: Form Options
+renderType: freemarker
+templateScript: /easya11y/templates/components/options.ftl
+dialog: easya11y:components/options

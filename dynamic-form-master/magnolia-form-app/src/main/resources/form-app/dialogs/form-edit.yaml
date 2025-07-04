@@ -1,0 +1,59 @@
+light: false
+form:
+  implementationClass: info.magnolia.ui.javascript.form.FormViewWithChangeListener
+  properties:
+
+    - name: id
+      $type: hiddenField
+      type: java.util.UUID
+      converterClass: com.vaadin.data.converter.StringToUuidConverter
+
+    - name: title
+      $type: textField
+      required: true
+      i18n: true
+
+    - name: description
+      $type: textField
+      required: false
+      i18n: true
+      rows: 5
+
+    - name: anonymize
+      $type: checkBoxField
+      type: java.lang.Boolean
+
+    - name: onlyAuthenticated
+      $type: checkBoxField
+      type: java.lang.Boolean
+
+    - name: publicResults
+      $type: checkBoxField
+      type: java.lang.Boolean
+
+    - name: image
+      $type: damLinkField
+
+    - name: rules
+      label: Form rules
+      $type: javascriptField
+      fieldScript: /form-app/webresources/formRules/index.html
+
+  layout:
+    $type: tabbedLayout
+    tabs:
+      main:
+        fields:
+          - name: id
+          - name: title
+          - name: description
+          - name: image
+          - name: anonymize
+          - name: onlyAuthenticated
+          - name: publicResults
+      rules:
+        fields:
+          - name: rules
+
+
+actions: !include:/form-app/includes/database-actions.yaml

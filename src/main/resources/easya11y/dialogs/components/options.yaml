@@ -1,0 +1,78 @@
+label: Form Options
+width: large
+form:
+  implementationClass: info.magnolia.ui.javascript.form.FormViewWithChangeListener
+  name: Form Options
+  properties:
+  - name: optionType
+    label: Option Type
+    defaultValue: checkbox
+    $type: comboBoxField
+    required: true
+    datasource:
+      $type: optionListDatasource
+      options:
+        - value: checkbox
+          name: 0
+          label: Checkboxes
+        - value: radio
+          name: 1
+          label: Radio buttons
+        - value: drop-down
+          name: 2
+          label: Drop-down
+        - value: multi-drop-down
+          name: 3
+          label: Multi-select drop-down
+  - name: label
+    label: Label
+    $type: textField
+  - name: name
+    label: Field Name
+    $type: textField
+    required: true
+    description: "Required for form validation. All checkboxes/radio buttons in a group must share the same name."
+  - name: required
+    label: Required
+    $type: checkBoxField
+  - name: placeholder
+    label: Placeholder
+    $type: textField
+    i18n: true
+  - name: options
+    label: Options
+    $type: jcrMultiField
+    field:
+      $type: compositeField
+      label: Option
+      properties:
+          value:
+            $type: textField
+            label: Value
+            required: true
+          label:
+            $type: textField
+            label: Label
+  - !include:/mmp/includes/dialogs/class.yaml
+  - !include:/mmp/includes/dialogs/css.yaml
+
+  layout:
+    $type: tabbedLayout
+    tabs:
+      firstTab:
+        label: Main
+        fields:
+          - name: optionType
+          - name: label
+          - name: name
+          - name: required
+          - name: placeholder
+      secondTab:
+        label: Options
+        fields:
+          - name: options
+      thirdTab:
+        label: Style
+        fields:
+          - name: class
+          - name: css

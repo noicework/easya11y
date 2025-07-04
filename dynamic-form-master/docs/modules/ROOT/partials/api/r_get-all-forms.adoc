@@ -1,0 +1,61 @@
+= Get all forms
+
+[.d-get]#GET# `/forms`
+
+Description::
+Returns a list of all forms defined in the system.
+
+== Request
+
+[source]
+----
+GET {{host}}{{base_path}}/forms/
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+----
+
+== Response
+
+[.collapse]
+icon:expand[] Response
+
+[.collapse-content]
+[source,json]
+----
+[
+  {
+    "id": 2,
+    "version": 2,
+    "created": 1630498693782,
+    "createdBy": "superuser",
+    "modified": 1632244721862,
+    "modifiedBy": "superuser",
+    "title": "Example form",
+    "description": "Form with different types of questions.\nPlease answer the questions bellow!",
+    "sections": [],
+    "questions": [],
+    "anonymize": false,
+    "onlyAuthenticated": false,
+    "publicResults": true,
+    "orderIndex": 1,
+    "localisations": []
+  },
+  {
+    "id": 3,
+    "version": 1,
+    "created": 1630499697054,
+    "createdBy": "superuser",
+    "modified": 1630499697054,
+    "modifiedBy": "superuser",
+    "title": "Product form",
+    "description": "This is a new form",
+    "sections": [],
+    "questions": [],
+    "anonymize": false,
+    "onlyAuthenticated": false,
+    "publicResults": false,
+    "orderIndex": 2,
+    "localisations": []
+  }
+]
+----

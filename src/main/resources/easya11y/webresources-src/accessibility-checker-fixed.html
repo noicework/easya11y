@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Checker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 24px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #068449;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-stats {
+            font-size: 0.5em;
+            color: #7f8c8d;
+            font-weight: normal;
+        }
+        
+        .controls {
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 12px;
+            align-items: center;
+            background-color: #f8faf9;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #e8e8e8;
+        }
+        
+        .search-container {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: #fff;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #068449;
+            box-shadow: 0 0 0 2px rgba(6, 132, 73, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+        
+        .form-select, .sort-select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: #fff;
+            cursor: pointer;
+            min-width: 200px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-select:focus, .sort-select:focus {
+            outline: none;
+            border-color: #068449;
+            box-shadow: 0 0 0 2px rgba(6, 132, 73, 0.1);
+        }
+        
+        .form-select:hover, .sort-select:hover {
+            border-color: #068449;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            font-weight: 500;
+            letter-spacing: 0.025em;
+        }
+        
+        .btn-primary {
+            background-color: #068449;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #056b3b;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .btn-success {
+            background-color: #068449;
+            color: white;
+            border: 1px solid #068449;
+        }
+        
+        .btn-success:hover {
+            background-color: #fff;
+            color: #068449;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border-color: #068449;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .filters {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .filters.active {
+            display: block;
+        }
+        
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #068449;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background-color: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #fcc;
+        }
+        
+        .info {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #bbdefb;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #fff 0%, #f8faf9 100%);
+            padding: 24px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(6, 132, 73, 0.12);
+            border-color: rgba(6, 132, 73, 0.2);
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: 600;
+            color: #068449;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .submissions-container {
+            margin-top: 20px;
+        }
+        
+        .submission {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        
+        .submission:hover {
+            box-shadow: 0 4px 12px rgba(6, 132, 73, 0.15);
+            transform: translateY(-2px);
+            border-color: rgba(6, 132, 73, 0.3);
+        }
+        
+        .submission.expanded {
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .submission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .submission-meta {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .submission-date {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        .submission-expand {
+            color: #068449;
+            font-size: 1.2em;
+            transition: transform 0.3s;
+        }
+        
+        .submission.expanded .submission-expand {
+            transform: rotate(180deg);
+        }
+        
+        .submission-preview {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        
+        .submission-fields {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .submission.expanded .submission-fields {
+            display: grid;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+            stroke: #068449;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .pagination-btn:hover:not(:disabled) {
+            background-color: #f8f9fa;
+            border-color: #068449;
+        }
+        
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-info {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        /* Accessibility scan specific styles */
+        .page-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .page-path {
+            font-size: 0.85em;
+            color: #6c757d;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+        
+        .scan-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .wcag-level {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .score-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 20px;
+            border-radius: 6px;
+            min-width: 100px;
+        }
+        
+        .score-label {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+        
+        .score-value {
+            font-size: 2em;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .score-good {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .score-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .score-bad {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .violation-summary {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .violation-count {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .violation-count.critical {
+            background-color: #721c24;
+            color: white;
+        }
+        
+        .violation-count.serious {
+            background-color: #e53e3e;
+            color: white;
+        }
+        
+        .violation-count.moderate {
+            background-color: #ed8936;
+            color: white;
+        }
+        
+        .violation-count.minor {
+            background-color: #ecc94b;
+            color: #744210;
+        }
+        
+        .violation-count.success {
+            background-color: #48bb78;
+            color: white;
+        }
+        
+        .scan-details {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .violation-card {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .violation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .violation-title {
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 4px;
+        }
+        
+        .violation-description {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+        
+        .violation-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        
+        .wcag-tag {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+        
+        .affected-elements {
+            margin-top: 12px;
+        }
+        
+        .affected-elements-title {
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            color: #495057;
+        }
+        
+        .element-item {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 6px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+        }
+        
+        .element-selector {
+            color: #0066cc;
+            margin-bottom: 4px;
+        }
+        
+        .element-html {
+            color: #6c757d;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .help-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #068449;
+            text-decoration: none;
+            font-size: 0.85em;
+            margin-top: 8px;
+        }
+        
+        .help-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Progress modal styles */
+        .scan-progress-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .scan-progress-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            min-width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .scan-progress-content h3 {
+            margin: 0 0 20px 0;
+            color: #333;
+        }
+        
+        .progress-info {
+            margin-bottom: 10px;
+            color: #666;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: #068449;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-stats {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+        
+        #cancelScanBtn {
+            width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .submission-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            Accessibility Checker
+            <span class="header-stats" id="headerStats"></span>
+        </h1>
+        
+        <div class="controls">
+            <div class="search-container">
+                <span class="search-icon">⌕</span>
+                <input type="text" 
+                       id="searchInput" 
+                       class="search-input" 
+                       placeholder="Search pages or issues...">
+            </div>
+            <select id="pageSelect" class="form-select">
+                <option value="">All Pages</option>
+            </select>
+            <select id="sortSelect" class="sort-select">
+                <option value="score-asc">Worst Score First</option>
+                <option value="score-desc">Best Score First</option>
+                <option value="date-desc">Recently Scanned</option>
+                <option value="violations-desc">Most Issues</option>
+            </select>
+            <button id="scanBtn" class="btn btn-primary">
+                <span>▶</span> Scan Page
+            </button>
+            <button id="scanAllBtn" class="btn btn-primary">
+                <span>⊞</span> Scan All
+            </button>
+            <button id="filterBtn" class="btn btn-primary">
+                <span>⊙</span> Filters
+            </button>
+            <button id="exportBtn" class="btn btn-success">
+                <span>⤓</span> Export Report
+            </button>
+        </div>
+        
+        <div id="filters" class="filters">
+            <div class="filter-row">
+                <select id="severityFilter" class="form-select">
+                    <option value="">All Severities</option>
+                    <option value="critical">Critical</option>
+                    <option value="serious">Serious</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="minor">Minor</option>
+                </select>
+                <select id="wcagFilter" class="form-select">
+                    <option value="">All WCAG Levels</option>
+                    <option value="A">Level A</option>
+                    <option value="AA">Level AA</option>
+                    <option value="AAA">Level AAA</option>
+                </select>
+                <button id="applyFilters" class="btn btn-primary">Apply Filters</button>
+            </div>
+        </div>
+        
+        <div id="statsContainer" class="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-label">Total Pages</div>
+                <div class="stat-value" id="totalPages">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pages Scanned</div>
+                <div class="stat-value" id="scannedPages">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Average Score</div>
+                <div class="stat-value" id="averageScore">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Critical Issues</div>
+                <div class="stat-value" id="criticalIssues" style="color: #dc3545;">0</div>
+            </div>
+        </div>
+        
+        <div id="messageContainer"></div>
+        
+        <div id="submissionsContainer" class="submissions-container">
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 16v-4"></path>
+                    <path d="M12 8h.01"></path>
+                </svg>
+                <p>Select a page to scan for accessibility issues</p>
+            </div>
+        </div>
+        
+        <div id="pagination" class="pagination" style="display: none;">
+            <button id="prevPage" class="pagination-btn">Previous</button>
+            <span class="pagination-info">
+                Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+            </span>
+            <button id="nextPage" class="pagination-btn">Next</button>
+        </div>
+    </div>
+
+    <!-- Load the bundled accessibility scanner with axe-core -->
+    <script src="js/easya11y.js"></script>
+    
+    <script>
+        // Configuration
+        const baseUrl = window.location.origin;
+        const pathParts = window.location.pathname.split('/');
+        const contextPath = pathParts[1] === 'magnoliaAuthor' ? '/magnoliaAuthor' : '';
+        const apiBase = `${baseUrl}${contextPath}/.rest`;
+        
+        // State
+        let allPages = [];
+        let scanResults = [];
+        let filteredResults = [];
+        let currentPagePath = '';
+        let currentPage = 1;
+        const itemsPerPage = 20;
+        let sortOrder = 'score-asc';
+        let searchTerm = '';
+        let severityFilter = '';
+        let wcagFilter = '';
+        let isScanning = false;
+        let scanner = null;
+        
+        // DOM elements
+        const pageSelect = document.getElementById('pageSelect');
+        const sortSelect = document.getElementById('sortSelect');
+        const searchInput = document.getElementById('searchInput');
+        const scanBtn = document.getElementById('scanBtn');
+        const scanAllBtn = document.getElementById('scanAllBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const filterBtn = document.getElementById('filterBtn');
+        const filters = document.getElementById('filters');
+        const severityFilterSelect = document.getElementById('severityFilter');
+        const wcagFilterSelect = document.getElementById('wcagFilter');
+        const applyFiltersBtn = document.getElementById('applyFilters');
+        const submissionsContainer = document.getElementById('submissionsContainer');
+        const messageContainer = document.getElementById('messageContainer');
+        const statsContainer = document.getElementById('statsContainer');
+        const headerStats = document.getElementById('headerStats');
+        const pagination = document.getElementById('pagination');
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Accessibility Checker initialized');
+            console.log('Context path:', contextPath);
+            console.log('API base:', apiBase);
+            
+            // Initialize the accessibility scanner
+            if (window.AccessibilityScanner) {
+                scanner = new window.AccessibilityScanner(apiBase);
+                console.log('Accessibility scanner initialized');
+            } else {
+                console.error('AccessibilityScanner not found. Make sure the script is loaded.');
+            }
+            
+            loadPages();
+            loadScanResults();
+            setupEventListeners();
+        });
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            pageSelect.addEventListener('change', (e) => {
+                currentPagePath = e.target.value;
+                currentPage = 1;
+                updateScanButtonState();
+            });
+            
+            sortSelect.addEventListener('change', (e) => {
+                sortOrder = e.target.value;
+                sortAndDisplayResults();
+            });
+            
+            searchInput.addEventListener('input', debounce((e) => {
+                searchTerm = e.target.value.toLowerCase();
+                filterAndDisplayResults();
+            }, 300));
+            
+            scanBtn.addEventListener('click', () => {
+                if (currentPagePath && scanner) {
+                    scanPage(currentPagePath);
+                }
+            });
+            
+            scanAllBtn.addEventListener('click', () => {
+                if (confirm('This will scan all pages. This may take a while. Continue?')) {
+                    scanAllPages();
+                }
+            });
+            
+            exportBtn.addEventListener('click', () => {
+                exportReport();
+            });
+            
+            filterBtn.addEventListener('click', () => {
+                filters.classList.toggle('active');
+            });
+            
+            applyFiltersBtn.addEventListener('click', () => {
+                severityFilter = severityFilterSelect.value;
+                wcagFilter = wcagFilterSelect.value;
+                filterAndDisplayResults();
+            });
+            
+            document.getElementById('prevPage').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayResults();
+                }
+            });
+            
+            document.getElementById('nextPage').addEventListener('click', () => {
+                const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayResults();
+                }
+            });
+        }
+        
+        // Load available pages
+        async function loadPages() {
+            try {
+                const response = await fetch(`${apiBase}/easya11y/pages?includeStatus=true`);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load pages: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                allPages = data.items || [];
+                populatePageSelect(allPages);
+                updateStats();
+            } catch (error) {
+                showMessage(`Error loading pages: ${error.message}`, 'error');
+                console.error('Error loading pages:', error);
+            }
+        }
+        
+        // Populate page select dropdown
+        function populatePageSelect(pages) {
+            pageSelect.innerHTML = '<option value="">Select a page to scan</option>';
+            
+            pages.forEach(page => {
+                const option = document.createElement('option');
+                option.value = page.path;
+                option.textContent = page.title || page.name || page.path;
+                if (page.lastScanned) {
+                    option.textContent += ` (Score: ${page.score || 'N/A'})`;
+                }
+                pageSelect.appendChild(option);
+            });
+        }
+        
+        // Load scan results
+        async function loadScanResults() {
+            try {
+                showMessage('Loading scan results...', 'info');
+                
+                const response = await fetch(`${apiBase}/easya11y/results`);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load scan results: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                scanResults = data.results || [];
+                filterAndDisplayResults();
+                updateStats();
+                clearMessage();
+            } catch (error) {
+                showMessage(`Error loading scan results: ${error.message}`, 'error');
+                console.error('Error loading scan results:', error);
+            }
+        }
+        
+        // Scan a single page
+        async function scanPage(pagePath) {
+            if (!scanner) {
+                showMessage('Scanner not initialized', 'error');
+                return;
+            }
+            
+            if (isScanning) {
+                showMessage('A scan is already in progress', 'info');
+                return;
+            }
+            
+            try {
+                isScanning = true;
+                updateScanButtonState();
+                showMessage('Initiating accessibility scan...', 'info');
+                
+                // Initiate scan through backend
+                const initResponse = await fetch(`${apiBase}/easya11y/scan/initiate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pagePath })
+                });
+                
+                if (!initResponse.ok) {
+                    throw new Error(`Failed to initiate scan: ${initResponse.status}`);
+                }
+                
+                const pageData = await initResponse.json();
+                showMessage(`Scanning ${pageData.pageTitle}...`, 'info');
+                
+                // Perform the actual scan
+                const scanResult = await scanner.scanPage(pageData);
+                
+                showMessage(`Scan completed for ${pageData.pageTitle}`, 'success');
+                
+                // Reload results
+                await loadScanResults();
+                
+            } catch (error) {
+                showMessage(`Error scanning page: ${error.message}`, 'error');
+                console.error('Error scanning page:', error);
+            } finally {
+                isScanning = false;
+                updateScanButtonState();
+            }
+        }
+        
+        // Scan all pages
+        async function scanAllPages() {
+            if (!scanner) {
+                showMessage('Scanner not initialized', 'error');
+                return;
+            }
+            
+            if (isScanning) {
+                showMessage('A scan is already in progress', 'info');
+                return;
+            }
+            
+            try {
+                isScanning = true;
+                updateScanButtonState();
+                
+                // Create progress modal
+                const progressModal = createProgressModal();
+                let cancelRequested = false;
+                
+                document.getElementById('cancelScanBtn').addEventListener('click', () => {
+                    cancelRequested = true;
+                });
+                
+                // Scan all pages
+                const results = await scanner.scanMultiplePages(
+                    allPages,
+                    (progress) => {
+                        progressModal.update(progress);
+                        if (cancelRequested) {
+                            throw new Error('Scan cancelled by user');
+                        }
+                    }
+                );
+                
+                progressModal.close();
+                
+                const successCount = results.filter(r => r.success).length;
+                showMessage(`Scan completed: ${successCount} of ${results.length} pages scanned successfully`, 'success');
+                
+                // Reload results
+                await loadScanResults();
+                
+            } catch (error) {
+                document.querySelector('.scan-progress-modal')?.remove();
+                showMessage(`Error during bulk scan: ${error.message}`, 'error');
+                console.error('Error during bulk scan:', error);
+            } finally {
+                isScanning = false;
+                updateScanButtonState();
+            }
+        }
+        
+        // Filter and display scan results
+        function filterAndDisplayResults() {
+            filteredResults = scanResults.filter(result => {
+                // Search filter
+                if (searchTerm) {
+                    const searchableText = `${result.pageTitle} ${result.pagePath} ${JSON.stringify(result.violations || [])}`.toLowerCase();
+                    if (!searchableText.includes(searchTerm)) {
+                        return false;
+                    }
+                }
+                
+                // Page path filter
+                if (currentPagePath && result.pagePath !== currentPagePath) {
+                    return false;
+                }
+                
+                // Severity filter
+                if (severityFilter) {
+                    const hasSeverity = result.violations?.some(v => v.impact === severityFilter);
+                    if (!hasSeverity) {
+                        return false;
+                    }
+                }
+                
+                // WCAG filter
+                if (wcagFilter && result.wcagLevel !== wcagFilter) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            sortAndDisplayResults();
+        }
+        
+        // Sort and display scan results
+        function sortAndDisplayResults() {
+            // Sort results
+            filteredResults.sort((a, b) => {
+                switch (sortOrder) {
+                    case 'score-asc':
+                        return (a.score || 0) - (b.score || 0);
+                    case 'score-desc':
+                        return (b.score || 0) - (a.score || 0);
+                    case 'date-desc':
+                        return new Date(b.scanDate || 0) - new Date(a.scanDate || 0);
+                    case 'violations-desc':
+                        return (b.violationCount || 0) - (a.violationCount || 0);
+                    default:
+                        return 0;
+                }
+            });
+            
+            currentPage = 1;
+            displayResults();
+            updateStats();
+        }
+        
+        // Display scan results with pagination
+        function displayResults() {
+            if (!filteredResults || filteredResults.length === 0) {
+                submissionsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 16v-4"></path>
+                            <path d="M12 8h.01"></path>
+                        </svg>
+                        <p>${searchTerm || severityFilter || wcagFilter ? 'No scan results match your filters' : 'No scan results found. Select a page and click "Scan Page" to start.'}</p>
+                    </div>
+                `;
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageResults = filteredResults.slice(startIndex, endIndex);
+            
+            submissionsContainer.innerHTML = pageResults.map(result => {
+                const scoreClass = result.score >= 90 ? 'score-good' : result.score >= 70 ? 'score-warning' : 'score-bad';
+                const criticalCount = result.violations_critical || 0;
+                const seriousCount = result.violations_serious || 0;
+                const moderateCount = result.violations_moderate || 0;
+                const minorCount = result.violations_minor || 0;
+                
+                return `
+                    <div class="submission scan-result" onclick="toggleResult(this)" data-page-path="${result.pagePath}">
+                        <div class="submission-header">
+                            <div class="submission-meta">
+                                <div class="page-info">
+                                    <strong>${result.pageTitle || result.pagePath}</strong>
+                                    <span class="page-path">${result.pagePath}</span>
+                                </div>
+                                <div class="scan-info">
+                                    <span class="submission-date">Scanned ${formatDate(result.scanDate)}</span>
+                                    <span class="wcag-level">WCAG ${result.wcagLevel}</span>
+                                </div>
+                            </div>
+                            <div class="submission-expand">⌄</div>
+                        </div>
+                        <div class="submission-preview">
+                            <div class="score-display ${scoreClass}">
+                                <span class="score-label">Score</span>
+                                <span class="score-value">${Math.round(result.score || 0)}</span>
+                            </div>
+                            <div class="violation-summary">
+                                ${criticalCount > 0 ? `<span class="violation-count critical">Critical: ${criticalCount}</span>` : ''}
+                                ${seriousCount > 0 ? `<span class="violation-count serious">Serious: ${seriousCount}</span>` : ''}
+                                ${moderateCount > 0 ? `<span class="violation-count moderate">Moderate: ${moderateCount}</span>` : ''}
+                                ${minorCount > 0 ? `<span class="violation-count minor">Minor: ${minorCount}</span>` : ''}
+                                ${result.violationCount === 0 ? '<span class="violation-count success">✓ No violations found</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="submission-fields scan-details" data-loaded="false">
+                            <div class="loading">Loading detailed results...</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Update pagination
+            if (totalPages > 1) {
+                pagination.style.display = 'flex';
+                document.getElementById('currentPage').textContent = currentPage;
+                document.getElementById('totalPages').textContent = totalPages;
+                document.getElementById('prevPage').disabled = currentPage === 1;
+                document.getElementById('nextPage').disabled = currentPage === totalPages;
+            } else {
+                pagination.style.display = 'none';
+            }
+        }
+        
+        // Toggle result expansion and load details if needed
+        async function toggleResult(element) {
+            element.classList.toggle('expanded');
+            
+            const detailsContainer = element.querySelector('.scan-details');
+            if (element.classList.contains('expanded') && detailsContainer.dataset.loaded === 'false') {
+                const pagePath = element.dataset.pagePath;
+                await loadDetailedResults(pagePath, detailsContainer);
+            }
+        }
+        
+        // Load detailed scan results for a specific page
+        async function loadDetailedResults(pagePath, container) {
+            try {
+                const response = await fetch(`${apiBase}/easya11y/results/detail?pagePath=${encodeURIComponent(pagePath)}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load detailed results: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                container.dataset.loaded = 'true';
+                
+                if (!result.fullResults || !result.fullResults.violations) {
+                    container.innerHTML = '<p>No violation details available.</p>';
+                    return;
+                }
+                
+                const violations = result.fullResults.violations || [];
+                
+                if (violations.length === 0) {
+                    container.innerHTML = '<p class="violation-count success">✓ No accessibility violations found!</p>';
+                    return;
+                }
+                
+                container.innerHTML = violations.map(violation => `
+                    <div class="violation-card">
+                        <div class="violation-header">
+                            <div>
+                                <div class="violation-title">${escapeHtml(violation.help)}</div>
+                                <div class="violation-description">${escapeHtml(violation.description)}</div>
+                                <div class="violation-tags">
+                                    <span class="violation-count ${violation.impact}">${violation.impact}</span>
+                                    ${violation.tags.map(tag => `<span class="wcag-tag">${tag}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        ${violation.helpUrl ? `<a href="${violation.helpUrl}" target="_blank" class="help-link">Learn more →</a>` : ''}
+                        <div class="affected-elements">
+                            <div class="affected-elements-title">Affected elements (${violation.nodes.length})</div>
+                            ${violation.nodes.slice(0, 3).map(node => `
+                                <div class="element-item">
+                                    <div class="element-selector">${escapeHtml(node.target[0] || node.target)}</div>
+                                    <div class="element-html">${escapeHtml(node.html)}</div>
+                                </div>
+                            `).join('')}
+                            ${violation.nodes.length > 3 ? `<p style="margin: 8px 0; color: #6c757d; font-size: 0.9em;">... and ${violation.nodes.length - 3} more elements</p>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                container.innerHTML = `<p class="error">Error loading details: ${error.message}</p>`;
+                console.error('Error loading detailed results:', error);
+            }
+        }
+        
+        // Update statistics
+        function updateStats() {
+            if (scanResults && scanResults.length > 0) {
+                statsContainer.style.display = 'grid';
+                
+                // Total pages
+                document.getElementById('totalPages').textContent = allPages.length;
+                
+                // Scanned pages
+                document.getElementById('scannedPages').textContent = scanResults.length;
+                
+                // Average score
+                const avgScore = scanResults.reduce((sum, r) => sum + (r.score || 0), 0) / scanResults.length;
+                document.getElementById('averageScore').textContent = Math.round(avgScore);
+                
+                // Critical issues
+                const criticalCount = scanResults.reduce((sum, r) => sum + (r.violations_critical || 0), 0);
+                document.getElementById('criticalIssues').textContent = criticalCount;
+                
+                // Update header stats
+                const scannedPercent = Math.round((scanResults.length / allPages.length) * 100) || 0;
+                headerStats.textContent = `${scanResults.length} of ${allPages.length} pages scanned (${scannedPercent}%)`;
+            } else {
+                statsContainer.style.display = 'none';
+                headerStats.textContent = 'No pages scanned yet';
+            }
+        }
+        
+        // Export report as CSV
+        function exportReport() {
+            let exportUrl = `${apiBase}/easya11y/results/export/csv`;
+            if (currentPagePath) {
+                exportUrl += `?pagePath=${encodeURIComponent(currentPagePath)}`;
+            }
+            window.open(exportUrl, '_blank');
+        }
+        
+        // Update scan button state
+        function updateScanButtonState() {
+            scanBtn.disabled = isScanning || !currentPagePath;
+            scanAllBtn.disabled = isScanning;
+            
+            if (isScanning) {
+                scanBtn.innerHTML = '<span>⟳</span> Scanning...';
+                scanAllBtn.innerHTML = '<span>⟳</span> Scanning...';
+            } else {
+                scanBtn.innerHTML = '<span>▶</span> Scan Page';
+                scanAllBtn.innerHTML = '<span>⊞</span> Scan All';
+            }
+        }
+        
+        // Create progress modal for bulk scanning
+        function createProgressModal() {
+            const modal = document.createElement('div');
+            modal.className = 'scan-progress-modal';
+            modal.innerHTML = `
+                <div class="scan-progress-content">
+                    <h3>Scanning Pages</h3>
+                    <div class="progress-info">
+                        <span id="scanProgressText">Initializing...</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="scanProgressBar" class="progress-bar-fill"></div>
+                    </div>
+                    <div class="progress-stats">
+                        <span id="scanProgressStats">0 of 0 pages</span>
+                    </div>
+                    <button id="cancelScanBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            return {
+                modal,
+                update: (progress) => {
+                    document.getElementById('scanProgressText').textContent = 
+                        `Scanning: ${progress.currentPage}`;
+                    document.getElementById('scanProgressBar').style.width = 
+                        `${progress.percentage}%`;
+                    document.getElementById('scanProgressStats').textContent = 
+                        `${progress.current} of ${progress.total} pages`;
+                },
+                close: () => {
+                    modal.remove();
+                }
+            };
+        }
+        
+        // Show message
+        function showMessage(message, type = 'info') {
+            messageContainer.innerHTML = `<div class="${type}">${message}</div>`;
+        }
+        
+        // Clear message
+        function clearMessage() {
+            messageContainer.innerHTML = '';
+        }
+        
+        // Format date
+        function formatDate(timestamp) {
+            if (!timestamp) return '-';
+            
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+            if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+            if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+            
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+        
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    </script>
+</body>
+</html>

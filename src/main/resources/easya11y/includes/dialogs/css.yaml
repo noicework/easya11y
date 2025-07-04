@@ -1,0 +1,5 @@
+name: css
+label: Inline CSS
+$type: textField
+description: Inline CSS styles to apply to this component
+placeholder: e.g., margin-top: 20px;

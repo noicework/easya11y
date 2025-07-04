@@ -1,0 +1,90 @@
+label: Form Input
+width: medium
+form:
+  implementationClass: info.magnolia.ui.javascript.form.FormViewWithChangeListener
+  name: Form Input
+  properties:
+  - name: label
+    label: Label
+    $type: textField
+    i18n: true
+    required: true
+  - name: name
+    label: Field Name
+    $type: textField
+    i18n: true
+    required: true
+  - name: required
+    label: Required
+    $type: checkBoxField
+  - name: helpText
+    label: Help Text
+    $type: textField
+    i18n: true
+  - name: inputType
+    label: Input Type
+    defaultValue: text
+    $type: comboBoxField
+    required: true
+    datasource:
+      $type: optionListDatasource
+      options:
+        - value: text
+          name: 0
+          label: Text
+        - value: textarea
+          name: 1
+          label: Text Area
+        - value: email
+          name: 2
+          label: Email
+        - value: tel
+          name: 3
+          label: Telephone
+        - value: number
+          name: 4
+          label: Number
+        - value: date
+          name: 5
+          label: Date
+        - value: password
+          name: 6
+          label: Password
+  - name: placeholder
+    label: Placeholder
+    $type: textField
+    i18n: true
+  - name: pattern
+    label: Validation Pattern
+    $type: textField
+    description: Regular expression for validation (e.g. [A-Za-z]{3,})
+  - name: errorMessage
+    label: Error Message
+    $type: textField
+    i18n: true
+    description: Message to display when validation fails
+  - !include:/mmp/includes/dialogs/class.yaml
+  - !include:/mmp/includes/dialogs/css.yaml
+
+  layout:
+    $type: tabbedLayout
+    tabs:
+      firstTab:
+        label: Main
+        fields:
+          - name: label
+          - name: name
+          - name: required
+          - name: helpText
+          - name: inputType
+          - name: placeholder
+      validationTab:
+        label: Validation
+        fields:
+          - name: pattern
+          - name: errorMessage
+      styleTab:
+        label: Style
+        fields:
+          - name: class
+          - name: css

@@ -1,0 +1,87 @@
+name: link
+$type: switchableField
+label: Link
+itemProvider:
+  $type: currentItemProvider
+  createIfMissing: true
+field:
+  name: link
+  defaultValue: internal
+  $type: radioButtonGroupField
+  datasource:
+    sortable: true
+    $type: optionListDatasource
+    options:
+      - value: internal
+        name: internal
+        label: Internal
+      - value: external
+        name: external
+        label: External
+      - value: dam
+        name: dam
+        label: Assets
+forms:
+  - name: internal
+    implementationClass: info.magnolia.ui.javascript.form.FormViewWithChangeListener
+    properties:
+      - name: internal
+        label: Internal link
+        $type: linkField
+        textInputAllowed: true
+#        converterClass: info.magnolia.ui.form.field.definition.migration.LinkFieldDefinitionConverter$NoopConverter
+#        $type: linkField
+#        datasource:
+#          $type: jcrDatasource
+#          rootPath: /
+#          workspace: website
+#          allowedNodeTypes:
+#            - mgnl:page
+#            - mgnl:variants
+#            - mgnl:variant
+  - name: external
+    implementationClass: info.magnolia.ui.javascript.form.FormViewWithChangeListener
+    properties:
+      - name: external
+        label: External link
+        validators:
+          - name: url
+            errorMessage: Enter a valid url
+            $type: regexpValidator
+            pattern: "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"
+        $type: textField
+      
+      - !include:/mmp/includes/dialogs/text.yaml
+        name: icon
+        label: Icon
+  - name: dam
+    implementationClass: info.magnolia.ui.javascript.form.FormViewWithChangeListener
+    properties:
+      - name: dam
+        label: Magnolia Asset
+        $type: damLinkField
+        textInputAllowed: true
+#name: link
+#fieldType: switchable
+#label: Link
+#options:
+#  - name: internal
+#    label: Internal
+#    value: internal
+#    selected: true
+#  - name: external
+#    label: External
+#    value: external
+#fields:
+#  - name: internal
+#    fieldType: link
+#    appName: pages
+#    label: Internal link
+#  - name: external
+#    fieldType: text
+#    label: External link
+#    validators:
+#      - name: url
+#        class: info.magnolia.ui.form.validator.definition.RegexpValidatorDefinition
+#        pattern: ^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]
+#        errorMessage: 'Enter a valid url'

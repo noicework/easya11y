@@ -1,0 +1,4 @@
+title: Form Hidden
+renderType: freemarker
+templateScript: /easya11y/templates/components/hidden.ftl
+dialog: easya11y:components/hidden

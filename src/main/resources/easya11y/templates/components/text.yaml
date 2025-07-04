@@ -1,0 +1,4 @@
+title: Form Input
+renderType: freemarker
+templateScript: /easya11y/templates/components/text.ftl
+dialog: easya11y:components/text

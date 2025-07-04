@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d %-5p %-50.50c: %m%n"/>
+        </Console>
+
+        <RollingFile name="sync-log-debug"
+                     fileName="./target/logs/magnolia-debug.log"
+                     filePattern="./target/logs/magnolia-debug-%i.log"
+                     append="true">
+            <PatternLayout pattern="%-5p %c %d{dd.MM.yyyy HH:mm:ss} -- %m%n"/>
+            <ThresholdFilter level="DEBUG"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <Async name="log-debug">
+            <AppenderRef ref="sync-log-debug"/>
+        </Async>
+
+        <!-- Log Error-->
+
+        <RollingFile name="sync-log-error"
+                     fileName="./target/logs/magnolia-error.log"
+                     filePattern="./target/logs/magnolia-error-%i.log"
+                     append="true">
+            <PatternLayout pattern="%-5p %c %d{dd.MM.yyyy HH:mm:ss} -- %m%n"/>
+            <ThresholdFilter level="ERROR"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <Async name="log-error">
+            <AppenderRef ref="sync-log-error"/>
+        </Async>
+    </Appenders>
+
+    <Loggers>
+
+        <!-- EBEAN ORM -->
+        <logger name="io.ebean.DDL" level="TRACE"/>
+        <logger name="io.ebean.SQL" level="TRACE"/>
+        <logger name="io.ebean.TXN" level="TRACE"/>
+        <logger name="io.ebean.SUM" level="TRACE"/>
+
+        <!-- Magnolia categories -->
+        <Logger name="info.magnolia" level="INFO"/>
+        <Logger name="org.springframework" level="INFO" />
+
+        <!-- External libraries -->
+        <Logger name="org" level="WARN"/>
+        <Logger name="org.apache.jackrabbit" level="WARN"/>
+
+        <!-- Reflections library spoils logs with hundreds of harmless warnings; tries to look into native libs but none of its DefaultUrlTypes can handle them. -->
+        <Logger name="org.reflections" level="ERROR"/>
+        <Logger name="com" level="WARN"/>
+        <Logger name="net" level="WARN"/>
+        <Logger name="freemarker" level="WARN"/>
+        <Logger name="httpclient" level="WARN"/>
+        <Logger name="openwfe.org.log" level="WARN"/>
+        <Logger name="openwfe" level="WARN"/>
+
+        <Root level="ALL">
+            <AppenderRef ref="log-error"/>
+            <AppenderRef ref="log-debug"/>
+            <!--  debug  -->
+            <AppenderRef ref="console"/>
+            <!--  enable this too to get mail notifications  -->
+            <!--
+              <AppenderRef ref="mail" />
+            -->
+        </Root>
+    </Loggers>
+
+</Configuration>

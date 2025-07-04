@@ -1,0 +1,16 @@
+name: form-embed
+label: Form Embed
+form:
+  properties:
+    - name: formId
+      label: Form
+      description: Select a form to display
+      $type: linkField
+      required: true
+      i18n: true
+      datasource:
+        $type: jcrDatasource
+        workspace: easya11y
+        rootPath: /easya11y
+        allowedNodeTypes:
+          - mgnl:page

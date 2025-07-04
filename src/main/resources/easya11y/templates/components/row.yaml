@@ -1,0 +1,21 @@
+title: Form Row
+renderType: freemarker
+templateScript: /easya11y/templates/components/row.ftl
+dialog: easya11y:components/row
+areas:
+  col-1: &col
+    availableComponents:
+      text:
+        id: easya11y:components/text
+      options:
+        id: easya11y:components/options
+      hidden:
+        id: easya11y:components/hidden
+      conditional:
+        id: easya11y:components/conditional
+      button:
+        id: easya11y:components/button
+      row:
+        id: easya11y:components/row
+  col-2: *col
+  col-3: *col

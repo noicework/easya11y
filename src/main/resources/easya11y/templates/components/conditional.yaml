@@ -1,0 +1,18 @@
+title: Form Conditional
+renderType: freemarker
+templateScript: /easya11y/templates/components/conditional.ftl
+dialog: easya11y:components/conditional
+areas:
+  items:
+    title: Form Items
+    availableComponents:
+      row:
+        id: easya11y:components/row
+      text:
+        id: easya11y:components/text
+      options:
+        id: easya11y:components/options
+      hidden:
+        id: easya11y:components/hidden
+      conditional:
+        id: easya11y:components/conditional

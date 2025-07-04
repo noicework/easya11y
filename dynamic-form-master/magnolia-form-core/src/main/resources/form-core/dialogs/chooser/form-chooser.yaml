@@ -1,0 +1,46 @@
+label: Form
+class: info.magnolia.ui.chooser.definition.SingleItemWorkbenchChooserDefinition
+actions:
+  choose:
+    $type: chooseAction
+datasource:
+  $type: dbFormDatasource
+  entityName: Form
+  describeBy: title
+workbenchChooser:
+  workbench:
+    contentViews:
+      - name: list
+        $type: listView
+        multiSelect: false
+        columns:
+
+          - name: "title"
+            width: 400
+            class: info.magnolia.form.column.DbFormsTitleColumnDefinition
+
+          - name: "description"
+            width: 800
+            class: info.magnolia.form.column.DbFormsDetailsColumnDefinition
+
+          - name: "modifiedBy"
+            width: 200
+            editable: false
+            sortable: true
+
+          - name: "modified"
+            $type: dateColumn
+            width: 220
+            editable: false
+            sortable: true
+
+          - name: "createdBy"
+            width: 200
+            editable: false
+            sortable: true
+
+          - name: "created"
+            $type: dateColumn
+            width: 220
+            editable: false
+            sortable: true

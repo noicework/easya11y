@@ -1,0 +1,19 @@
+name: btnVariant
+label: Button Variant
+defaultValue: primary
+$type: comboBoxField
+datasource:
+  $type: optionListDatasource
+  options:
+    - value: none
+      name: -1
+      label: None
+    - value: primary
+      name: 0
+      label: Primary
+    - value: secondary
+      name: 1
+      label: Secondary
+    - value: tertiary
+      name: 8
+      label: Tertiary

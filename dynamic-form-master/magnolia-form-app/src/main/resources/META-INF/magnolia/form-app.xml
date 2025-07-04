@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module SYSTEM "module.dtd" >
+<module>
+  <name>form-app</name>
+  <displayName>${project.name}</displayName>
+  <description>${project.description}</description>
+  <class>info.magnolia.form.FormAppModule</class>
+  <versionHandler>info.magnolia.form.setup.FormAppModuleVersionHandler</versionHandler>
+  <version>${project.version}</version>
+
+  <!-- For more information on module descriptor configuration options -->
+  <!-- https://documentation.magnolia-cms.com/display/DOCS/XML-based+module+descriptor -->
+
+  <components>
+    <id>app-forms-dashboard</id>
+
+    <component>
+      <type>info.magnolia.form.analytics.FormResultsAnalyticsView</type>
+      <implementation>info.magnolia.form.analytics.FormResultsAnalyticsView</implementation>
+    </component>
+
+  </components>
+
+  <components>
+    <id>datasource-forms</id>
+
+    <!-- Option A: community edition (without multisite module) -->
+    <!--
+    <component>
+      <type>info.magnolia.ui.api.i18n.I18NAuthoringSupport</type>
+      <implementation>info.magnolia.form.i18n.SiteI18nFormsAuthoringSupport</implementation>
+    </component>
+    -->
+
+    <!-- Option B: dx-core edition (with multisite module) -->
+    <component>
+      <type>info.magnolia.ui.api.i18n.I18NAuthoringSupport</type>
+      <implementation>info.magnolia.form.i18n.MultiSiteI18nFormsAuthoringSupport</implementation>
+    </component>
+
+
+
+    <component>
+      <type>info.magnolia.ui.contentapp.Datasource</type>
+      <implementation>info.magnolia.form.data.DbDatasource</implementation>
+    </component>
+
+    <component>
+      <type>info.magnolia.form.data.DbDataProvider</type>
+      <implementation>info.magnolia.form.data.DbDataProvider</implementation>
+    </component>
+
+    <component>
+      <type>info.magnolia.form.data.DbHierarchicalDataProvider</type>
+      <implementation>info.magnolia.form.data.DbHierarchicalDataProvider</implementation>
+    </component>
+
+    <component>
+      <type>info.magnolia.ui.datasource.ItemResolver</type>
+      <implementation>info.magnolia.form.data.DbItemResolver</implementation>
+    </component>
+
+    <component>
+      <type>info.magnolia.ui.contentapp.browser.preview.PreviewProvider</type>
+      <implementation>info.magnolia.form.data.NoPreviewProvider</implementation>
+    </component>
+
+    <component>
+      <type>info.magnolia.ui.datasource.PropertySetFactory</type>
+      <implementation>info.magnolia.form.data.DbBeanPropertySetFactory</implementation>
+    </component>
+
+    <component>
+      <type>info.magnolia.ui.field.SelectFieldSupport</type>
+      <implementation>info.magnolia.ui.jdbc.field.JdbcSelectFieldSupport</implementation>
+    </component>
+
+    <!--*** Type mappings ***-->
+
+    <type-mapping>
+      <type>info.magnolia.ui.contentapp.browser.StatusBar</type>
+      <implementation>info.magnolia.form.data.DbStatusBar</implementation>
+    </type-mapping>
+
+    <type-mapping>
+      <type>info.magnolia.ui.contentapp.browser.ListPresenter</type>
+      <implementation>info.magnolia.form.data.DbListPresenter</implementation>
+    </type-mapping>
+
+    <type-mapping>
+      <type>info.magnolia.ui.contentapp.browser.TreePresenter</type>
+      <implementation>info.magnolia.form.data.DbTreePresenter</implementation>
+    </type-mapping>
+
+    <!--*** End of type mappings ***-->
+
+  </components>
+
+  <components>
+    <id>main</id>
+
+    <component>
+      <type>info.magnolia.form.analytics.ResponseCountByDateDataSupplier</type>
+      <implementation>info.magnolia.form.analytics.ResponseCountByDateDataSupplier</implementation>
+    </component>
+
+    <component>
+      <type>info.magnolia.form.analytics.ResponseCountByAnswerDataSupplier</type>
+      <implementation>info.magnolia.form.analytics.ResponseCountByAnswerDataSupplier</implementation>
+    </component>
+
+    <component>
+      <type>info.magnolia.form.analytics.ResponseAverageByAnswerDataSupplier</type>
+      <implementation>info.magnolia.form.analytics.ResponseAverageByAnswerDataSupplier</implementation>
+    </component>
+  </components>
+
+  <dependencies>
+    <dependency>
+      <name>core</name>
+      <version>*</version>
+    </dependency>
+    <dependency>
+      <name>ui-admincentral</name>
+      <version>*</version>
+    </dependency>
+  </dependencies>
+</module>

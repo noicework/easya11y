@@ -1,0 +1,2 @@
+class: info.magnolia.rest.registry.ConfiguredEndpointDefinition
+implementationClass: work.noice.easya11y.endpoints.ConfigurationEndpoint

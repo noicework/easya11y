@@ -1,0 +1,62 @@
+light: false
+form:
+  properties:
+
+    - name: title
+      $type: textField
+      required: true
+      i18n: true
+
+    - name: label
+      $type: textField
+      required: true
+      i18n: true
+
+    - name: value
+      $type: textField
+      required: true
+
+    - name: image
+      $type: damLinkField
+
+    - name: freeTextOption
+      $type: switchableField
+      required: true
+      field:
+        name: freeText
+        $type: radioButtonGroupField
+        required: true
+        layout: horizontal
+        datasource:
+          $type: optionListDatasource
+          options:
+            - name: dontShowFreeText
+              label: Don't show free text option
+              value: dontShowFreeText
+              selected: true
+            - name: showFreeText
+              label: Show free text option
+              value: showFreeText
+      itemProvider:
+        $type: currentItemProvider
+      forms:
+        - name: showFreeText
+          properties:
+            - name: freeTextLabel
+              label: Label
+              i18n: true
+              $type: textField
+
+  layout:
+    $type: tabbedLayout
+    tabs:
+      main:
+        fields:
+          - name: title
+          - name: label
+          - name: value
+          - name: image
+          - name: freeTextOption
+
+
+actions: !include:/form-app/includes/database-actions.yaml

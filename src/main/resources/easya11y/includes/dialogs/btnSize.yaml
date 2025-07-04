@@ -1,0 +1,17 @@
+name: btnSize
+label: Button Size
+defaultValue: none
+$type: comboBoxField
+datasource:
+  $type: optionListDatasource
+  options:
+    - value: none
+      name: -1
+      label: None
+      selected: true
+    - value: lg
+      name: 0
+      label: Large
+    - value: sm
+      name: 1
+      label: Small
