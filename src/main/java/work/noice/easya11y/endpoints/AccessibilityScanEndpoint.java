@@ -39,6 +39,9 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
     private static final String SCAN_RESULTS_WORKSPACE = "easya11y";
     private static final ObjectMapper objectMapper = new ObjectMapper();
     
+    // Temporary storage for scan parameters
+    private static final Map<String, String> scanWcagLevels = new HashMap<>();
+    
     @Inject
     public AccessibilityScanEndpoint(EndpointDefinition definition) {
         super(definition);
@@ -56,9 +59,14 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
     @Consumes(MediaType.APPLICATION_JSON)
     public Response initiateScan(Map<String, String> request) {
         String pagePath = request.get("pagePath");
+        String wcagLevel = request.get("wcagLevel");
         
         if (pagePath == null || pagePath.isEmpty()) {
             return buildErrorResponse("Page path is required", Response.Status.BAD_REQUEST);
+        }
+        
+        if (wcagLevel == null || wcagLevel.isEmpty()) {
+            wcagLevel = "AA"; // Default to AA if not provided
         }
         
         try {
@@ -76,6 +84,9 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
             // Generate scan ID
             String scanId = UUID.randomUUID().toString();
             
+            // Store WCAG level for this scan
+            scanWcagLevels.put(scanId, wcagLevel);
+            
             // Build page URL
             String contextPath = MgnlContext.getContextPath();
             String pageUrl = MgnlContext.getWebContext().getRequest().getScheme() + "://" + 
@@ -92,6 +103,7 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
             response.put("pagePath", pagePath);
             response.put("pageUrl", pageUrl);
             response.put("pageTitle", pageTitle);
+            response.put("wcagLevel", wcagLevel);
             response.put("message", "Scan initiated. Use the URL to scan the page with axe-core.");
             
             return Response.ok(response).build();
@@ -119,7 +131,14 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
             String pagePath = scanResults.get("pagePath").asText();
             String pageUrl = scanResults.get("pageUrl").asText();
             String pageTitle = scanResults.get("pageTitle").asText();
-            String wcagLevel = scanResults.get("wcagLevel").asText("AA");
+            
+            // Get WCAG level from request or use stored value from scan initiation
+            String wcagLevel = scanResults.has("wcagLevel") ? 
+                scanResults.get("wcagLevel").asText() : 
+                scanWcagLevels.getOrDefault(scanId, "AA");
+            
+            // Clean up temporary storage
+            scanWcagLevels.remove(scanId);
             
             // Get axe results
             JsonNode axeResults = scanResults.get("axeResults");

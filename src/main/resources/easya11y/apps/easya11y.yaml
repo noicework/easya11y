@@ -1,6 +1,6 @@
 !page-editor-app:easya11y
 name: easya11y
-label: Accessibility Checker
+label: Accessibility
 icon: easya11y-icon
 
 datasource:
@@ -11,7 +11,7 @@ datasource:
 # Extend the browser subapp with our custom actions
 subApps:
   # Add our custom accessibility checker subapp
-  accessibilityChecker:
+  browser:
     label: Home
     class: work.noice.easya11y.ui.AccessibilityCheckerSubAppDescriptor
     closable: false

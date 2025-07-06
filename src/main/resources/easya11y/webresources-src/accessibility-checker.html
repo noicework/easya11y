@@ -16,7 +16,7 @@
         
         body {
             font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: #f5f5f5;
+            background-color: #fff;
             color: #333;
             line-height: 1.6;
             padding: 20px;
@@ -66,7 +66,6 @@
         
         .scan-controls {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
             gap: 20px;
             align-items: end;
             margin-bottom: 20px;
@@ -84,20 +83,84 @@
             font-weight: 500;
         }
         
-        .page-select-large {
+        .searchable-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        
+        .page-search-input {
+            width: 100%;
             padding: 12px 15px;
             font-size: 16px;
             border: 2px solid #ddd;
             border-radius: 6px;
             background-color: #fff;
-            cursor: pointer;
             transition: all 0.3s;
         }
         
-        .page-select-large:focus {
+        .page-search-input:focus {
             outline: none;
             border-color: #068449;
             box-shadow: 0 0 0 3px rgba(6, 132, 73, 0.1);
+        }
+        
+        .page-dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            background: #fff;
+            border: 2px solid #068449;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+        }
+        
+        .page-dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .page-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .page-dropdown-item:hover,
+        .page-dropdown-item.selected {
+            background-color: #f0f9f4;
+        }
+        
+        .page-dropdown-item.highlighted {
+            background-color: #e6f4ea;
+        }
+        
+        .page-dropdown-item .page-title {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .page-dropdown-item .page-path {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-top: 2px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+        
+        .dropdown-loader {
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+        }
+        
+        .no-results {
+            padding: 20px;
+            text-align: center;
+            color: #999;
         }
         
         .btn-large {
@@ -716,14 +779,30 @@
             width: 100%;
         }
         
+        @media (max-width: 1024px) {
+            .scan-controls {
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+            
+            .scan-controls .control-group:first-child {
+                grid-column: 1 / -1;
+            }
+        }
+        
         @media (max-width: 768px) {
             .scan-controls {
                 grid-template-columns: 1fr;
                 gap: 15px;
             }
             
+            .scan-controls .control-group:first-child {
+                grid-column: auto;
+            }
+            
             .btn-large {
                 width: 100%;
+                min-height: 56px;
             }
             
             .controls {
@@ -746,24 +825,35 @@
                 align-items: flex-start;
                 gap: 10px;
             }
+            
+            .page-dropdown-list {
+                max-height: 250px;
+            }
+            
+            .scan-section {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>
-            Accessibility Checker
-            <span class="header-stats" id="headerStats"></span>
-        </h1>
-        
         <div class="scan-section">
-            <h2>Accessibility Scanning</h2>
+            <span class="header-stats" id="headerStats"></span>
+
             <div class="scan-controls">
                 <div class="control-group">
-                    <label for="pageSelect">Select Page to Scan</label>
-                    <select id="pageSelect" class="page-select-large">
-                        <option value="">Choose a page...</option>
-                    </select>
+                    <label for="pageSearchInput">Select Page to Scan</label>
+                    <div class="searchable-dropdown">
+                        <input type="text" 
+                               id="pageSearchInput" 
+                               class="page-search-input" 
+                               placeholder="Search and select a page..."
+                               autocomplete="off">
+                        <div id="pageDropdown" class="page-dropdown-list" style="display: none;">
+                            <div class="dropdown-loader" style="display: none;">Loading pages...</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="control-group">
                     <label for="wcagLevelSelect">WCAG Level</label>
@@ -777,7 +867,7 @@
                     <span>▶</span> Scan Selected Page
                 </button>
             </div>
-            <div style="text-align: center; margin-top: 20px;">
+            <div>
                 <button id="scanAllBtn" class="btn btn-scan-all btn-large">
                     <span>⊞</span> Scan All Pages
                 </button>
@@ -891,7 +981,8 @@
         let scanner = null;
         
         // DOM elements
-        const pageSelect = document.getElementById('pageSelect');
+        const pageSearchInput = document.getElementById('pageSearchInput');
+        const pageDropdown = document.getElementById('pageDropdown');
         const sortSelect = document.getElementById('sortSelect');
         const searchInput = document.getElementById('searchInput');
         const scanBtn = document.getElementById('scanBtn');
@@ -930,10 +1021,24 @@
         
         // Setup event listeners
         function setupEventListeners() {
-            pageSelect.addEventListener('change', (e) => {
-                currentPagePath = e.target.value;
-                currentPage = 1;
-                updateScanButtonState();
+            // Searchable dropdown events
+            pageSearchInput.addEventListener('focus', () => {
+                showPageDropdown();
+            });
+            
+            pageSearchInput.addEventListener('input', debounce((e) => {
+                filterPageDropdown(e.target.value);
+            }, 200));
+            
+            pageSearchInput.addEventListener('keydown', (e) => {
+                handleDropdownKeyNavigation(e);
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.searchable-dropdown')) {
+                    hidePageDropdown();
+                }
             });
             
             sortSelect.addEventListener('change', (e) => {
@@ -999,7 +1104,6 @@
                 
                 const data = await response.json();
                 allPages = data.items || [];
-                populatePageSelect(allPages);
                 updateStats();
             } catch (error) {
                 showMessage(`Error loading pages: ${error.message}`, 'error');
@@ -1007,19 +1111,110 @@
             }
         }
         
-        // Populate page select dropdown
-        function populatePageSelect(pages) {
-            pageSelect.innerHTML = '<option value="">Select a page to scan</option>';
+        // Populate searchable dropdown
+        function populatePageDropdown(pages = allPages) {
+            pageDropdown.innerHTML = '';
             
-            pages.forEach(page => {
-                const option = document.createElement('option');
-                option.value = page.path;
-                option.textContent = page.title || page.name || page.path;
-                if (page.lastScanned) {
-                    option.textContent += ` (Score: ${page.score || 'N/A'})`;
-                }
-                pageSelect.appendChild(option);
+            if (pages.length === 0) {
+                pageDropdown.innerHTML = '<div class="no-results">No pages found</div>';
+                return;
+            }
+            
+            pages.forEach((page, index) => {
+                const item = document.createElement('div');
+                item.className = 'page-dropdown-item';
+                item.dataset.path = page.path;
+                item.dataset.index = index;
+                
+                item.innerHTML = `
+                    <div class="page-title">${escapeHtml(page.title || page.name || page.path)}</div>
+                    <div class="page-path">${escapeHtml(page.path)}</div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    selectPage(page);
+                });
+                
+                pageDropdown.appendChild(item);
             });
+        }
+        
+        // Show page dropdown
+        function showPageDropdown() {
+            populatePageDropdown();
+            pageDropdown.style.display = 'block';
+        }
+        
+        // Hide page dropdown
+        function hidePageDropdown() {
+            pageDropdown.style.display = 'none';
+            pageDropdown.querySelectorAll('.highlighted').forEach(el => {
+                el.classList.remove('highlighted');
+            });
+        }
+        
+        // Filter page dropdown
+        function filterPageDropdown(searchTerm) {
+            const filtered = allPages.filter(page => {
+                const searchText = `${page.title || ''} ${page.name || ''} ${page.path}`.toLowerCase();
+                return searchText.includes(searchTerm.toLowerCase());
+            });
+            
+            populatePageDropdown(filtered);
+        }
+        
+        // Select a page
+        function selectPage(page) {
+            currentPagePath = page.path;
+            pageSearchInput.value = page.title || page.name || page.path;
+            pageSearchInput.dataset.selectedPath = page.path;
+            hidePageDropdown();
+            currentPage = 1;
+            updateScanButtonState();
+        }
+        
+        // Handle keyboard navigation
+        function handleDropdownKeyNavigation(e) {
+            const items = pageDropdown.querySelectorAll('.page-dropdown-item');
+            const highlighted = pageDropdown.querySelector('.highlighted');
+            let currentIndex = highlighted ? parseInt(highlighted.dataset.index) : -1;
+            
+            switch(e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    if (currentIndex < items.length - 1) {
+                        currentIndex++;
+                        highlightItem(items[currentIndex]);
+                    }
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (currentIndex > 0) {
+                        currentIndex--;
+                        highlightItem(items[currentIndex]);
+                    }
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (highlighted) {
+                        const page = allPages.find(p => p.path === highlighted.dataset.path);
+                        if (page) selectPage(page);
+                    }
+                    break;
+                case 'Escape':
+                    e.preventDefault();
+                    hidePageDropdown();
+                    break;
+            }
+        }
+        
+        // Highlight dropdown item
+        function highlightItem(item) {
+            pageDropdown.querySelectorAll('.highlighted').forEach(el => {
+                el.classList.remove('highlighted');
+            });
+            item.classList.add('highlighted');
+            item.scrollIntoView({ block: 'nearest' });
         }
         
         // Load scan results
@@ -1084,7 +1279,7 @@
                 // Perform the actual scan with WCAG level
                 const scanResult = await scanner.scanPage({
                     ...pageData,
-                    wcagLevel
+                    wcagLevel: wcagLevel
                 });
                 
                 showMessage(`Scan completed for ${pageData.pageTitle}`, 'success');
@@ -1261,10 +1456,6 @@
                             <div class="submission-expand">⌄</div>
                         </div>
                         <div class="submission-preview">
-                            <div class="score-display ${scoreClass}">
-                                <span class="score-label">Score</span>
-                                <span class="score-value">${(result.score || 0).toFixed(1)}</span>
-                            </div>
                             <div class="violation-summary">
                                 ${criticalCount > 0 ? `<span class="violation-count critical">Critical: ${criticalCount}</span>` : ''}
                                 ${seriousCount > 0 ? `<span class="violation-count serious">Serious: ${seriousCount}</span>` : ''}
@@ -1401,7 +1592,8 @@
         
         // Update scan button state
         function updateScanButtonState() {
-            scanBtn.disabled = isScanning || !currentPagePath;
+            const selectedPath = pageSearchInput.dataset.selectedPath || '';
+            scanBtn.disabled = isScanning || !selectedPath || !currentPagePath;
             scanAllBtn.disabled = isScanning;
             
             if (isScanning) {

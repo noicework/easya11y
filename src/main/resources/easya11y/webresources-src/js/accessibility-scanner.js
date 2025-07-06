@@ -85,15 +85,15 @@ class AccessibilityScanner {
      */
     async scanPage(pageData) {
         const { scanId, pagePath, pageUrl, pageTitle, wcagLevel = 'AA' } = pageData;
-        this.currentScanId = scanId;
         
         console.log('Starting background scan for:', pageUrl);
         
         // Initialize container for hidden iframes
         const container = this.initializeIframeContainer();
         
-        // Create hidden iframe
+        // Create hidden iframe with unique ID
         const iframe = document.createElement('iframe');
+        iframe.id = `a11y-scan-${scanId}`;
         iframe.style.cssText = `
             width: 1280px;
             height: 1024px;
