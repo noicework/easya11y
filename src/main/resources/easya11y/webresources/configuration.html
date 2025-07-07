@@ -159,149 +159,36 @@
             100% { transform: rotate(360deg); }
         }
 
-        .toggle-password {
-            position: relative;
-        }
-
-        .toggle-password button {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        .smtp-config {
-            display: none;
-        }
-
-        .smtp-enabled {
-            display: block;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>easya11y Global Configuration</h1>
+        <h1>easya11y Configuration</h1>
         
         <div id="alert" class="alert"></div>
         
         <form id="configForm">
-            <!-- reCAPTCHA Configuration -->
-            <div class="config-section">
-                <h2>reCAPTCHA v3 Configuration</h2>
-                <div class="form-group">
-                    <label for="recaptchaSiteKey">Site Key</label>
-                    <input type="text" id="recaptchaSiteKey" name="recaptchaSiteKey" placeholder="Your reCAPTCHA v3 site key">
-                    <div class="help-text">The public site key from Google reCAPTCHA console</div>
-                </div>
-                <div class="form-group">
-                    <label for="recaptchaSecretKey">Secret Key</label>
-                    <div class="toggle-password">
-                        <input type="password" id="recaptchaSecretKey" name="recaptchaSecretKey" placeholder="Your reCAPTCHA v3 secret key">
-                        <button type="button" onclick="togglePassword('recaptchaSecretKey')">👁</button>
-                    </div>
-                    <div class="help-text">The private secret key from Google reCAPTCHA console (keep this secure)</div>
-                </div>
-                <div class="form-group">
-                    <label for="recaptchaThreshold">Score Threshold</label>
-                    <input type="text" id="recaptchaThreshold" name="recaptchaThreshold" placeholder="0.5" value="0.5">
-                    <div class="help-text">Minimum score required to pass validation (0.0 - 1.0, default: 0.5)</div>
-                </div>
-            </div>
 
-            <!-- Mailchimp Configuration -->
+            <!-- WCAG Settings -->
             <div class="config-section">
-                <h2>Mailchimp Configuration</h2>
+                <h2>WCAG Accessibility Settings</h2>
                 <div class="form-group">
-                    <label for="mailchimpApiKey">Default API Key</label>
-                    <div class="toggle-password">
-                        <input type="password" id="mailchimpApiKey" name="mailchimpApiKey" placeholder="Your Mailchimp API key">
-                        <button type="button" onclick="togglePassword('mailchimpApiKey')">👁</button>
-                    </div>
-                    <div class="help-text">Default API key for Mailchimp integration (can be overridden per form)</div>
+                    <label for="wcagVersion">Default WCAG Version</label>
+                    <select id="wcagVersion" name="wcagVersion">
+                        <option value="2.0">WCAG 2.0</option>
+                        <option value="2.1">WCAG 2.1</option>
+                        <option value="2.2" selected>WCAG 2.2</option>
+                    </select>
+                    <div class="help-text">Default WCAG version for accessibility checks</div>
                 </div>
                 <div class="form-group">
-                    <label for="mailchimpDataCenter">Default Data Center</label>
-                    <input type="text" id="mailchimpDataCenter" name="mailchimpDataCenter" placeholder="us1">
-                    <div class="help-text">Default data center (e.g., us1, us2) - found in your API key after the dash</div>
-                </div>
-            </div>
-
-            <!-- SMTP Configuration -->
-            <div class="config-section">
-                <h2>Email (SMTP) Configuration</h2>
-                <div class="form-group">
-                    <label for="smtpEnabled">
-                        <input type="checkbox" id="smtpEnabled" name="smtpEnabled" onchange="toggleSmtpConfig()">
-                        Enable SMTP Configuration
-                    </label>
-                    <div class="help-text">Configure SMTP settings for sending form submission emails</div>
-                </div>
-                
-                <div class="smtp-config" id="smtpConfig">
-                    <div class="form-group">
-                        <label for="smtpHost">SMTP Host</label>
-                        <input type="text" id="smtpHost" name="smtpHost" placeholder="smtp.gmail.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="smtpPort">SMTP Port</label>
-                        <input type="text" id="smtpPort" name="smtpPort" placeholder="587">
-                        <div class="help-text">Common ports: 25 (standard), 587 (TLS), 465 (SSL)</div>
-                    </div>
-                    <div class="form-group">
-                        <label for="smtpAuth">
-                            <input type="checkbox" id="smtpAuth" name="smtpAuth">
-                            SMTP Authentication Required
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label for="smtpStartTls">
-                            <input type="checkbox" id="smtpStartTls" name="smtpStartTls">
-                            Enable STARTTLS
-                        </label>
-                        <div class="help-text">Enable TLS encryption (recommended)</div>
-                    </div>
-                    <div class="form-group">
-                        <label for="smtpUsername">SMTP Username</label>
-                        <input type="text" id="smtpUsername" name="smtpUsername" placeholder="your-email@gmail.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="smtpPassword">SMTP Password</label>
-                        <div class="toggle-password">
-                            <input type="password" id="smtpPassword" name="smtpPassword" placeholder="Your SMTP password">
-                            <button type="button" onclick="togglePassword('smtpPassword')">👁</button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="smtpFrom">Default From Address</label>
-                        <input type="text" id="smtpFrom" name="smtpFrom" placeholder="noreply@yourdomain.com">
-                        <div class="help-text">Default sender address for form emails</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Default Form Settings -->
-            <div class="config-section">
-                <h2>Default Form Settings</h2>
-                <div class="form-group">
-                    <label for="defaultSuccessMessage">Default Success Message</label>
-                    <input type="text" id="defaultSuccessMessage" name="defaultSuccessMessage" 
-                           placeholder="Thank you for your submission. We'll get back to you soon!">
-                </div>
-                <div class="form-group">
-                    <label for="defaultErrorMessage">Default Error Message</label>
-                    <input type="text" id="defaultErrorMessage" name="defaultErrorMessage" 
-                           placeholder="Sorry, there was an error submitting your form. Please try again.">
-                </div>
-                <div class="form-group">
-                    <label for="defaultEmailSubject">Default Email Subject</label>
-                    <input type="text" id="defaultEmailSubject" name="defaultEmailSubject" 
-                           placeholder="New Form Submission">
+                    <label for="wcagLevel">Default WCAG Conformance Level</label>
+                    <select id="wcagLevel" name="wcagLevel">
+                        <option value="A">Level A</option>
+                        <option value="AA" selected>Level AA</option>
+                        <option value="AAA">Level AAA</option>
+                    </select>
+                    <div class="help-text">Default conformance level for accessibility checks</div>
                 </div>
             </div>
 
@@ -352,7 +239,6 @@
                 
                 if (data.success && data.configuration) {
                     populateForm(data.configuration);
-                    showAlert('Configuration loaded successfully', 'success');
                 }
             } catch (error) {
                 showAlert('Error loading configuration: ' + error.message, 'error');
@@ -375,10 +261,6 @@
                 }
             }
             
-            // Handle checkboxes
-            configuration.smtpEnabled = document.getElementById('smtpEnabled').checked;
-            configuration.smtpAuth = document.getElementById('smtpAuth').checked;
-            configuration.smtpStartTls = document.getElementById('smtpStartTls').checked;
             
             try {
                 const response = await fetch(configEndpoint, {
@@ -420,29 +302,6 @@
                     }
                 }
             });
-            
-            // Update SMTP visibility
-            toggleSmtpConfig();
-        }
-
-        function toggleSmtpConfig() {
-            const enabled = document.getElementById('smtpEnabled').checked;
-            const smtpConfig = document.getElementById('smtpConfig');
-            
-            if (enabled) {
-                smtpConfig.classList.add('smtp-enabled');
-            } else {
-                smtpConfig.classList.remove('smtp-enabled');
-            }
-        }
-
-        function togglePassword(fieldId) {
-            const field = document.getElementById(fieldId);
-            if (field.type === 'password') {
-                field.type = 'text';
-            } else {
-                field.type = 'password';
-            }
         }
 
         function showLoading(show) {

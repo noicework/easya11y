@@ -154,14 +154,14 @@ public class ConfigurationEndpoint extends AbstractEndpoint<EndpointDefinition> 
      * @param configuration The configuration map
      */
     private void updateSystemProperties(Map<String, Object> configuration) {
-        // reCAPTCHA settings
-        if (configuration.containsKey("recaptchaSecretKey")) {
-            System.setProperty("easya11y.recaptcha.secretKey", 
-                configuration.get("recaptchaSecretKey").toString());
+        // WCAG settings
+        if (configuration.containsKey("wcagVersion")) {
+            System.setProperty("easya11y.wcag.version", 
+                configuration.get("wcagVersion").toString());
         }
-        if (configuration.containsKey("recaptchaThreshold")) {
-            System.setProperty("easya11y.recaptcha.threshold", 
-                configuration.get("recaptchaThreshold").toString());
+        if (configuration.containsKey("wcagLevel")) {
+            System.setProperty("easya11y.wcag.level", 
+                configuration.get("wcagLevel").toString());
         }
     }
     

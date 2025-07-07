@@ -28,6 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import info.magnolia.jcr.util.PropertyUtil;
+import javax.jcr.Session;
+
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.VerticalLayout;
@@ -84,9 +87,13 @@ public class RunAccessibilityCheckAction extends AbstractAction<ConfiguredAction
                            MgnlContext.getWebContext().getRequest().getServerPort() +
                            MgnlContext.getContextPath();
             
+            // Get WCAG configuration from saved settings
+            String wcagVersion = getWcagVersion();
+            String wcagLevel = getWcagLevel();
+            
             Map<String, String> request = new HashMap<>();
             request.put("pagePath", pagePath);
-            request.put("wcagLevel", "AA"); // Default to AA
+            request.put("wcagLevel", wcagLevel);
             
             Response response = client.target(baseUrl + "/.rest/easya11y/scan/initiate")
                     .request(MediaType.APPLICATION_JSON)
@@ -104,7 +111,8 @@ public class RunAccessibilityCheckAction extends AbstractAction<ConfiguredAction
                     "&scanId=" + scanId +
                     "&pagePath=" + URLEncoder.encode(pagePath, StandardCharsets.UTF_8.toString()) +
                     "&pageTitle=" + URLEncoder.encode(pageTitle, StandardCharsets.UTF_8.toString()) +
-                    "&wcagLevel=" + URLEncoder.encode("AA", StandardCharsets.UTF_8.toString());
+                    "&wcagLevel=" + URLEncoder.encode(wcagLevel, StandardCharsets.UTF_8.toString()) +
+                    "&wcagVersion=" + URLEncoder.encode(wcagVersion, StandardCharsets.UTF_8.toString());
                 
                 // Create dialog with iframe
                 openScannerDialog(scanViewerUrl, pageTitle);
@@ -151,5 +159,37 @@ public class RunAccessibilityCheckAction extends AbstractAction<ConfiguredAction
     private void showError(String errorText) {
         Message message = new Message(MessageType.ERROR, "Accessibility Check Error", errorText);
         appContext.sendLocalMessage(message);
+    }
+    
+    /**
+     * Get WCAG version from configuration or return default.
+     */
+    private String getWcagVersion() {
+        try {
+            Session session = MgnlContext.getJCRSession("easya11y");
+            if (session.nodeExists("/configuration")) {
+                Node configNode = session.getNode("/configuration");
+                return PropertyUtil.getString(configNode, "wcagVersion", "2.2");
+            }
+        } catch (RepositoryException e) {
+            log.warn("Could not read WCAG version from configuration", e);
+        }
+        return "2.2"; // Default to WCAG 2.2
+    }
+    
+    /**
+     * Get WCAG level from configuration or return default.
+     */
+    private String getWcagLevel() {
+        try {
+            Session session = MgnlContext.getJCRSession("easya11y");
+            if (session.nodeExists("/configuration")) {
+                Node configNode = session.getNode("/configuration");
+                return PropertyUtil.getString(configNode, "wcagLevel", "AA");
+            }
+        } catch (RepositoryException e) {
+            log.warn("Could not read WCAG level from configuration", e);
+        }
+        return "AA"; // Default to AA
     }
 }
