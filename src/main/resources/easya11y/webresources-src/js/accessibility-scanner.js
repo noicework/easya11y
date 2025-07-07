@@ -284,7 +284,7 @@ class AccessibilityScanner {
      * Send scan results to the backend
      */
     async sendResults(scanData) {
-        const response = await fetch(`${this.apiBase}/scan/results`, {
+        const response = await fetch(`${this.apiBase}/easya11y/scan/results`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(scanData)
