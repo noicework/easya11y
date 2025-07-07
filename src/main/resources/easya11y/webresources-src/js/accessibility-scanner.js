@@ -171,7 +171,7 @@ class AccessibilityScanner {
                     pagePath,
                     pageUrl,
                     pageTitle,
-                    wcagLevel: 'AA',
+                    wcagLevel: wcagLevel,
                     axeResults: formattedResults
                 });
                 
@@ -203,7 +203,7 @@ class AccessibilityScanner {
                     pagePath,
                     pageUrl,
                     pageTitle: pageTitle + ' (Cross-origin)',
-                    wcagLevel: 'AA',
+                    wcagLevel: wcagLevel,
                     axeResults: errorResult
                 });
                 
@@ -238,7 +238,7 @@ class AccessibilityScanner {
             
             try {
                 // Initiate scan for this page
-                const initResponse = await fetch(`${this.apiBase}/scan/initiate`, {
+                const initResponse = await fetch(`${this.apiBase}/easya11y/scan/initiate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 

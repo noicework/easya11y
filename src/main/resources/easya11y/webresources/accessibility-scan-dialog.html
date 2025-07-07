@@ -351,8 +351,10 @@
         const wcagLevel = urlParams.get('wcagLevel') || 'AA';
         
         // Get context path
-        const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/.resources'));
-        const apiBase = contextPath + '/.rest/easya11y';
+        const baseUrl = window.location.origin;
+        const pathParts = window.location.pathname.split('/');
+        const contextPath = pathParts[1] === 'magnoliaAuthor' ? '/magnoliaAuthor' : '';
+        const apiBase = `${baseUrl}${contextPath}/.rest`;
         
         // Initialize scanner
         let scanner = null;

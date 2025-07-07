@@ -7,1008 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: #fff;
-            color: #333;
-            line-height: 1.6;
-            padding: 20px;
-            font-size: 14px;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            padding: 24px;
-        }
-        
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 30px;
-            font-size: 1.5em;
-            border-bottom: 2px solid #068449;
-            padding-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .header-stats {
-            font-size: 0.9em;
-            color: #6c757d;
-            font-weight: normal;
-            background: rgba(6, 132, 73, 0.08);
-            padding: 8px 16px;
-            border-radius: 20px;
-            border: 1px solid rgba(6, 132, 73, 0.15);
-        }
-        
-        .btn-bulk-scan {
-            background: #068449;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            letter-spacing: 0.02em;
-            box-shadow: 0 2px 8px rgba(6, 132, 73, 0.2);
-        }
-        
-        .btn-bulk-scan:hover {
-            background: #056b3b;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(6, 132, 73, 0.3);
-        }
-        
-        .btn-bulk-scan span {
-            font-size: 1.1em;
-        }
-        
-        .scan-section {
-            margin-bottom: 30px;
-            background: linear-gradient(135deg, #f8faf9 0%, #f0f4f2 100%);
-            padding: 40px;
-            border-radius: 16px;
-            border: 1px solid rgba(6, 132, 73, 0.08);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 
-                        0 12px 24px rgba(0, 0, 0, 0.04),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            position: relative;
-        }
-        
-        .scan-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #068449 0%, #07a05a 100%);
-            opacity: 0.8;
-        }
-        
-        .scan-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-        }
-        
-        .scan-header h2 {
-            font-size: 1.4em;
-            color: #2c3e50;
-            margin: 0;
-            font-weight: 400;
-            letter-spacing: -0.02em;
-        }
-        
-        .scan-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            margin-bottom: 0;
-        }
-        
-        .primary-controls {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 16px;
-            align-items: end;
-        }
-        
-        .secondary-controls {
-            padding-top: 24px;
-            border-top: 1px solid rgba(6, 132, 73, 0.1);
-        }
-        
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .control-group label {
-            font-size: 0.9em;
-            color: #6c757d;
-            font-weight: 500;
-        }
-        
-        .searchable-dropdown {
-            position: relative;
-            width: 100%;
-        }
-        
-        .page-search-input {
-            width: 100%;
-            padding: 14px 18px;
-            font-size: 16px;
-            border: 2px solid #e0e6e3;
-            border-radius: 8px;
-            background-color: #fff;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 500;
-        }
-        
-        .page-search-input:hover {
-            border-color: rgba(6, 132, 73, 0.3);
-        }
-        
-        .page-search-input:focus {
-            outline: none;
-            border-color: #068449;
-            box-shadow: 0 0 0 4px rgba(6, 132, 73, 0.1);
-            transform: translateY(-1px);
-        }
-        
-        .page-dropdown-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            max-height: 300px;
-            overflow-y: auto;
-            background: #fff;
-            border: 2px solid #068449;
-            border-top: none;
-            border-radius: 0 0 6px 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 1000;
-        }
-        
-        .page-dropdown-item {
-            padding: 10px 15px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .page-dropdown-item:last-child {
-            border-bottom: none;
-        }
-        
-        .page-dropdown-item:hover,
-        .page-dropdown-item.selected {
-            background-color: #f0f9f4;
-        }
-        
-        .page-dropdown-item.highlighted {
-            background-color: #e6f4ea;
-        }
-        
-        .page-dropdown-item .page-title {
-            font-weight: 500;
-            color: #333;
-        }
-        
-        .page-dropdown-item .page-path {
-            font-size: 0.85em;
-            color: #6c757d;
-            margin-top: 2px;
-            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-        }
-        
-        .dropdown-loader {
-            padding: 20px;
-            text-align: center;
-            color: #6c757d;
-        }
-        
-        .no-results {
-            padding: 20px;
-            text-align: center;
-            color: #999;
-        }
-        
-        .btn-large {
-            padding: 14px 28px;
-            font-size: 16px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            min-height: 52px;
-            border-radius: 8px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-large::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        
-        .btn-large:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-        
-        .btn-primary.btn-large {
-            background: linear-gradient(135deg, #068449 0%, #07a05a 100%);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 12px rgba(6, 132, 73, 0.3);
-        }
-        
-        .btn-primary.btn-large:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(6, 132, 73, 0.4);
-        }
-        
-        .btn-scan-all {
-            background-color: transparent;
-            color: #068449;
-            border: 2px solid #068449;
-            font-weight: 500;
-        }
-        
-        .btn-scan-all:hover {
-            background-color: #068449;
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(6, 132, 73, 0.2);
-        }
-        
-        .controls {
-            margin-bottom: 24px;
-            display: grid;
-            grid-template-columns: 1fr auto auto auto;
-            gap: 12px;
-            align-items: center;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 6px;
-            border: 1px solid #e8e8e8;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-        }
-        
-        .search-container {
-            position: relative;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 10px 15px 10px 40px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            background-color: #fff;
-            transition: border-color 0.3s;
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: #068449;
-            box-shadow: 0 0 0 2px rgba(6, 132, 73, 0.1);
-        }
-        
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #7f8c8d;
-        }
-        
-        .form-select, .sort-select {
-            padding: 12px 16px;
-            border: 2px solid #e0e6e3;
-            border-radius: 8px;
-            font-size: 14px;
-            background-color: #fff;
-            cursor: pointer;
-            min-width: 220px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 500;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23068449' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            padding-right: 40px;
-        }
-        
-        .form-select:hover, .sort-select:hover {
-            border-color: rgba(6, 132, 73, 0.3);
-            transform: translateY(-1px);
-        }
-        
-        .form-select:focus, .sort-select:focus {
-            outline: none;
-            border-color: #068449;
-            box-shadow: 0 0 0 4px rgba(6, 132, 73, 0.1);
-        }
-        
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-            font-weight: 500;
-            letter-spacing: 0.025em;
-        }
-        
-        .btn-primary {
-            background-color: #068449;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #056b3b;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        
-        .btn-success {
-            background-color: #068449;
-            color: white;
-            border: 1px solid #068449;
-        }
-        
-        .btn-success:hover {
-            background-color: #fff;
-            color: #068449;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            border-color: #068449;
-        }
-        
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-        
-        .filters {
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-            display: none;
-        }
-        
-        .filters.active {
-            display: block;
-        }
-        
-        .filter-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #7f8c8d;
-        }
-        
-        .loading::after {
-            content: '';
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            margin-left: 10px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #068449;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .error {
-            background-color: #fee;
-            color: #c33;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            border: 1px solid #fcc;
-        }
-        
-        .info {
-            background-color: #e3f2fd;
-            color: #1976d2;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            border: 1px solid #bbdefb;
-        }
-        
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, #fff 0%, #f8faf9 100%);
-            padding: 24px;
-            border-radius: 6px;
-            border: 1px solid #e0e0e0;
-            text-align: center;
-            transition: all 0.3s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(6, 132, 73, 0.12);
-            border-color: rgba(6, 132, 73, 0.2);
-        }
-        
-        .stat-label {
-            color: #6c757d;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-        }
-        
-        .stat-value {
-            font-size: 2em;
-            font-weight: 600;
-            color: #068449;
-            font-variant-numeric: tabular-nums;
-        }
-        
-        .submissions-container {
-            margin-top: 20px;
-        }
-        
-        .submission {
-            background-color: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 20px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        }
-        
-        .submission:hover {
-            box-shadow: 0 4px 12px rgba(6, 132, 73, 0.15);
-            transform: translateY(-2px);
-            border-color: rgba(6, 132, 73, 0.3);
-        }
-        
-        .submission.expanded {
-            background-color: #fff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        
-        .submission-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .submission-meta {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        
-        .submission-date {
-            color: #6c757d;
-            font-size: 0.9em;
-        }
-        
-        .submission-expand {
-            color: #068449;
-            font-size: 1.2em;
-            transition: transform 0.3s;
-        }
-        
-        .submission.expanded .submission-expand {
-            transform: rotate(180deg);
-        }
-        
-        .submission-preview {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-        }
-        
-        .submission-fields {
-            display: none;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #dee2e6;
-        }
-        
-        .submission.expanded .submission-fields {
-            display: grid;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 80px 20px;
-            color: #6c757d;
-        }
-        
-        .empty-state svg {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-            opacity: 0.3;
-            stroke: #068449;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 30px;
-        }
-        
-        .pagination-btn {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            background-color: #fff;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .pagination-btn:hover:not(:disabled) {
-            background-color: #f8f9fa;
-            border-color: #068449;
-        }
-        
-        .pagination-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .pagination-info {
-            color: #6c757d;
-            font-size: 0.9em;
-        }
-        
-        /* Accessibility scan specific styles */
-        .page-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        
-        .page-path {
-            font-size: 0.85em;
-            color: #6c757d;
-            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-        }
-        
-        .scan-info {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        .wcag-level {
-            background-color: #e3f2fd;
-            color: #1976d2;
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 0.85em;
-            font-weight: 500;
-        }
-        
-        .score-display {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px 20px;
-            border-radius: 6px;
-            min-width: 100px;
-        }
-        
-        .score-label {
-            font-size: 0.85em;
-            color: #6c757d;
-            margin-bottom: 4px;
-        }
-        
-        .score-value {
-            font-size: 2em;
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
-        }
-        
-        .score-good {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        
-        .score-warning {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-        
-        .score-bad {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        
-        .violation-summary {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        
-        .violation-count {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 500;
-        }
-        
-        .violation-count.critical {
-            background-color: #721c24;
-            color: white;
-        }
-        
-        .violation-count.serious {
-            background-color: #e53e3e;
-            color: white;
-        }
-        
-        .violation-count.moderate {
-            background-color: #ed8936;
-            color: white;
-        }
-        
-        .violation-count.minor {
-            background-color: #ecc94b;
-            color: #744210;
-        }
-        
-        .violation-count.success {
-            background-color: #48bb78;
-            color: white;
-        }
-        
-        .scan-details {
-            max-height: 600px;
-            overflow-y: auto;
-        }
-        
-        .violation-card {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 16px;
-            margin-bottom: 12px;
-        }
-        
-        .violation-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-        
-        .violation-title {
-            font-weight: 600;
-            color: #212529;
-            margin-bottom: 4px;
-        }
-        
-        .violation-description {
-            color: #6c757d;
-            font-size: 0.9em;
-            margin-bottom: 8px;
-        }
-        
-        .violation-tags {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            margin-bottom: 12px;
-        }
-        
-        .wcag-tag {
-            background-color: #e9ecef;
-            color: #495057;
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-size: 0.75em;
-            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-        }
-        
-        .affected-elements {
-            margin-top: 12px;
-        }
-        
-        .affected-elements-title {
-            font-weight: 600;
-            font-size: 0.9em;
-            margin-bottom: 8px;
-            color: #495057;
-        }
-        
-        .element-item {
-            background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            padding: 8px;
-            margin-bottom: 6px;
-            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-            font-size: 0.85em;
-            overflow-x: auto;
-        }
-        
-        .element-selector {
-            color: #0066cc;
-            margin-bottom: 4px;
-        }
-        
-        .element-html {
-            color: #6c757d;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        
-        .help-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            color: #068449;
-            text-decoration: none;
-            font-size: 0.85em;
-            margin-top: 8px;
-        }
-        
-        .help-link:hover {
-            text-decoration: underline;
-        }
-        
-        /* Progress modal styles */
-        .scan-progress-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-        }
-        
-        .scan-progress-content {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            min-width: 400px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .scan-progress-content h3 {
-            margin: 0 0 20px 0;
-            color: #333;
-        }
-        
-        .progress-info {
-            margin-bottom: 10px;
-            color: #666;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background: #f0f0f0;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-        
-        .progress-bar-fill {
-            height: 100%;
-            background: #068449;
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-        
-        .progress-stats {
-            text-align: center;
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 20px;
-        }
-        
-        #cancelScanBtn {
-            width: 100%;
-        }
-        
-        @media (max-width: 1024px) {
-            .primary-controls {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-            
-            .secondary-controls {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-            
-            .scan-section {
-                padding: 32px;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .scan-section {
-                padding: 24px;
-                border-radius: 12px;
-            }
-            
-            .scan-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-                margin-bottom: 24px;
-            }
-            
-            .scan-header h2 {
-                font-size: 1.25em;
-            }
-            
-            .header-actions {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .btn-bulk-scan {
-                font-size: 0.85em;
-                padding: 6px 12px;
-            }
-            
-            .primary-controls,
-            .secondary-controls {
-                gap: 20px;
-            }
-            
-            .btn-large {
-                width: 100%;
-                min-height: 48px;
-                font-size: 15px;
-            }
-            
-            .page-search-input {
-                font-size: 16px;
-                padding: 12px 16px;
-            }
-            
-            .form-select, .sort-select {
-                min-width: 100%;
-                font-size: 16px;
-            }
-            
-            .controls {
-                grid-template-columns: 1fr;
-                gap: 16px;
-                padding: 16px;
-            }
-            
-            .filter-row {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-            
-            .submission-meta {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-            }
-            
-            .page-dropdown-list {
-                max-height: 250px;
-            }
-            
-            .stats {
-                grid-template-columns: 1fr 1fr;
-                gap: 12px;
-            }
-            
-            .stat-card {
-                padding: 16px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .scan-section {
-                padding: 20px;
-                margin-bottom: 20px;
-            }
-            
-            .container {
-                padding: 12px;
-            }
-            
-            .stats {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/accessibility-checker.css">
 </head>
 <body>
     <div class="container">
@@ -1152,7 +151,7 @@
         let allPages = [];
         let scanResults = [];
         let filteredResults = [];
-        let currentPagePath = '';
+        let currentPagePath = ''; // This should be empty initially to show all results
         let currentPage = 1;
         const itemsPerPage = 20;
         let sortOrder = 'date-desc';
@@ -1279,8 +278,8 @@
             });
             
             document.getElementById('nextPage').addEventListener('click', () => {
-                const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
-                if (currentPage < totalPages) {
+                const totalPagesCount = Math.ceil(filteredResults.length / itemsPerPage);
+                if (currentPage < totalPagesCount) {
                     currentPage++;
                     displayResults();
                 }
@@ -1423,7 +422,22 @@
                 }
                 
                 const data = await response.json();
-                scanResults = data.results || [];
+                console.log('Loaded scan results:', data);
+                console.log('Data type:', typeof data);
+                console.log('Has results property:', 'results' in data);
+                console.log('Results value:', data.results);
+                
+                // Handle different response formats
+                if (Array.isArray(data)) {
+                    scanResults = data;
+                } else if (data.results) {
+                    scanResults = data.results;
+                } else {
+                    scanResults = [];
+                }
+                
+                console.log('Total scan results:', scanResults.length);
+                console.log('First result:', scanResults[0]);
                 filterAndDisplayResults();
                 updateStats();
                 clearMessage();
@@ -1476,10 +490,72 @@
                     wcagLevel: wcagLevel
                 });
                 
+                console.log('Scan result from scanner:', scanResult);
                 showMessage(`Scan completed for ${pageData.pageTitle}`, 'success');
                 
-                // Reload results
+                // Wait a moment for the backend to process the result
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Clear the page filter to show all results
+                currentPagePath = '';
+                pageSearchInput.value = '';
+                pageSearchInput.dataset.selectedPath = '';
+                
+                // Reload the scan results to ensure list is updated
                 await loadScanResults();
+                
+                // Try to show modal with scan results directly
+                if (scanResult && scanResult.violations) {
+                    // Build a result object from the axe scan results
+                    const modalData = {
+                        pageTitle: pageData.pageTitle,
+                        pagePath: pagePath,
+                        score: calculateScore(scanResult),
+                        violationCount: scanResult.violations.length,
+                        violations: scanResult.violations,
+                        violations_critical: scanResult.violations.filter(v => v.impact === 'critical').length,
+                        violations_serious: scanResult.violations.filter(v => v.impact === 'serious').length,
+                        violations_moderate: scanResult.violations.filter(v => v.impact === 'moderate').length,
+                        violations_minor: scanResult.violations.filter(v => v.impact === 'minor').length,
+                        passes: scanResult.passes
+                    };
+                    console.log('Showing modal with constructed data:', modalData);
+                    showScanResultsModal(modalData);
+                    
+                    // Don't reload immediately - wait for modal to close
+                    return;
+                }
+                
+                // Get the latest scan result for this page to show in modal
+                console.log('Fetching scan results for modal...', `${apiBase}/easya11y/results?pagePath=${encodeURIComponent(pagePath)}&limit=1`);
+                const resultsResponse = await fetch(`${apiBase}/easya11y/results?pagePath=${encodeURIComponent(pagePath)}&limit=1`);
+                console.log('Results response status:', resultsResponse.status);
+                
+                if (resultsResponse.ok) {
+                    const resultsData = await resultsResponse.json();
+                    console.log('Results data:', resultsData);
+                    
+                    if (resultsData.results && resultsData.results.length > 0) {
+                        console.log('Showing modal with result:', resultsData.results[0]);
+                        // Show the modal with the scan results
+                        showScanResultsModal(resultsData.results[0]);
+                    } else if (resultsData.length > 0) {
+                        // Handle case where results might be directly an array
+                        console.log('Showing modal with result (array):', resultsData[0]);
+                        showScanResultsModal(resultsData[0]);
+                    } else {
+                        console.log('No results found in response');
+                        await loadScanResults();
+                    }
+                } else {
+                    console.log('Failed to fetch results, status:', resultsResponse.status);
+                    // Clear the page filter to show all results
+                    currentPagePath = '';
+                    pageSearchInput.value = '';
+                    pageSearchInput.dataset.selectedPath = '';
+                    // If we can't get the result, just reload the list
+                    await loadScanResults();
+                }
                 
             } catch (error) {
                 showMessage(`Error scanning page: ${error.message}`, 'error');
@@ -1549,6 +625,11 @@
         
         // Filter and display scan results
         function filterAndDisplayResults() {
+            console.log('filterAndDisplayResults called');
+            console.log('scanResults before filter:', scanResults);
+            console.log('scanResults length:', scanResults.length);
+            console.log('Current filters:', { searchTerm, currentPagePath, severityFilter, wcagFilter });
+            
             filteredResults = scanResults.filter(result => {
                 // Search filter
                 if (searchTerm) {
@@ -1565,7 +646,12 @@
                 
                 // Severity filter
                 if (severityFilter) {
-                    const hasSeverity = result.violations?.some(v => v.impact === severityFilter);
+                    // Check if the result has violations of the specified severity
+                    const hasSeverity = 
+                        (severityFilter === 'critical' && result.criticalCount > 0) ||
+                        (severityFilter === 'serious' && result.seriousCount > 0) ||
+                        (severityFilter === 'moderate' && result.moderateCount > 0) ||
+                        (severityFilter === 'minor' && result.minorCount > 0);
                     if (!hasSeverity) {
                         return false;
                     }
@@ -1578,6 +664,9 @@
                 
                 return true;
             });
+            
+            console.log('filteredResults after filter:', filteredResults);
+            console.log('filteredResults length:', filteredResults.length);
             
             sortAndDisplayResults();
         }
@@ -1607,7 +696,12 @@
         
         // Display scan results with pagination
         function displayResults() {
+            console.log('displayResults called');
+            console.log('filteredResults:', filteredResults);
+            console.log('filteredResults length:', filteredResults?.length);
+            
             if (!filteredResults || filteredResults.length === 0) {
+                console.log('No results to display, showing empty state');
                 submissionsContainer.innerHTML = `
                     <div class="empty-state">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1622,7 +716,7 @@
                 return;
             }
             
-            const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+            const totalPagesCount = Math.ceil(filteredResults.length / itemsPerPage);
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
             const pageResults = filteredResults.slice(startIndex, endIndex);
@@ -1635,7 +729,7 @@
                 const minorCount = result.minorCount || result.violations_minor || 0;
                 
                 return `
-                    <div class="submission scan-result" onclick="toggleResult(this)" data-page-path="${result.pagePath}">
+                    <div class="submission scan-result ${scoreClass}" onclick="toggleResult(this)" data-page-path="${result.pagePath}">
                         <div class="submission-header">
                             <div class="submission-meta">
                                 <div class="page-info">
@@ -1645,6 +739,7 @@
                                 <div class="scan-info">
                                     <span class="submission-date">Scanned ${formatDate(result.scanDate)}</span>
                                     <span class="wcag-level">WCAG ${result.wcagLevel}</span>
+                                    <span class="score-badge ${scoreClass}">Score: ${result.score ? result.score.toFixed(1) : '0.0'}</span>
                                 </div>
                             </div>
                             <div class="submission-expand">⌄</div>
@@ -1666,12 +761,12 @@
             }).join('');
             
             // Update pagination
-            if (totalPages > 1) {
+            if (totalPagesCount > 1) {
                 pagination.style.display = 'flex';
                 document.getElementById('currentPage').textContent = currentPage;
-                document.getElementById('totalPages').textContent = totalPages;
+                document.getElementById('totalPages').textContent = totalPagesCount;
                 document.getElementById('prevPage').disabled = currentPage === 1;
-                document.getElementById('nextPage').disabled = currentPage === totalPages;
+                document.getElementById('nextPage').disabled = currentPage === totalPagesCount;
             } else {
                 pagination.style.display = 'none';
             }
@@ -1899,6 +994,233 @@
                 timeout = setTimeout(later, wait);
             };
         }
+        
+        // Modal functions
+        function showScanResultsModal(scanResult) {
+            try {
+                console.log('showScanResultsModal called with:', scanResult);
+                const modal = document.getElementById('scanResultsModal');
+                const body = document.getElementById('scanResultsBody');
+                
+                if (!modal || !body) {
+                    console.error('Modal elements not found');
+                    return;
+                }
+                
+                // Calculate stats
+                const violationCount = scanResult.violations?.length || 0;
+                const passCount = scanResult.passes?.length || 0;
+                const totalIssues = scanResult.violations?.reduce((sum, v) => sum + (v.nodes?.length || 0), 0) || 0;
+                
+                // Build modal content using similar structure as scan dialog
+                let html = `
+                <div class="scan-summary">
+                    <div class="scan-score">
+                        <div class="score-circle-container">
+                            <div class="score-circle">
+                                <svg width="80" height="80">
+                                    <circle cx="40" cy="40" r="32" class="score-circle-bg"></circle>
+                                    <circle cx="40" cy="40" r="32" class="score-circle-progress" 
+                                            style="stroke: ${getScoreColor(scanResult.score)}; 
+                                                   stroke-dasharray: ${2 * Math.PI * 32}; 
+                                                   stroke-dashoffset: ${2 * Math.PI * 32 * (1 - scanResult.score / 100)}"></circle>
+                                </svg>
+                                <div class="score-text" style="color: ${getScoreColor(scanResult.score)}">${scanResult.score}</div>
+                            </div>
+                        </div>
+                        <div class="score-details">
+                            <div class="score-label">Page: ${escapeHtml(scanResult.pageTitle)}</div>
+                            <div class="stats-row">
+                                <span>Violations: <strong>${violationCount}</strong></span>
+                                <span>Passed Rules: <strong>${passCount}</strong></span>
+                                <span>Total Issues: <strong>${totalIssues}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="violation-summary">
+                        ${scanResult.violations_critical > 0 ? `<span class="violation-count critical">Critical: ${scanResult.violations_critical}</span>` : ''}
+                        ${scanResult.violations_serious > 0 ? `<span class="violation-count serious">Serious: ${scanResult.violations_serious}</span>` : ''}
+                        ${scanResult.violations_moderate > 0 ? `<span class="violation-count moderate">Moderate: ${scanResult.violations_moderate}</span>` : ''}
+                        ${scanResult.violations_minor > 0 ? `<span class="violation-count minor">Minor: ${scanResult.violations_minor}</span>` : ''}
+                        ${scanResult.violationCount === 0 ? `<span class="violation-count success">No violations found!</span>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Add violations details if any
+            if (scanResult.violations && scanResult.violations.length > 0) {
+                html += '<div class="scan-violations"><h4>Accessibility Issues</h4><div class="violations-list">';
+                
+                // Group violations by impact
+                const violationsByImpact = {
+                    critical: [],
+                    serious: [],
+                    moderate: [],
+                    minor: []
+                };
+                
+                scanResult.violations.forEach(v => {
+                    if (violationsByImpact[v.impact]) {
+                        violationsByImpact[v.impact].push(v);
+                    }
+                });
+                
+                // Display violations by impact level
+                ['critical', 'serious', 'moderate', 'minor'].forEach(impact => {
+                    violationsByImpact[impact].forEach(violation => {
+                        html += createViolationCard(violation);
+                    });
+                });
+                
+                html += '</div></div>';
+            } else {
+                html += `
+                    <div class="success-message">
+                        <strong>Great job!</strong> No accessibility violations found.
+                    </div>
+                `;
+            }
+            
+            body.innerHTML = html;
+            modal.classList.add('active');
+            
+            // Add event listeners for "show more" links
+            body.querySelectorAll('.show-more-elements').forEach(link => {
+                link.addEventListener('click', function() {
+                    const violationId = this.getAttribute('data-violation');
+                    const hiddenElements = body.querySelectorAll(`.elements-collapsed[data-violation="${violationId}"]`);
+                    const isExpanded = this.getAttribute('data-expanded') === 'true';
+                    
+                    if (isExpanded) {
+                        hiddenElements.forEach(el => el.style.display = 'none');
+                        this.textContent = `... and ${this.getAttribute('data-count')} more elements`;
+                        this.setAttribute('data-expanded', 'false');
+                    } else {
+                        hiddenElements.forEach(el => el.style.display = 'block');
+                        this.textContent = 'Show less';
+                        this.setAttribute('data-expanded', 'true');
+                    }
+                });
+            });
+            
+            } catch (error) {
+                console.error('Error showing scan results modal:', error);
+            }
+        }
+        
+        function createViolationCard(violation) {
+            const violationId = 'violation-' + Math.random().toString(36).substr(2, 9);
+            
+            // Show first 3 elements
+            const visibleElements = violation.nodes.slice(0, 3).map(node => 
+                `<div class="element-item">${escapeHtml(node.target || node.html || node.selector || '')}</div>`
+            ).join('');
+            
+            // Hidden elements
+            const hiddenElements = violation.nodes.length > 3 ? 
+                violation.nodes.slice(3).map(node => 
+                    `<div class="element-item elements-collapsed" data-violation="${violationId}" style="display: none;">${escapeHtml(node.target || node.html || node.selector || '')}</div>`
+                ).join('') : '';
+            
+            // Show more link
+            const showMoreLink = violation.nodes.length > 3 ? 
+                `<span class="show-more-elements" data-violation="${violationId}" data-expanded="false" data-count="${violation.nodes.length - 3}">
+                    ... and ${violation.nodes.length - 3} more elements
+                </span>` : '';
+            
+            return `
+                <div class="violation-card">
+                    <div class="violation-header">
+                        <div class="violation-title">${escapeHtml(violation.help || violation.description)}</div>
+                        <span class="violation-impact ${violation.impact}" style="background: ${getImpactColor(violation.impact)}; color: white;">
+                            ${violation.impact}
+                        </span>
+                    </div>
+                    <div class="violation-description">${escapeHtml(violation.description)}</div>
+                    <div class="violation-elements">
+                        <strong>Affected elements:</strong>
+                        ${visibleElements}
+                        ${hiddenElements}
+                        ${showMoreLink}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function closeScanResultsModal() {
+            const modal = document.getElementById('scanResultsModal');
+            modal.classList.remove('active');
+            
+            // Clear the page filter to show all results
+            currentPagePath = '';
+            pageSearchInput.value = '';
+            pageSearchInput.dataset.selectedPath = '';
+            
+            // Refresh the scan results list with a small delay to ensure the backend has indexed the new result
+            setTimeout(() => {
+                loadScanResults();
+            }, 500);
+        }
+        
+        function getScoreClass(score) {
+            if (score >= 90) return 'score-good';
+            if (score >= 70) return 'score-warning';
+            return 'score-bad';
+        }
+        
+        function getScoreColor(score) {
+            if (score >= 90) return '#28a745';
+            if (score >= 70) return '#ffc107';
+            return '#dc3545';
+        }
+        
+        function getImpactColor(impact) {
+            switch(impact) {
+                case 'critical': return '#721c24';
+                case 'serious': return '#e53e3e';
+                case 'moderate': return '#ed8936';
+                case 'minor': return '#ecc94b';
+                default: return '#6c757d';
+            }
+        }
+        
+        // Calculate accessibility score based on violations
+        function calculateScore(scanResult) {
+            if (!scanResult || !scanResult.violations) return 100;
+            
+            const violations = scanResult.violations;
+            const totalElements = (scanResult.passes ? scanResult.passes.length : 0) + violations.length;
+            
+            if (totalElements === 0) return 100;
+            
+            // Weight violations by impact
+            let weightedViolations = 0;
+            violations.forEach(violation => {
+                const weight = violation.impact === 'critical' ? 10 : 
+                             violation.impact === 'serious' ? 5 : 
+                             violation.impact === 'moderate' ? 2 : 1;
+                weightedViolations += weight * violation.nodes.length;
+            });
+            
+            const score = Math.max(0, Math.round(100 - (weightedViolations / totalElements) * 100));
+            return score;
+        }
     </script>
+    
+    <!-- Scan Results Modal -->
+    <div id="scanResultsModal" class="scan-results-modal">
+        <div class="scan-results-content">
+            <div class="scan-results-header">
+                <h3>Scan Results</h3>
+                <button class="close-modal-btn" onclick="closeScanResultsModal()">×</button>
+            </div>
+            <div class="scan-results-body" id="scanResultsBody">
+                <!-- Content will be dynamically populated -->
+            </div>
+            <div class="scan-results-footer">
+                <button class="btn btn-primary" onclick="closeScanResultsModal()">Close</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
