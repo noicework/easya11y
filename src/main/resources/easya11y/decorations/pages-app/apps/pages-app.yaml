@@ -1,0 +1,41 @@
+subApps:
+  browser:
+    actions:
+      runAccessibilityCheck:
+        $type: info.magnolia.ui.api.action.ConfiguredActionDefinition
+        implementationClass: work.noice.easya11y.actions.RunAccessibilityCheckAction
+        label: Run Accessibility Check
+        icon: easya11y-icon
+        availability:
+          rules:
+            isPage:
+              $type: jcrNodeTypeRule
+              nodeType: mgnl:page
+    actionbar:
+      sections:
+        pageActions:
+          groups:
+            accessibilityGroup:
+              items:
+                - name: runAccessibilityCheck
+                  
+  detail:
+    actions:
+      runAccessibilityCheck:
+        $type: info.magnolia.ui.api.action.ConfiguredActionDefinition
+        implementationClass: work.noice.easya11y.actions.RunAccessibilityCheckAction
+        label: Run Accessibility Check
+        icon: easya11y-icon
+        availability:
+          writePermissionRequired: false
+          rules:
+            isPage:
+              $type: jcrNodeTypeRule
+              nodeType: mgnl:page
+    actionbar:
+      sections:
+        pageActions:
+          groups:
+            accessibilityGroup:
+              items:
+                - name: runAccessibilityCheck

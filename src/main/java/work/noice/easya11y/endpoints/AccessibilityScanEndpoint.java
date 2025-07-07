@@ -9,6 +9,7 @@ import work.noice.easya11y.models.AccessibilityScanResult;
 
 import javax.inject.Inject;
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.ws.rs.*;
@@ -70,32 +71,30 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
         }
         
         try {
-            Session websiteSession = MgnlContext.getJCRSession(WEBSITE_WORKSPACE);
-            
-            if (!websiteSession.nodeExists(pagePath)) {
-                return buildErrorResponse("Page not found: " + pagePath, Response.Status.NOT_FOUND);
-            }
-            
-            Node pageNode = websiteSession.getNode(pagePath);
-            if (!NodeUtil.isNodeType(pageNode, "mgnl:page")) {
-                return buildErrorResponse("Path does not point to a page", Response.Status.BAD_REQUEST);
-            }
-            
             // Generate scan ID
             String scanId = UUID.randomUUID().toString();
             
             // Store WCAG level for this scan
             scanWcagLevels.put(scanId, wcagLevel);
             
-            // Build page URL
+            // Build page URL directly - let the rendered page handle whether it exists
             String contextPath = MgnlContext.getContextPath();
             String pageUrl = MgnlContext.getWebContext().getRequest().getScheme() + "://" + 
                            MgnlContext.getWebContext().getRequest().getServerName() + ":" +
                            MgnlContext.getWebContext().getRequest().getServerPort() +
                            contextPath + pagePath + ".html";
             
-            // Get page title
-            String pageTitle = PropertyUtil.getString(pageNode, "title", pageNode.getName());
+            // Try to get page title from JCR if available, otherwise use page name from path
+            String pageTitle = pagePath.substring(pagePath.lastIndexOf('/') + 1);
+            try {
+                Session websiteSession = MgnlContext.getJCRSession(WEBSITE_WORKSPACE);
+                if (websiteSession.nodeExists(pagePath)) {
+                    Node pageNode = websiteSession.getNode(pagePath);
+                    pageTitle = PropertyUtil.getString(pageNode, "title", pageTitle);
+                }
+            } catch (Exception e) {
+                log.warn("Could not get page title from JCR for path: {}, using default: {}", pagePath, pageTitle);
+            }
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -108,7 +107,7 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
             
             return Response.ok(response).build();
             
-        } catch (RepositoryException e) {
+        } catch (Exception e) {
             log.error("Error initiating scan", e);
             return buildErrorResponse("Error initiating scan: " + e.getMessage(), Response.Status.INTERNAL_SERVER_ERROR);
         }

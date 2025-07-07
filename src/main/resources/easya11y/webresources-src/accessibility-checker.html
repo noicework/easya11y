@@ -1017,6 +1017,18 @@
             loadPages();
             loadScanResults();
             setupEventListeners();
+            
+            // Check if autoRun parameter is present
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('autoRun') === 'true') {
+                console.log('Auto-run mode detected, starting scan automatically...');
+                // Wait a bit for everything to load, then start scan
+                setTimeout(() => {
+                    if (currentPagePath && currentPageUrl) {
+                        startScan();
+                    }
+                }, 1000);
+            }
         });
         
         // Setup event listeners

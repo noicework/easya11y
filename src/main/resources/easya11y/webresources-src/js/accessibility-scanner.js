@@ -238,7 +238,7 @@ class AccessibilityScanner {
             
             try {
                 // Initiate scan for this page
-                const initResponse = await fetch(`${this.apiBase}/easya11y/scan/initiate`, {
+                const initResponse = await fetch(`${this.apiBase}/scan/initiate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
@@ -284,7 +284,7 @@ class AccessibilityScanner {
      * Send scan results to the backend
      */
     async sendResults(scanData) {
-        const response = await fetch(`${this.apiBase}/easya11y/scan/results`, {
+        const response = await fetch(`${this.apiBase}/scan/results`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(scanData)
