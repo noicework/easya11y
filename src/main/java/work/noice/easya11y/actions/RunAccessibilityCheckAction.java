@@ -18,6 +18,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ProcessingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,30 +101,41 @@ public class RunAccessibilityCheckAction extends AbstractAction<ConfiguredAction
                     .post(Entity.json(request));
             
             if (response.getStatus() == 200) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> result = response.readEntity(Map.class);
-                String pageUrl = (String) result.get("pageUrl");
-                String scanId = (String) result.get("scanId");
-                
-                // Create the scan viewer URL for the dialog view
-                String scanViewerUrl = baseUrl + "/.resources/easya11y/webresources/accessibility-scan-dialog.html" +
-                    "?pageUrl=" + URLEncoder.encode(pageUrl, StandardCharsets.UTF_8.toString()) +
-                    "&scanId=" + scanId +
-                    "&pagePath=" + URLEncoder.encode(pagePath, StandardCharsets.UTF_8.toString()) +
-                    "&pageTitle=" + URLEncoder.encode(pageTitle, StandardCharsets.UTF_8.toString()) +
-                    "&wcagLevel=" + URLEncoder.encode(wcagLevel, StandardCharsets.UTF_8.toString()) +
-                    "&wcagVersion=" + URLEncoder.encode(wcagVersion, StandardCharsets.UTF_8.toString());
-                
-                // Create dialog with iframe
-                openScannerDialog(scanViewerUrl, pageTitle);
-                
-                log.info("Accessibility scan dialog opened. Scan ID: {}", scanId);
+                try {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> result = response.readEntity(Map.class);
+                    String pageUrl = (String) result.get("pageUrl");
+                    String scanId = (String) result.get("scanId");
+                    
+                    // Create the scan viewer URL for the dialog view
+                    String scanViewerUrl = baseUrl + "/.resources/easya11y/webresources/accessibility-scan-dialog.html" +
+                        "?pageUrl=" + URLEncoder.encode(pageUrl, StandardCharsets.UTF_8.toString()) +
+                        "&scanId=" + scanId +
+                        "&pagePath=" + URLEncoder.encode(pagePath, StandardCharsets.UTF_8.toString()) +
+                        "&pageTitle=" + URLEncoder.encode(pageTitle, StandardCharsets.UTF_8.toString()) +
+                        "&wcagLevel=" + URLEncoder.encode(wcagLevel, StandardCharsets.UTF_8.toString()) +
+                        "&wcagVersion=" + URLEncoder.encode(wcagVersion, StandardCharsets.UTF_8.toString());
+                    
+                    // Create dialog with iframe
+                    openScannerDialog(scanViewerUrl, pageTitle);
+                    
+                    log.info("Accessibility scan dialog opened. Scan ID: {}", scanId);
+                } catch (ProcessingException e) {
+                    // This happens when the response is HTML instead of JSON, typically meaning the REST endpoint is not accessible
+                    log.error("REST endpoint returned HTML instead of JSON - likely a permission issue", e);
+                    showError("REST endpoint error - are you sure you enabled /.rest/easya11y/* to the rest-anonymous user role?");
+                }
                 
             } else {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> error = response.readEntity(Map.class);
-                String errorMessage = (String) error.get("message");
-                showError("Failed to initiate scan: " + errorMessage);
+                try {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> error = response.readEntity(Map.class);
+                    String errorMessage = (String) error.get("message");
+                    showError("Failed to initiate scan: " + errorMessage);
+                } catch (ProcessingException e) {
+                    // If we can't read the error response as JSON, show a generic error
+                    showError("Failed to initiate scan. Check that REST endpoints are properly configured.");
+                }
             }
             
         } catch (RepositoryException e) {

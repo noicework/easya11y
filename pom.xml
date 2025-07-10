@@ -6,7 +6,7 @@
   <version>1.0</version>
   <packaging>jar</packaging>
   <name>easya11y Magnolia Module</name>
-  <description>Accessibility testing module for Magnolia CMS that provides easy integration with automated accessibility checks</description>
+  <description>Accessibility testing module for Magnolia CMS</description>
   <url>https://github.com/noicework/easya11y</url>
   
   <licenses>
@@ -21,8 +21,8 @@
     <developer>
       <name>Jake Tracey</name>
       <email>jake.tracey@noice.work</email>
-      <organization>work.noice</organization>
-      <organizationUrl>https://work.noice</organizationUrl>
+      <organization>Noice</organization>
+      <organizationUrl>https://noice.work</organizationUrl>
     </developer>
   </developers>
   
@@ -33,7 +33,7 @@
   </scm>
   
   <properties>
-    <magnoliaBundleVersion>6.3.8</magnoliaBundleVersion>
+    <magnoliaBundleVersion>6.3.10</magnoliaBundleVersion>
     <javaVersion>1.8</javaVersion>
   </properties>
 
@@ -175,7 +175,6 @@
         <configuration>
           <doclint>none</doclint>
           <failOnError>false</failOnError>
-          <additionalparam>-Xdoclint:none</additionalparam>
           <additionalJOption>-Xdoclint:none</additionalJOption>
         </configuration>
         <executions>
