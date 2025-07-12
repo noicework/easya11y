@@ -1,4 +1,4 @@
-import type { Page, ScanInit, ScanResult, DetailedResult, FilterState, WCAGLevel } from '@types/index'
+import type { Page, ScanInit, ScanResult, DetailedResult, WCAGLevel } from '@types'
 
 class AccessibilityService {
   private apiBase: string
@@ -83,6 +83,40 @@ class AccessibilityService {
       exportUrl += `?pagePath=${encodeURIComponent(pagePath)}`
     }
     return exportUrl
+  }
+
+  async getConfiguration(): Promise<any> {
+    const response = await fetch(`${this.apiBase}/easya11y/configuration`)
+    
+    if (!response.ok) {
+      throw new Error(`Failed to load configuration: ${response.status}`)
+    }
+    
+    const data = await response.json()
+    
+    if (data.success && data.configuration) {
+      return data.configuration
+    }
+    
+    return {}
+  }
+
+  async saveConfiguration(configuration: any): Promise<void> {
+    const response = await fetch(`${this.apiBase}/easya11y/configuration`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(configuration)
+    })
+    
+    if (!response.ok) {
+      throw new Error(`Failed to save configuration: ${response.status}`)
+    }
+    
+    const data = await response.json()
+    
+    if (!data.success) {
+      throw new Error(data.message || 'Failed to save configuration')
+    }
   }
 }
 

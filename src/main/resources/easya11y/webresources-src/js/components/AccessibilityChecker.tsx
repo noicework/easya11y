@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui/card'
 import { StatsOverview } from '@components/StatsOverview'
 import { ScanControls } from '@components/ScanControls'
@@ -14,7 +14,8 @@ import { usePages } from '@hooks/usePages'
 import { useScanResults } from '@hooks/useScanResults'
 import { useScanner } from '@hooks/useScanner'
 import { accessibilityService } from '@services/accessibility.service'
-import type { Page, ScanResult, FilterState, SortOrder, WCAGLevel } from '@types/index'
+import { calculateScore } from '@lib/utils'
+import type { Page, ScanResult, FilterState, SortOrder, WCAGLevel } from '@types'
 
 export function AccessibilityChecker() {
   // State
@@ -112,6 +113,7 @@ export function AccessibilityChecker() {
       
       // Show results modal if scan succeeded
       if (result && !result.errorMessage) {
+        const calculatedScore = calculateScore(result)
         const newResult: ScanResult = {
           scanId: Date.now().toString(),
           pagePath: selectedPage.path,
@@ -119,7 +121,7 @@ export function AccessibilityChecker() {
           pageTitle: selectedPage.title || selectedPage.name || selectedPage.path,
           scanDate: new Date().toISOString(),
           wcagLevel,
-          score: result.score || 0,
+          score: calculatedScore,
           violationCount: result.violations?.length || 0,
           violations: result.violations,
           passes: result.passes,
@@ -156,7 +158,6 @@ export function AccessibilityChecker() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Accessibility Checker</h1>
           <p className="text-muted-foreground">
             Scan and monitor accessibility compliance across your website
           </p>

@@ -56,25 +56,47 @@ export function getImpactColor(impact: string): string {
 
 /**
  * Calculate accessibility score based on violations
+ * This should match the Java backend calculation in AccessibilityScanResult.calculateScore()
  */
 export function calculateScore(scanResult: { violations?: any[], passes?: any[] }): number {
   if (!scanResult || !scanResult.violations) return 100
   
   const violations = scanResult.violations
-  const totalElements = (scanResult.passes ? scanResult.passes.length : 0) + violations.length
+  const passes = scanResult.passes || []
+  
+  // Count total elements tested (unique elements, not violations)
+  let totalElements = passes.length
+  violations.forEach(violation => {
+    totalElements += (violation.nodes?.length || 0)
+  })
   
   if (totalElements === 0) return 100
   
-  // Weight violations by impact
-  let weightedViolations = 0
+  // Count violations by impact (just count, not nodes)
+  const violationsByImpact = {
+    critical: 0,
+    serious: 0,
+    moderate: 0,
+    minor: 0
+  }
+  
   violations.forEach(violation => {
-    const weight = violation.impact === 'critical' ? 10 : 
-                 violation.impact === 'serious' ? 5 : 
-                 violation.impact === 'moderate' ? 2 : 1
-    weightedViolations += weight * (violation.nodes?.length || 0)
+    if (violation.impact && violationsByImpact.hasOwnProperty(violation.impact)) {
+      violationsByImpact[violation.impact as keyof typeof violationsByImpact]++
+    }
   })
   
-  const score = Math.max(0, Math.round(100 - (weightedViolations / totalElements) * 100))
+  // Calculate weighted violations (matching Java backend)
+  const weightedViolations = 
+    (violationsByImpact.critical * 10.0) +
+    (violationsByImpact.serious * 5.0) +
+    (violationsByImpact.moderate * 2.0) +
+    (violationsByImpact.minor * 1.0)
+  
+  // Calculate score (matching Java backend formula)
+  const violationRatio = weightedViolations / (totalElements * 10.0)
+  const score = Math.max(0, Math.round(100.0 - (violationRatio * 100.0)))
+  
   return score
 }
 

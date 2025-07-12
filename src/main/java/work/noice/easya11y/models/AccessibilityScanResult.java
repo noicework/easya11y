@@ -76,7 +76,7 @@ public class AccessibilityScanResult {
         
         // Calculate score (higher violations = lower score)
         double violationRatio = weightedViolations / (totalElements * 10.0);
-        this.score = Math.max(0, 100.0 - (violationRatio * 100.0));
+        this.score = Math.round(Math.max(0, 100.0 - (violationRatio * 100.0)));
     }
     
     /**

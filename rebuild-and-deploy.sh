@@ -7,7 +7,7 @@ echo "Building easya11y..."
 mvn clean package
 
 echo "Copying JAR to Magnolia Author instance..."
-cp target/easya11y-1.0.jar ~/Projects/mmp/apache-tomcat/webapps/magnoliaAuthor/WEB-INF/lib
+cp target/easya11y-1.0.1.jar ~/Projects/mmp/apache-tomcat/webapps/magnoliaAuthor/WEB-INF/lib
 
 echo "Shutting down Tomcat..."
 ~/Projects/mmp/apache-tomcat/bin/shutdown.sh

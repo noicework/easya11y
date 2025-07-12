@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { accessibilityService } from '@services/accessibility.service'
-import type { ScanResult } from '@types/index'
+import type { ScanResult } from '@types'
 
 export function useScanResults() {
   return useQuery<ScanResult[], Error>({

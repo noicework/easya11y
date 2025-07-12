@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card, CardContent } from '@components/ui/card'
 import { ScoreIndicator } from '@components/ScoreIndicator'
 import { ViolationCard } from '@components/ViolationCard'
@@ -6,7 +6,6 @@ import { Alert, AlertDescription } from '@components/ui/alert'
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { scannerService } from '@services/scanner.service'
 import { calculateScore } from '@lib/utils'
-import type { Violation } from '@types/index'
 
 export function AccessibilityScanDialog() {
   const [isScanning, setIsScanning] = useState(true)
@@ -80,16 +79,16 @@ export function AccessibilityScanDialog() {
   const violations = scanResult.violations || []
   const violationCount = violations.length
   const passCount = scanResult.passes?.length || 0
-  const totalIssues = violations.reduce((sum: number, v: Violation) => 
+  const totalIssues = violations.reduce((sum: number, v: any) => 
     sum + (v.nodes?.length || 0), 0
   )
 
   // Count violations by impact
   const impactCounts = {
-    critical: violations.filter((v: Violation) => v.impact === 'critical').length,
-    serious: violations.filter((v: Violation) => v.impact === 'serious').length,
-    moderate: violations.filter((v: Violation) => v.impact === 'moderate').length,
-    minor: violations.filter((v: Violation) => v.impact === 'minor').length,
+    critical: violations.filter((v: any) => v.impact === 'critical').length,
+    serious: violations.filter((v: any) => v.impact === 'serious').length,
+    moderate: violations.filter((v: any) => v.impact === 'moderate').length,
+    minor: violations.filter((v: any) => v.impact === 'minor').length,
   }
 
   return (
@@ -145,8 +144,8 @@ export function AccessibilityScanDialog() {
               <h3 className="mb-4 text-lg font-semibold">Accessibility Issues</h3>
               <div className="space-y-4">
                 {['critical', 'serious', 'moderate', 'minor'].map((impact) => {
-                  const impactViolations = violations.filter((v: Violation) => v.impact === impact)
-                  return impactViolations.map((violation: Violation) => (
+                  const impactViolations = violations.filter((v: any) => v.impact === impact)
+                  return impactViolations.map((violation: any) => (
                     <ViolationCard key={violation.id} violation={violation} />
                   ))
                 })}

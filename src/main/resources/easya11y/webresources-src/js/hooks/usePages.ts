@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { accessibilityService } from '@services/accessibility.service'
-import type { Page } from '@types/index'
+import type { Page } from '@types'
 
 export function usePages() {
   return useQuery<Page[], Error>({

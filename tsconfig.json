@@ -22,7 +22,8 @@
       "@hooks/*": ["src/main/resources/easya11y/webresources-src/js/hooks/*"],
       "@lib/*": ["src/main/resources/easya11y/webresources-src/js/lib/*"],
       "@services/*": ["src/main/resources/easya11y/webresources-src/js/services/*"],
-      "@types/*": ["src/main/resources/easya11y/webresources-src/js/types/*"]
+      "@types/*": ["src/main/resources/easya11y/webresources-src/js/types/*"],
+      "@types": ["src/main/resources/easya11y/webresources-src/js/types/index"]
     }
   },
   "include": ["src/main/resources/easya11y/webresources-src/**/*"],

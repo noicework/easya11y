@@ -14,6 +14,7 @@ export default defineConfig({
   plugins: [react()],
   root: SRC_DIR,
   publicDir: path.join(SRC_DIR, 'public'),
+  base: process.env.NODE_ENV === 'production' ? '/magnoliaAuthor/.resources/easya11y/webresources/' : '/',
   build: {
     outDir: DIST_DIR,
     emptyOutDir: false, // Don't clean output to preserve other files
@@ -21,6 +22,7 @@ export default defineConfig({
       input: {
         'accessibility-checker': path.join(SRC_DIR, 'accessibility-checker.html'),
         'accessibility-scan-dialog': path.join(SRC_DIR, 'accessibility-scan-dialog.html'),
+        'configuration': path.join(SRC_DIR, 'configuration.html'),
       },
       output: {
         entryFileNames: 'js/[name].js',

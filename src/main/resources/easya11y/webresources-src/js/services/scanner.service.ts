@@ -1,10 +1,8 @@
-import axe from 'axe-core'
 import { calculateScore } from '@lib/utils'
 import { accessibilityService } from './accessibility.service'
-import type { Page, WCAGLevel, ScanProgress } from '@types/index'
+import type { Page, WCAGLevel, ScanProgress } from '@types'
 
 export class ScannerService {
-  private isScanning = false
   private iframeContainer: HTMLDivElement | null = null
 
   constructor() {
@@ -155,7 +153,7 @@ export class ScannerService {
           }
         })
         
-        return results
+        return { ...results, score }
         
       } catch (e) {
         console.error('Error during scan:', e)
@@ -184,7 +182,7 @@ export class ScannerService {
           axeResults: errorResult
         })
         
-        return errorResult
+        return { ...errorResult, score: errorScore }
       }
     } catch (error) {
       this.cleanupIframe(iframe)

@@ -1,4 +1,3 @@
-import React from 'react'
 import { cn } from '@lib/utils'
 
 interface ScoreIndicatorProps {
@@ -84,7 +83,7 @@ export function ScoreIndicator({
           className={cn("font-bold", config.text)}
           style={{ color }}
         >
-          {score}
+          {Math.round(score)}
         </span>
       </div>
       {showLabel && (

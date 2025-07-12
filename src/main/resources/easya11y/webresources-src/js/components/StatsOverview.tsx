@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { cn } from '@lib/utils'
-import type { ScanStats } from '@types/index'
+import type { ScanStats } from '@types'
 
 interface StatsOverviewProps {
   stats: ScanStats

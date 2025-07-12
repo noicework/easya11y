@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { scannerService } from '@services/scanner.service'
 import { accessibilityService } from '@services/accessibility.service'
-import type { Page, WCAGLevel, ScanProgress } from '@types/index'
+import type { Page, WCAGLevel, ScanProgress } from '@types'
 
 export function useScanner() {
   const queryClient = useQueryClient()

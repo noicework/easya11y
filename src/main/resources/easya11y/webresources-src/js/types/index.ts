@@ -90,3 +90,10 @@ export interface DetailedResult extends ScanResult {
     errorMessage?: string
   }
 }
+
+export type WCAGVersion = '2.0' | '2.1' | '2.2'
+
+export interface Configuration {
+  wcagVersion: WCAGVersion
+  wcagLevel: WCAGLevel
+}
