@@ -26,14 +26,15 @@ export function useScanner() {
   })
 
   const scanMultiplePagesMutation = useMutation({
-    mutationFn: async ({ pages, wcagLevel }: { pages: Page[]; wcagLevel: WCAGLevel }) => {
+    mutationFn: async ({ pages, wcagLevel, concurrentBatchSize = 3 }: { pages: Page[]; wcagLevel: WCAGLevel; concurrentBatchSize?: number }) => {
       setIsScanning(true)
       setScanProgress(null)
       
       const result = await scannerService.scanMultiplePages(
         pages,
         wcagLevel,
-        (progress) => setScanProgress(progress)
+        (progress) => setScanProgress(progress),
+        concurrentBatchSize
       )
       
       return result
@@ -56,8 +57,8 @@ export function useScanner() {
   )
 
   const scanAllPages = useCallback(
-    (pages: Page[], wcagLevel: WCAGLevel = 'AA') => {
-      return scanMultiplePagesMutation.mutateAsync({ pages, wcagLevel })
+    (pages: Page[], wcagLevel: WCAGLevel = 'AA', concurrentBatchSize?: number) => {
+      return scanMultiplePagesMutation.mutateAsync({ pages, wcagLevel, concurrentBatchSize })
     },
     [scanMultiplePagesMutation]
   )

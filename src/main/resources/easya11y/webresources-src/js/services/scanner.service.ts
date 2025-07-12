@@ -194,41 +194,67 @@ export class ScannerService {
   async scanMultiplePages(
     pages: Page[],
     wcagLevel: WCAGLevel = 'AA',
-    progressCallback?: (progress: ScanProgress) => void
+    progressCallback?: (progress: ScanProgress) => void,
+    concurrentBatchSize: number = 3
   ): Promise<any[]> {
-    const results = []
+    const results: any[] = []
+    const completedCount = { value: 0 }
     
-    for (let i = 0; i < pages.length; i++) {
-      const page = pages[i]
+    // Process pages in batches
+    for (let i = 0; i < pages.length; i += concurrentBatchSize) {
+      const batch = pages.slice(i, i + concurrentBatchSize)
       
-      if (progressCallback) {
-        progressCallback({
-          current: i + 1,
-          total: pages.length,
-          currentPage: page.title || page.path,
-          percentage: Math.round(((i + 1) / pages.length) * 100)
-        })
-      }
+      // Scan pages in the current batch concurrently
+      const batchPromises = batch.map(async (page) => {
+        try {
+          const pageData = await accessibilityService.initiateScan(page.path, wcagLevel)
+          const scanResult = await this.scanPage({ ...pageData, wcagLevel })
+          
+          // Update progress for each completed page
+          completedCount.value++
+          if (progressCallback) {
+            progressCallback({
+              current: completedCount.value,
+              total: pages.length,
+              currentPage: page.title || page.path,
+              percentage: Math.round((completedCount.value / pages.length) * 100)
+            })
+          }
+          
+          return {
+            page: page.path,
+            success: true,
+            violationCount: scanResult.violations.length
+          }
+        } catch (error) {
+          console.error(`Error scanning ${page.path}:`, error)
+          
+          // Update progress even for failed pages
+          completedCount.value++
+          if (progressCallback) {
+            progressCallback({
+              current: completedCount.value,
+              total: pages.length,
+              currentPage: page.title || page.path,
+              percentage: Math.round((completedCount.value / pages.length) * 100)
+            })
+          }
+          
+          return {
+            page: page.path,
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          }
+        }
+      })
       
-      try {
-        const pageData = await accessibilityService.initiateScan(page.path, wcagLevel)
-        const scanResult = await this.scanPage({ ...pageData, wcagLevel })
-        
-        results.push({
-          page: page.path,
-          success: true,
-          violationCount: scanResult.violations.length
-        })
-        
-        await this.delay(1000)
-        
-      } catch (error) {
-        console.error(`Error scanning ${page.path}:`, error)
-        results.push({
-          page: page.path,
-          success: false,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        })
+      // Wait for all pages in the batch to complete
+      const batchResults = await Promise.all(batchPromises)
+      results.push(...batchResults)
+      
+      // Add a small delay between batches to avoid overwhelming the system
+      if (i + concurrentBatchSize < pages.length) {
+        await this.delay(500)
       }
     }
     

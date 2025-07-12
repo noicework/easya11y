@@ -58,26 +58,9 @@ public class AccessibilityScanResult {
     }
     
     /**
-     * Calculate accessibility score based on violations and their impact.
-     * Score is 0-100, where 100 is perfect accessibility.
+     * Score is now calculated on the frontend and passed to backend.
+     * This ensures consistency across the application.
      */
-    public void calculateScore() {
-        if (totalElements == 0) {
-            this.score = 100.0;
-            return;
-        }
-        
-        // Calculate weighted score based on violation impact
-        double weightedViolations = 
-            (violationsByImpact.get("critical") * 10.0) +
-            (violationsByImpact.get("serious") * 5.0) +
-            (violationsByImpact.get("moderate") * 2.0) +
-            (violationsByImpact.get("minor") * 1.0);
-        
-        // Calculate score (higher violations = lower score)
-        double violationRatio = weightedViolations / (totalElements * 10.0);
-        this.score = Math.round(Math.max(0, 100.0 - (violationRatio * 100.0)));
-    }
     
     /**
      * Inner class representing an accessibility violation.

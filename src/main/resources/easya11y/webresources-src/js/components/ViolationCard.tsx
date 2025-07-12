@@ -7,7 +7,7 @@ import { ChevronDown, ChevronUp, Code, ExternalLink, Info } from 'lucide-react'
 import { cn } from '@lib/utils'
 
 interface ViolationNode {
-  target: string[]
+  target: string | string[]
   html: string
   failureSummary?: string
   any?: any[]
@@ -125,7 +125,7 @@ export function ViolationCard({ violation, expanded: initialExpanded = false }: 
                 <Code className="h-4 w-4" />
                 <AlertDescription className="space-y-2">
                   <div className="font-mono text-xs overflow-x-auto">
-                    {node.target.join(' > ')}
+                    {Array.isArray(node.target) ? node.target.join(' > ') : node.target}
                   </div>
                   {node.html && (
                     <pre className="text-xs bg-muted p-2 rounded overflow-x-auto">

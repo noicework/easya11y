@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -12,7 +13,8 @@ import { Button } from '@components/ui/button'
 import { ScoreIndicator } from '@components/ScoreIndicator'
 import { ViolationCard } from '@components/ViolationCard'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui/card'
-import { ExternalLink, CheckCircle2 } from 'lucide-react'
+import { ExternalLink, CheckCircle2, Loader2 } from 'lucide-react'
+import { accessibilityService } from '@services/accessibility.service'
 import type { ScanResult } from '@types'
 
 interface ScanResultsModalProps {
@@ -22,24 +24,62 @@ interface ScanResultsModalProps {
 }
 
 export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalProps) {
-  if (!result) return null
+  const [detailedResult, setDetailedResult] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const critical = result.criticalCount || result.violations_critical || 0
-  const serious = result.seriousCount || result.violations_serious || 0
-  const moderate = result.moderateCount || result.violations_moderate || 0
-  const minor = result.minorCount || result.violations_minor || 0
+  useEffect(() => {
+    if (isOpen && result?.pagePath) {
+      loadDetailedResult()
+    }
+  }, [isOpen, result?.pagePath])
 
-  const groupedViolations = {
-    critical: result.violations?.filter((v: any) => v.impact === 'critical') || [],
-    serious: result.violations?.filter((v: any) => v.impact === 'serious') || [],
-    moderate: result.violations?.filter((v: any) => v.impact === 'moderate') || [],
-    minor: result.violations?.filter((v: any) => v.impact === 'minor') || [],
+  const loadDetailedResult = async () => {
+    if (!result?.pagePath) return
+    
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const details = await accessibilityService.getDetailedResult(result.pagePath)
+      setDetailedResult(details)
+    } catch (err) {
+      setError('Failed to load scan details')
+      console.error('Error loading scan details:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const totalPassed = result.passes?.length || 0
+  if (!result) return null
+  
+  // Use detailed result if available, otherwise fall back to summary
+  const displayResult = detailedResult || result
+
+  // Group violations by impact
+  const groupedViolations = {
+    critical: displayResult.violations?.filter((v: any) => v.impact === 'critical') || [],
+    serious: displayResult.violations?.filter((v: any) => v.impact === 'serious') || [],
+    moderate: displayResult.violations?.filter((v: any) => v.impact === 'moderate') || [],
+    minor: displayResult.violations?.filter((v: any) => v.impact === 'minor') || [],
+  }
+
+  // Calculate counts from the grouped violations
+  const critical = groupedViolations.critical.length
+  const serious = groupedViolations.serious.length
+  const moderate = groupedViolations.moderate.length
+  const minor = groupedViolations.minor.length
+
+  const totalPassed = displayResult.passes?.length || displayResult.passCount || 0
+
+  const handleClose = () => {
+    setDetailedResult(null)
+    setError(null)
+    onClose()
+  }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <div className="flex items-start justify-between">
@@ -73,8 +113,20 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
             </TabsList>
 
             <TabsContent value="violations" className="flex-1 overflow-hidden mt-4">
-              <ScrollArea className="h-[400px] pr-4">
-                <div className="space-y-6">
+              {loading ? (
+                <div className="flex items-center justify-center h-[400px]">
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Loading scan details...</p>
+                  </div>
+                </div>
+              ) : error ? (
+                <div className="flex items-center justify-center h-[400px]">
+                  <p className="text-sm text-muted-foreground">{error}</p>
+                </div>
+              ) : (
+                <ScrollArea className="h-[400px] pr-4">
+                  <div className="space-y-6">
                   {critical > 0 && (
                     <div className="space-y-3">
                       <h3 className="font-medium flex items-center gap-2">
@@ -145,13 +197,22 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
                     </Card>
                   )}
                 </div>
-              </ScrollArea>
+                </ScrollArea>
+              )}
             </TabsContent>
 
             <TabsContent value="passes" className="flex-1 overflow-hidden mt-4">
-              <ScrollArea className="h-[400px] pr-4">
-                <div className="space-y-2">
-                  {result.passes?.map((pass: any) => (
+              {loading ? (
+                <div className="flex items-center justify-center h-[400px]">
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Loading scan details...</p>
+                  </div>
+                </div>
+              ) : (
+                <ScrollArea className="h-[400px] pr-4">
+                  <div className="space-y-2">
+                    {displayResult.passes?.map((pass: any) => (
                     <Card key={pass.id}>
                       <CardHeader>
                         <div className="flex items-start justify-between">
@@ -165,7 +226,8 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
                     </Card>
                   ))}
                 </div>
-              </ScrollArea>
+                </ScrollArea>
+              )}
             </TabsContent>
 
             <TabsContent value="summary" className="mt-4">

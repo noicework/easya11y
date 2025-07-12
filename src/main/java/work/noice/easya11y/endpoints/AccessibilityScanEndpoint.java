@@ -136,6 +136,17 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
                 scanResults.get("wcagLevel").asText() : 
                 scanWcagLevels.getOrDefault(scanId, "AA");
             
+            // Get score from frontend (required)
+            if (!scanResults.has("score")) {
+                return buildErrorResponse("Score is required from frontend calculation", Response.Status.BAD_REQUEST);
+            }
+            Double frontendScore = scanResults.get("score").asDouble();
+            
+            // Validate score range
+            if (frontendScore < 0 || frontendScore > 100) {
+                return buildErrorResponse("Score must be between 0 and 100", Response.Status.BAD_REQUEST);
+            }
+            
             // Clean up temporary storage
             scanWcagLevels.remove(scanId);
             
@@ -179,8 +190,8 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
                 result.setTotalElements(totalPassElements + result.getElementsWithIssues());
             }
             
-            // Calculate score
-            result.calculateScore();
+            // Set the frontend-calculated score
+            result.setScore(frontendScore);
             
             // Store in JCR
             Session scanSession = MgnlContext.getJCRSession(SCAN_RESULTS_WORKSPACE);
