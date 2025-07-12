@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/main/resources/easya11y/webresources-src/*"],
+      "@components/*": ["src/main/resources/easya11y/webresources-src/js/components/*"],
+      "@hooks/*": ["src/main/resources/easya11y/webresources-src/js/hooks/*"],
+      "@lib/*": ["src/main/resources/easya11y/webresources-src/js/lib/*"],
+      "@services/*": ["src/main/resources/easya11y/webresources-src/js/services/*"],
+      "@types/*": ["src/main/resources/easya11y/webresources-src/js/types/*"]
+    }
+  },
+  "include": ["src/main/resources/easya11y/webresources-src/**/*"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>work.noice</groupId>
   <artifactId>easya11y</artifactId>
-  <version>1.0</version>
+  <version>1.0.1</version>
   <packaging>jar</packaging>
   <name>easya11y Magnolia Module</name>
   <description>Accessibility testing module for Magnolia CMS</description>
