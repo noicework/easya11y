@@ -7,10 +7,43 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/.resources/easya11y/webresources/js/configuration.js"></script>
-  <link rel="modulepreload" crossorigin href="/.resources/easya11y/webresources/js/globals-BigXdOGl.js">
-  <link rel="modulepreload" crossorigin href="/.resources/easya11y/webresources/js/label-CMjTWxBL.js">
-  <link rel="stylesheet" crossorigin href="/.resources/easya11y/webresources/css/globals.css">
+  
+  
+  
+  
+
+    <script>
+        // Dynamically load resources with correct context path
+        (function() {
+            // Get context path from URL parameter or pathname
+            var urlParams = new URLSearchParams(window.location.search);
+            var contextPath = urlParams.get('contextPath') || '';
+            
+            if (!contextPath) {
+                var pathname = window.location.pathname;
+                var resourcesIndex = pathname.indexOf('/.resources/');
+                if (resourcesIndex > 0) {
+                    contextPath = pathname.substring(0, resourcesIndex);
+                }
+            }
+            
+            // Load resources with correct paths
+            var resourceBase = contextPath + '/.resources/easya11y/webresources/';
+            
+            // Load CSS
+            var css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.href = resourceBase + 'css/globals.css';
+            document.head.appendChild(css);
+            
+            // Load main script
+            var script = document.createElement('script');
+            script.type = 'module';
+            script.crossOrigin = true;
+            script.src = resourceBase + 'js/configuration.js';
+            document.head.appendChild(script);
+        })();
+    </script>
 </head>
 <body>
     <div id="root"></div>

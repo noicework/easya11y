@@ -10,8 +10,71 @@ const SRC_DIR = path.resolve(__dirname, 'src/main/resources/easya11y/webresource
 const DIST_DIR = path.resolve(__dirname, 'src/main/resources/easya11y/webresources')
 
 // https://vitejs.dev/config/
+// Custom plugin to handle dynamic loading
+const dynamicLoadingPlugin = () => {
+  return {
+    name: 'dynamic-loading-plugin',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html, { filename }) {
+        if (process.env.NODE_ENV === 'production') {
+          // Extract the main script name from the HTML
+          const scriptMatch = html.match(/<script type="module"[^>]*src="([^"]*\.js)"[^>]*><\/script>/);
+          const mainScript = scriptMatch ? scriptMatch[1].split('/').pop() : '';
+          
+          // Build the dynamic loader script
+          const dynamicLoader = `
+    <script>
+        // Dynamically load resources with correct context path
+        (function() {
+            // Get context path from URL parameter or pathname
+            var urlParams = new URLSearchParams(window.location.search);
+            var contextPath = urlParams.get('contextPath') || '';
+            
+            if (!contextPath) {
+                var pathname = window.location.pathname;
+                var resourcesIndex = pathname.indexOf('/.resources/');
+                if (resourcesIndex > 0) {
+                    contextPath = pathname.substring(0, resourcesIndex);
+                }
+            }
+            
+            // Load resources with correct paths
+            var resourceBase = contextPath + '/.resources/easya11y/webresources/';
+            
+            // Load CSS
+            var css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.href = resourceBase + 'css/globals.css';
+            document.head.appendChild(css);
+            
+            // Load main script
+            var script = document.createElement('script');
+            script.type = 'module';
+            script.crossOrigin = true;
+            script.src = resourceBase + 'js/${mainScript}';
+            document.head.appendChild(script);
+        })();
+    </script>`;
+          
+          // Remove all Vite-injected scripts and styles
+          html = html.replace(/<script type="module"[^>]*src="[^"]*\.js"[^>]*><\/script>/g, '')
+                     .replace(/<link rel="modulepreload"[^>]*>/g, '')
+                     .replace(/<link rel="stylesheet"[^>]*href="[^"]*\.css"[^>]*>/g, '');
+          
+          // Add our dynamic loader before the closing head tag
+          html = html.replace('</head>', dynamicLoader + '\n</head>');
+          
+          return html;
+        }
+        return html;
+      }
+    }
+  };
+};
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), dynamicLoadingPlugin()],
   root: SRC_DIR,
   publicDir: path.join(SRC_DIR, 'public'),
   base: process.env.NODE_ENV === 'production' ? '/.resources/easya11y/webresources/' : '/',

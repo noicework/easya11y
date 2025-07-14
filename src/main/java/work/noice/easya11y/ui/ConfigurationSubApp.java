@@ -86,6 +86,10 @@ public class ConfigurationSubApp implements SubApp {
             // Get the context path
             String contextPath = VaadinService.getCurrentRequest().getContextPath();
             String fullPath = contextPath + "/" + htmlPath;
+            
+            // Add context path as URL parameter
+            String separator = fullPath.contains("?") ? "&" : "?";
+            fullPath = fullPath + separator + "contextPath=" + contextPath;
 
             // Create an iframe to display the HTML content
             com.vaadin.ui.BrowserFrame frame = new com.vaadin.ui.BrowserFrame(null,

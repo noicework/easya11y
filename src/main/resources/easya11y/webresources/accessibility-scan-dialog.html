@@ -99,10 +99,43 @@
             display: none;
         }
     </style>
-  <script type="module" crossorigin src="/.resources/easya11y/webresources/js/accessibility-scan-dialog.js"></script>
-  <link rel="modulepreload" crossorigin href="/.resources/easya11y/webresources/js/globals-BigXdOGl.js">
-  <link rel="modulepreload" crossorigin href="/.resources/easya11y/webresources/js/scanner.service-BVJoDcRC.js">
-  <link rel="stylesheet" crossorigin href="/.resources/easya11y/webresources/css/globals.css">
+  
+  
+  
+  
+
+    <script>
+        // Dynamically load resources with correct context path
+        (function() {
+            // Get context path from URL parameter or pathname
+            var urlParams = new URLSearchParams(window.location.search);
+            var contextPath = urlParams.get('contextPath') || '';
+            
+            if (!contextPath) {
+                var pathname = window.location.pathname;
+                var resourcesIndex = pathname.indexOf('/.resources/');
+                if (resourcesIndex > 0) {
+                    contextPath = pathname.substring(0, resourcesIndex);
+                }
+            }
+            
+            // Load resources with correct paths
+            var resourceBase = contextPath + '/.resources/easya11y/webresources/';
+            
+            // Load CSS
+            var css = document.createElement('link');
+            css.rel = 'stylesheet';
+            css.href = resourceBase + 'css/globals.css';
+            document.head.appendChild(css);
+            
+            // Load main script
+            var script = document.createElement('script');
+            script.type = 'module';
+            script.crossOrigin = true;
+            script.src = resourceBase + 'js/accessibility-scan-dialog.js';
+            document.head.appendChild(script);
+        })();
+    </script>
 </head>
 <body>
     <div id="root"></div>

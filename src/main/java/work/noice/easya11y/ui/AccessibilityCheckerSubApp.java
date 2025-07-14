@@ -51,6 +51,10 @@ public class AccessibilityCheckerSubApp implements SubApp, View {
             htmlPath = contextPath + "/" + (htmlPath.startsWith("/") ? htmlPath.substring(1) : htmlPath);
         }
         
+        // Add context path as URL parameter
+        String separator = htmlPath.contains("?") ? "&" : "?";
+        htmlPath = htmlPath + separator + "contextPath=" + contextPath;
+        
         frame.setSource(new ExternalResource(htmlPath));
         return this;
     }
