@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accessibility Scan Results</title>
-    <link rel="stylesheet" href="css/accessibility-checker.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="./js/accessibility-scan-dialog.tsx"></script>
     <style>
         body {
             margin: 0 !important;
@@ -99,60 +102,6 @@
     </style>
 </head>
 <body>
-    <div class="scan-container scan-dialog-container">
-        <div class="scan-status" id="scanStatus">
-            <div class="scan-progress">
-                <div class="spinner"></div>
-                <span>Running accessibility scan...</span>
-            </div>
-        </div>
-        
-        <div class="scan-results-content scan-dialog-results hidden" id="resultsContainer">
-            <div class="scan-results-body">
-                <div class="scan-summary">
-                    <div class="scan-score">
-                        <div class="score-circle-container">
-                            <div class="score-circle">
-                                <svg width="80" height="80">
-                                    <circle cx="40" cy="40" r="32" class="score-circle-bg"></circle>
-                                    <circle cx="40" cy="40" r="32" class="score-circle-progress" id="scoreCircle"></circle>
-                                </svg>
-                                <div class="score-text" id="scoreText">0</div>
-                            </div>
-                        </div>
-                        <div class="score-details">
-                            <div class="score-label">Accessibility Score</div>
-                            <div class="score-value" id="scoreValue">0/100</div>
-                            <div class="stats-row">
-                                <span><strong id="violationCount">0</strong> violations</span>
-                                <span><strong id="passCount">0</strong> passed</span>
-                                <span><strong id="issueCount">0</strong> total issues</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="violation-summary" id="violationSummary"></div>
-                </div>
-                
-                <div class="scan-violations" id="violationsSection">
-                    <h4>Accessibility Issues</h4>
-                    <div class="violations-list" id="violationsList"></div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="error-message hidden" id="errorMessage"></div>
-    </div>
-    
-    <script src="js/easya11y.js"></script>
-    <script>
-        // Initialize the scan dialog when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.pageInitializers && window.pageInitializers.initScanDialog) {
-                window.pageInitializers.initScanDialog();
-            } else {
-                console.error('Page initializer not found. Make sure easya11y.js is loaded correctly.');
-            }
-        });
-    </script>
+    <div id="root"></div>
 </body>
 </html>

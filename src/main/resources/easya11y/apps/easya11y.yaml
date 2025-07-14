@@ -19,7 +19,7 @@ subApps:
   
   # Configuration subapp for WCAG settings
   configuration:
-    label: Configuration
+    label: Settings
     class: work.noice.easya11y.ui.ConfigurationSubAppDescriptor
     closable: false
     htmlPath: .resources/easya11y/webresources/configuration.html
