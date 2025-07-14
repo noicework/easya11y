@@ -6,6 +6,8 @@ import info.magnolia.jcr.util.PropertyUtil;
 import info.magnolia.rest.AbstractEndpoint;
 import info.magnolia.rest.EndpointDefinition;
 import work.noice.easya11y.models.AccessibilityScanResult;
+import work.noice.easya11y.services.ServerSideAccessibilityScanner;
+import info.magnolia.objectfactory.Components;
 
 import javax.inject.Inject;
 import javax.jcr.Node;
@@ -136,6 +138,17 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
                 scanResults.get("wcagLevel").asText() : 
                 scanWcagLevels.getOrDefault(scanId, "AA");
             
+            // Get score from frontend (required)
+            if (!scanResults.has("score")) {
+                return buildErrorResponse("Score is required from frontend calculation", Response.Status.BAD_REQUEST);
+            }
+            Double frontendScore = scanResults.get("score").asDouble();
+            
+            // Validate score range
+            if (frontendScore < 0 || frontendScore > 100) {
+                return buildErrorResponse("Score must be between 0 and 100", Response.Status.BAD_REQUEST);
+            }
+            
             // Clean up temporary storage
             scanWcagLevels.remove(scanId);
             
@@ -150,7 +163,20 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
             result.setId(scanId);
             result.setPageTitle(pageTitle);
             result.setWcagLevel(wcagLevel);
-            result.setScannerVersion(axeResults.get("toolOptions").get("version").asText("unknown"));
+            // Get scanner version safely
+            String scannerVersion = "unknown";
+            if (axeResults.has("testEngine")) {
+                JsonNode testEngine = axeResults.get("testEngine");
+                if (testEngine != null && testEngine.has("version")) {
+                    scannerVersion = "axe-" + testEngine.get("version").asText("unknown");
+                }
+            } else if (axeResults.has("toolOptions")) {
+                JsonNode toolOptions = axeResults.get("toolOptions");
+                if (toolOptions != null && toolOptions.has("version")) {
+                    scannerVersion = toolOptions.get("version").asText("unknown");
+                }
+            }
+            result.setScannerVersion(scannerVersion);
             
             // Process violations
             JsonNode violations = axeResults.get("violations");
@@ -179,8 +205,8 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
                 result.setTotalElements(totalPassElements + result.getElementsWithIssues());
             }
             
-            // Calculate score
-            result.calculateScore();
+            // Set the frontend-calculated score
+            result.setScore(frontendScore);
             
             // Store in JCR
             Session scanSession = MgnlContext.getJCRSession(SCAN_RESULTS_WORKSPACE);
@@ -248,11 +274,11 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
             try {
                 if (itemClass == AccessibilityScanResult.Violation.class) {
                     AccessibilityScanResult.Violation violation = new AccessibilityScanResult.Violation();
-                    violation.setId(item.get("id").asText());
-                    violation.setImpact(item.get("impact").asText());
-                    violation.setDescription(item.get("description").asText());
-                    violation.setHelp(item.get("help").asText());
-                    violation.setHelpUrl(item.get("helpUrl").asText());
+                    violation.setId(item.has("id") ? item.get("id").asText() : "");
+                    violation.setImpact(item.has("impact") ? item.get("impact").asText() : "");
+                    violation.setDescription(item.has("description") ? item.get("description").asText() : "");
+                    violation.setHelp(item.has("help") ? item.get("help").asText() : "");
+                    violation.setHelpUrl(item.has("helpUrl") ? item.get("helpUrl").asText() : "");
                     
                     // Process tags
                     JsonNode tags = item.get("tags");
@@ -317,6 +343,140 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
                 parentNode.addNode(parts[i], "mgnl:folder");
             }
         }
+    }
+    
+    /**
+     * Server-side scan for a specific page.
+     *
+     * @param request Request with pagePath, wcagLevel, and sendEmail parameters
+     * @return Response with scan results
+     */
+    @POST
+    @Path("/server")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response serverSideScan(Map<String, String> request) {
+        String pagePath = request.get("pagePath");
+        String wcagLevel = request.get("wcagLevel");
+        
+        if (pagePath == null || pagePath.isEmpty()) {
+            return buildErrorResponse("Page path is required", Response.Status.BAD_REQUEST);
+        }
+        
+        if (wcagLevel == null || wcagLevel.isEmpty()) {
+            wcagLevel = "AA";
+        }
+        
+        try {
+            // Get scanner instance
+            ServerSideAccessibilityScanner scanner = Components.getComponent(ServerSideAccessibilityScanner.class);
+            
+            // Build page URL with bypass authentication (similar to preview mode)
+            String scheme = MgnlContext.getWebContext().getRequest().getScheme();
+            String serverName = MgnlContext.getWebContext().getRequest().getServerName();
+            int serverPort = MgnlContext.getWebContext().getRequest().getServerPort();
+            String contextPath = MgnlContext.getContextPath();
+            
+            // Build regular page URL - authentication will be handled by Selenium
+            String pageUrl = scheme + "://" + serverName + ":" + serverPort + contextPath + 
+                           pagePath + ".html";
+            
+            log.info("Using regular page URL (authentication handled by Selenium): {}", pageUrl);
+            
+            // Run server-side scan
+            log.info("Starting server-side scan for: {}", pageUrl);
+            JsonNode axeResults = scanner.scanUrl(pageUrl, wcagLevel);
+            
+            // Calculate score
+            double score = calculateScore(axeResults);
+            
+            // Get page title
+            String pageTitle = pagePath.substring(pagePath.lastIndexOf('/') + 1);
+            try {
+                Session websiteSession = MgnlContext.getJCRSession(WEBSITE_WORKSPACE);
+                if (websiteSession.nodeExists(pagePath)) {
+                    Node pageNode = websiteSession.getNode(pagePath);
+                    pageTitle = PropertyUtil.getString(pageNode, "title", pageTitle);
+                }
+            } catch (Exception e) {
+                log.warn("Could not get page title for: {}", pagePath);
+            }
+            
+            // Prepare and store scan results
+            Map<String, Object> scanData = new HashMap<>();
+            scanData.put("scanId", UUID.randomUUID().toString());
+            scanData.put("pagePath", pagePath);
+            scanData.put("pageUrl", pageUrl);
+            scanData.put("pageTitle", pageTitle);
+            scanData.put("wcagLevel", wcagLevel);
+            scanData.put("score", score);
+            scanData.put("axeResults", axeResults);
+            
+            // Store results
+            JsonNode scanResults = objectMapper.valueToTree(scanData);
+            storeScanResults(scanResults);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("scanId", scanData.get("scanId"));
+            response.put("score", score);
+            response.put("violationCount", axeResults.get("violations").size());
+            response.put("pageUrl", pageUrl);
+            response.put("message", "Server-side scan completed successfully");
+            
+            return Response.ok(response).build();
+            
+        } catch (Exception e) {
+            log.error("Error during server-side scan", e);
+            return buildErrorResponse("Error during scan: " + e.getMessage(), 
+                Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    private double calculateScore(JsonNode axeResults) {
+        int totalViolations = 0;
+        double weightedViolations = 0.0;
+        
+        if (axeResults.has("violations")) {
+            JsonNode violations = axeResults.get("violations");
+            for (JsonNode violation : violations) {
+                String impact = violation.get("impact").asText();
+                int nodeCount = violation.get("nodes").size();
+                totalViolations += nodeCount;
+                
+                switch (impact) {
+                    case "critical":
+                        weightedViolations += nodeCount * 10;
+                        break;
+                    case "serious":
+                        weightedViolations += nodeCount * 5;
+                        break;
+                    case "moderate":
+                        weightedViolations += nodeCount * 2;
+                        break;
+                    case "minor":
+                        weightedViolations += nodeCount * 1;
+                        break;
+                }
+            }
+        }
+        
+        // Calculate total elements tested
+        int totalElements = 0;
+        if (axeResults.has("passes")) {
+            JsonNode passes = axeResults.get("passes");
+            for (JsonNode pass : passes) {
+                totalElements += pass.get("nodes").size();
+            }
+        }
+        totalElements += totalViolations;
+        
+        if (totalElements == 0) {
+            return 100.0;
+        }
+        
+        double score = 100.0 - (weightedViolations / totalElements * 100.0);
+        return Math.max(0, Math.min(100, score));
     }
     
     /**
