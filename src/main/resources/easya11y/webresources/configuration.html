@@ -365,8 +365,20 @@
     </div>
 
     <script>
-        // Get the base URL for API endpoints
-        const baseUrl = window.location.origin + (window.location.pathname.includes('magnolia') ? '/magnoliaAuthor' : '');
+        // Get the base URL for API endpoints dynamically
+        const pathParts = window.location.pathname.split('/');
+        let contextPath = '';
+        
+        // Find the context path by looking for the first path segment
+        // that contains 'magnolia' or similar patterns
+        for (let i = 1; i < pathParts.length; i++) {
+            if (pathParts[i] && pathParts[i].toLowerCase().includes('magnolia')) {
+                contextPath = '/' + pathParts[i];
+                break;
+            }
+        }
+        
+        const baseUrl = window.location.origin + contextPath;
         const configEndpoint = baseUrl + '/.rest/easya11y/configuration';
 
         // Load configuration on page load

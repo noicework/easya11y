@@ -6,6 +6,7 @@ import info.magnolia.ui.api.location.Location;
 import info.magnolia.ui.api.view.View;
 
 import com.vaadin.server.ExternalResource;
+import com.vaadin.server.VaadinService;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
@@ -42,9 +43,12 @@ public class AccessibilityCheckerSubApp implements SubApp, View {
             (AccessibilityCheckerSubAppDescriptor) subAppContext.getSubAppDescriptor();
         String htmlPath = descriptor.getHtmlPath();
         
+        // Get the context path dynamically
+        String contextPath = VaadinService.getCurrentRequest().getContextPath();
+        
         // Add context path if not already present
-        if (!htmlPath.startsWith("/magnoliaAuthor/") && !htmlPath.startsWith("http")) {
-            htmlPath = "/magnoliaAuthor/" + (htmlPath.startsWith("/") ? htmlPath.substring(1) : htmlPath);
+        if (!htmlPath.startsWith(contextPath + "/") && !htmlPath.startsWith("http")) {
+            htmlPath = contextPath + "/" + (htmlPath.startsWith("/") ? htmlPath.substring(1) : htmlPath);
         }
         
         frame.setSource(new ExternalResource(htmlPath));
