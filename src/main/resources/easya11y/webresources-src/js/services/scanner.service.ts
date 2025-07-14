@@ -68,7 +68,33 @@ export class ScannerService {
   }): Promise<any> {
     const { scanId, pagePath, pageUrl, pageTitle, wcagLevel = 'AA' } = pageData
     
-    console.log('Starting background scan for:', pageUrl)
+    // Check if we should use server-side scanning
+    const useServerSide = await accessibilityService.shouldUseServerSideScan()
+    
+    if (useServerSide) {
+      console.log('Using server-side scan for:', pageUrl)
+      try {
+        const serverResult = await accessibilityService.serverSideScan(pagePath, wcagLevel)
+        
+        // Get the detailed results that were just saved
+        const detailedResult = await accessibilityService.getDetailedResult(pagePath)
+        
+        return {
+          violations: detailedResult.fullResults?.violations || detailedResult.violations || [],
+          passes: detailedResult.fullResults?.passes || detailedResult.passes || [],
+          incomplete: detailedResult.fullResults?.incomplete || detailedResult.incomplete || [],
+          inapplicable: detailedResult.fullResults?.inapplicable || detailedResult.inapplicable || [],
+          timestamp: detailedResult.fullResults?.timestamp || new Date().toISOString(),
+          url: pageUrl,
+          score: detailedResult.score || serverResult.score
+        }
+      } catch (error) {
+        console.error('Server-side scan failed:', error)
+        throw error
+      }
+    }
+    
+    console.log('Starting client-side background scan for:', pageUrl)
     
     const container = this.initializeIframeContainer()
     const iframe = document.createElement('iframe')
@@ -207,8 +233,23 @@ export class ScannerService {
       // Scan pages in the current batch concurrently
       const batchPromises = batch.map(async (page) => {
         try {
-          const pageData = await accessibilityService.initiateScan(page.path, wcagLevel)
-          const scanResult = await this.scanPage({ ...pageData, wcagLevel })
+          // Check if we should use server-side scanning
+          const useServerSide = await accessibilityService.shouldUseServerSideScan()
+          
+          let scanResult
+          if (useServerSide) {
+            // For server-side scan, we don't need to initiate first
+            const serverResult = await accessibilityService.serverSideScan(page.path, wcagLevel)
+            const detailedResult = await accessibilityService.getDetailedResult(page.path)
+            scanResult = {
+              violations: detailedResult.fullResults?.violations || [],
+              score: serverResult.score
+            }
+          } else {
+            // For client-side scan, use the normal flow
+            const pageData = await accessibilityService.initiateScan(page.path, wcagLevel)
+            scanResult = await this.scanPage({ ...pageData, wcagLevel })
+          }
           
           // Update progress for each completed page
           completedCount.value++

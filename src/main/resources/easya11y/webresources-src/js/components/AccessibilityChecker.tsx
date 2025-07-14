@@ -113,7 +113,7 @@ export function AccessibilityChecker() {
       
       // Show results modal if scan succeeded
       if (result && !result.errorMessage) {
-        const calculatedScore = calculateScore(result)
+        const score = result.score ?? calculateScore(result)
         const newResult: ScanResult = {
           scanId: Date.now().toString(),
           pagePath: selectedPage.path,
@@ -121,7 +121,7 @@ export function AccessibilityChecker() {
           pageTitle: selectedPage.title || selectedPage.name || selectedPage.path,
           scanDate: new Date().toISOString(),
           wcagLevel,
-          score: calculatedScore,
+          score: score,
           violationCount: result.violations?.length || 0,
           violations: result.violations,
           passes: result.passes,

@@ -75,7 +75,7 @@ export function AccessibilityScanDialog() {
 
   if (!scanResult) return null
 
-  const score = calculateScore(scanResult)
+  const score = scanResult.score ?? calculateScore(scanResult)
   const violations = scanResult.violations || []
   const violationCount = violations.length
   const passCount = scanResult.passes?.length || 0

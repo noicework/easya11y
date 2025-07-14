@@ -52,9 +52,6 @@ export function StatsOverview({ stats, className }: StatsOverviewProps) {
               <CountUp value={Number(stat.value)} />
             </span>
           </div>
-          <div className="absolute right-0 top-0 h-24 w-24 translate-x-8 translate-y-[-4rem]">
-            <div className="h-full w-full rounded-full bg-primary/5" />
-          </div>
         </motion.div>
       ))}
     </div>

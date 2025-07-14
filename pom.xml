@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>work.noice</groupId>
   <artifactId>easya11y</artifactId>
-  <version>1.0.1</version>
+  <version>1.2.0</version>
   <packaging>jar</packaging>
   <name>easya11y Magnolia Module</name>
   <description>Accessibility testing module for Magnolia CMS</description>
@@ -88,6 +88,39 @@
     <dependency>
       <groupId>info.magnolia</groupId>
       <artifactId>magnolia-module-mail</artifactId>
+    </dependency>
+    
+    <!-- Selenium for server-side browser automation -->
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>4.15.0</version>
+    </dependency>
+    
+    <!-- Selenium Chrome Driver -->
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-chrome-driver</artifactId>
+      <version>4.15.0</version>
+    </dependency>
+    
+    <!-- WebDriverManager for automatic driver management -->
+    <dependency>
+      <groupId>io.github.bonigarcia</groupId>
+      <artifactId>webdrivermanager</artifactId>
+      <version>5.6.2</version>
+    </dependency>
+    
+    <!-- Jackson for JSON processing -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    
+    <!-- Magnolia Scheduler Module -->
+    <dependency>
+      <groupId>info.magnolia.scheduler</groupId>
+      <artifactId>magnolia-module-scheduler</artifactId>
     </dependency>
   </dependencies>
 

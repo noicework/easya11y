@@ -180,3 +180,13 @@ Score = 100 - (weighted violations / total elements * 100)
 - Customizable rule sets
 - Historical trend analysis
 - Multi-language support
+
+## License
+
+EasyA11y is open source software, licensed under the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/).
+
+You are free to use, modify, and distribute this software commercially or non-commercially. If you make any changes to EasyA11y’s source files, you must share those changes under the same license.
+
+This strikes a balance between community collaboration and commercial use—perfect for agencies, freelancers, and accessibility advocates who want to contribute while maintaining flexibility in their own projects.
+
+Brought to you by [Noice](https://noice.work), helping teams deliver accessible, performant websites faster.

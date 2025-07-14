@@ -11,9 +11,22 @@
   <!-- For more information on module descriptor configuration options -->
   <!-- https://documentation.magnolia-cms.com/display/DOCS/XML-based+module+descriptor -->
 
+  <components>
+    <id>main</id>
+    <component>
+      <type>work.noice.easya11y.services.ServerSideAccessibilityScanner</type>
+      <implementation>work.noice.easya11y.services.ServerSideAccessibilityScanner</implementation>
+      <scope>singleton</scope>
+    </component>
+  </components>
+
   <dependencies>
     <dependency>
       <name>core</name>
+      <version>*</version>
+    </dependency>
+    <dependency>
+      <name>scheduler</name>
       <version>*</version>
     </dependency>
     <!--  Add other dependencies here, e.g the mte (magnolia templating essentials).

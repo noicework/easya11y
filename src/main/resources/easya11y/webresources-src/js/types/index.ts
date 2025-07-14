@@ -93,7 +93,20 @@ export interface DetailedResult extends ScanResult {
 
 export type WCAGVersion = '2.0' | '2.1' | '2.2'
 
+export type ScheduleFrequency = 'daily' | 'weekly' | 'monthly' | 'custom'
+
 export interface Configuration {
   wcagVersion: WCAGVersion
   wcagLevel: WCAGLevel
+  emailEnabled?: boolean
+  emailRecipients?: string
+  emailFrom?: string
+  emailOnViolations?: boolean
+  emailDigest?: boolean
+  scanScheduleEnabled?: boolean
+  scanScheduleCron?: string
+  scheduleFrequency?: ScheduleFrequency
+  serverSideScan?: boolean
+  scanPaths?: string
+  excludePaths?: string
 }
