@@ -119,13 +119,8 @@ public class ServerSideScanCommand extends MgnlCommand {
         // Build regular page URL - authentication will be handled by Selenium
         try {
             String contextPath = MgnlContext.getContextPath();
-            String scheme = "http";
-            String serverName = "localhost";
-            int serverPort = 8080;
-            
-            // Use regular page URL
-            return scheme + "://" + serverName + ":" + serverPort + contextPath + 
-                   pagePath + ".html";
+            // Context path contains the full base URL including scheme, host, and port
+            return contextPath + pagePath + ".html";
         } catch (Exception e) {
             // Fallback
             return "http://localhost:8080/magnoliaAuthor" + pagePath + ".html";

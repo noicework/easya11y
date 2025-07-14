@@ -14,7 +14,7 @@ export default defineConfig({
   plugins: [react()],
   root: SRC_DIR,
   publicDir: path.join(SRC_DIR, 'public'),
-  base: process.env.NODE_ENV === 'production' ? '/magnoliaAuthor/.resources/easya11y/webresources/' : '/',
+  base: process.env.NODE_ENV === 'production' ? '/.resources/easya11y/webresources/' : '/',
   build: {
     outDir: DIST_DIR,
     emptyOutDir: false, // Don't clean output to preserve other files
@@ -57,7 +57,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/.rest': {
-        target: 'http://localhost:8080/magnoliaAuthor',
+        target: process.env.MAGNOLIA_URL || 'http://localhost:8080/magnoliaAuthor',
         changeOrigin: true,
       }
     }

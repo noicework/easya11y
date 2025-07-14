@@ -203,19 +203,9 @@ public class ScheduledAccessibilityScanJob implements Job {
      */
     private String buildPageUrl(String pagePath) {
         // Build regular page URL - authentication will be handled by Selenium
-        try {
-            String scheme = MgnlContext.getWebContext().getRequest().getScheme();
-            String serverName = MgnlContext.getWebContext().getRequest().getServerName();
-            int serverPort = MgnlContext.getWebContext().getRequest().getServerPort();
-            String contextPath = MgnlContext.getContextPath();
-            
-            // Use regular page URL
-            return scheme + "://" + serverName + ":" + serverPort + contextPath + 
-                   pagePath + ".html";
-        } catch (Exception e) {
-            // Fallback
-            return "http://localhost:8080/magnoliaAuthor" + pagePath + ".html";
-        }
+        String contextPath = MgnlContext.getContextPath();
+        // Context path contains the full base URL including scheme, host, and port
+        return contextPath + pagePath + ".html";
     }
     
     /**
