@@ -16,7 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@comp
 import { JiraIntegration } from '@components/JiraIntegration'
 import { ExternalLink, CheckCircle2, Loader2, Download, Share2 } from 'lucide-react'
 import { accessibilityService } from '@services/accessibility.service'
-import type { ScanResult } from '@types'
+import type { ScanResult, Configuration } from '@types'
 
 interface ScanResultsModalProps {
   isOpen: boolean
@@ -29,10 +29,12 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showJiraExport, setShowJiraExport] = useState(false)
+  const [configuration, setConfiguration] = useState<Configuration | null>(null)
 
   useEffect(() => {
     if (isOpen && result?.pagePath) {
       loadDetailedResult()
+      loadConfiguration()
     }
   }, [isOpen, result?.pagePath])
 
@@ -50,6 +52,15 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
       console.error('Error loading scan details:', err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadConfiguration = async () => {
+    try {
+      const config = await accessibilityService.getConfiguration()
+      setConfiguration(config)
+    } catch (err) {
+      console.error('Error loading configuration:', err)
     }
   }
 
@@ -78,6 +89,7 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
     setDetailedResult(null)
     setError(null)
     setShowJiraExport(false)
+    setConfiguration(null)
     onClose()
   }
 
@@ -85,6 +97,11 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
     const exportUrl = await accessibilityService.exportResults('csv', result.pagePath)
     window.open(exportUrl, '_blank')
   }
+
+  const isJiraConfigured = configuration?.jiraEnabled && 
+    configuration?.jiraUrl && 
+    configuration?.jiraApiToken && 
+    configuration?.jiraEmail
 
   return (
     <>
@@ -115,14 +132,16 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
                     <Download className="h-4 w-4 mr-2" />
                     CSV
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowJiraExport(true)}
-                  >
-                    <Share2 className="h-4 w-4 mr-2" />
-                    JIRA
-                  </Button>
+                  {isJiraConfigured && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowJiraExport(true)}
+                    >
+                      <Share2 className="h-4 w-4 mr-2" />
+                      JIRA
+                    </Button>
+                  )}
                 </div>
                 <ScoreIndicator score={result.score || 0} size="lg" />
               </div>

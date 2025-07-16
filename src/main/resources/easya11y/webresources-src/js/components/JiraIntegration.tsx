@@ -19,7 +19,7 @@ import {
 import { ExternalLink, AlertCircle, CheckCircle } from 'lucide-react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { accessibilityService } from '@services/accessibility.service'
-import type { ScanResult, Configuration } from '@types'
+import type { ScanResult } from '@types'
 
 interface JiraIntegrationProps {
   scanResult: ScanResult
@@ -37,8 +37,6 @@ interface JiraIssueData {
 }
 
 export function JiraIntegration({ scanResult, isOpen, onClose }: JiraIntegrationProps) {
-  const [showConfig, setShowConfig] = useState(false)
-  const [configForm, setConfigForm] = useState<Partial<Configuration>>({})
   const [issueForm, setIssueForm] = useState<JiraIssueData>({
     projectKey: '',
     summary: `Accessibility Issues: ${scanResult.pageTitle}`,
@@ -49,7 +47,7 @@ export function JiraIntegration({ scanResult, isOpen, onClose }: JiraIntegration
   })
 
   // Get configuration
-  const { data: config, refetch: refetchConfig } = useQuery({
+  const { data: config } = useQuery({
     queryKey: ['configuration'],
     queryFn: () => accessibilityService.getConfiguration(),
   })
@@ -57,29 +55,12 @@ export function JiraIntegration({ scanResult, isOpen, onClose }: JiraIntegration
   // Update form when config loads
   useEffect(() => {
     if (config) {
-      setConfigForm({
-        jiraUrl: config.jiraUrl || '',
-        jiraProjectKey: config.jiraProjectKey || '',
-        jiraApiToken: config.jiraApiToken || '',
-        jiraEmail: config.jiraEmail || '',
-        jiraEnabled: config.jiraEnabled || false,
-      })
       setIssueForm(prev => ({
         ...prev,
         projectKey: config.jiraProjectKey || '',
       }))
     }
   }, [config])
-
-  // Save configuration mutation
-  const saveConfigMutation = useMutation({
-    mutationFn: (newConfig: Configuration) => 
-      accessibilityService.saveConfiguration(newConfig),
-    onSuccess: () => {
-      refetchConfig()
-      setShowConfig(false)
-    },
-  })
 
   // Create JIRA issue mutation
   const createIssueMutation = useMutation({
@@ -131,16 +112,6 @@ ${index + 1}. *${violation.help}* (${violation.impact})
     setIssueForm(prev => ({ ...prev, description }))
   }
 
-  const handleSaveConfig = () => {
-    if (config) {
-      saveConfigMutation.mutate({
-        ...config,
-        ...configForm,
-        jiraEnabled: true,
-      })
-    }
-  }
-
   const handleCreateIssue = () => {
     createIssueMutation.mutate(issueForm)
   }
@@ -163,75 +134,21 @@ ${index + 1}. *${violation.help}* (${violation.impact})
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>JIRA Integration Not Configured</AlertTitle>
               <AlertDescription>
-                Please configure your JIRA settings to create issues.
+                Please configure your JIRA settings in the Configuration page to create issues.
               </AlertDescription>
             </Alert>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="jira-url">JIRA Instance URL</Label>
-                <Input
-                  id="jira-url"
-                  placeholder="https://your-domain.atlassian.net"
-                  value={configForm.jiraUrl || ''}
-                  onChange={(e) => setConfigForm(prev => ({ ...prev, jiraUrl: e.target.value }))}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="jira-project">Default Project Key</Label>
-                <Input
-                  id="jira-project"
-                  placeholder="PROJ"
-                  value={configForm.jiraProjectKey || ''}
-                  onChange={(e) => setConfigForm(prev => ({ ...prev, jiraProjectKey: e.target.value }))}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="jira-email">JIRA Email</Label>
-                <Input
-                  id="jira-email"
-                  type="email"
-                  placeholder="your-email@example.com"
-                  value={configForm.jiraEmail || ''}
-                  onChange={(e) => setConfigForm(prev => ({ ...prev, jiraEmail: e.target.value }))}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="jira-token">API Token</Label>
-                <Input
-                  id="jira-token"
-                  type="password"
-                  placeholder="Your JIRA API token"
-                  value={configForm.jiraApiToken || ''}
-                  onChange={(e) => setConfigForm(prev => ({ ...prev, jiraApiToken: e.target.value }))}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Generate an API token from your{' '}
-                  <a
-                    href="https://id.atlassian.com/manage-profile/security/api-tokens"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    Atlassian account settings
-                    <ExternalLink className="inline h-3 w-3 ml-1" />
-                  </a>
-                </p>
-              </div>
-            </div>
 
             <DialogFooter>
               <Button variant="outline" onClick={onClose}>
                 Cancel
               </Button>
               <Button
-                onClick={handleSaveConfig}
-                disabled={!configForm.jiraUrl || !configForm.jiraApiToken || !configForm.jiraEmail || saveConfigMutation.isPending}
+                onClick={() => {
+                  window.open('/easya11y/configuration', '_blank')
+                  onClose()
+                }}
               >
-                {saveConfigMutation.isPending ? 'Saving...' : 'Save Configuration'}
+                Go to Configuration
               </Button>
             </DialogFooter>
           </div>
@@ -305,27 +222,18 @@ ${index + 1}. *${violation.help}* (${violation.impact})
               </>
             )}
 
-            <DialogFooter className="flex items-center justify-between">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowConfig(!showConfig)}
-              >
-                Configure JIRA
+            <DialogFooter>
+              <Button variant="outline" onClick={onClose}>
+                {createIssueMutation.isSuccess ? 'Close' : 'Cancel'}
               </Button>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={onClose}>
-                  {createIssueMutation.isSuccess ? 'Close' : 'Cancel'}
+              {!createIssueMutation.isSuccess && (
+                <Button
+                  onClick={handleCreateIssue}
+                  disabled={!issueForm.projectKey || !issueForm.summary || createIssueMutation.isPending}
+                >
+                  {createIssueMutation.isPending ? 'Creating...' : 'Create Issue'}
                 </Button>
-                {!createIssueMutation.isSuccess && (
-                  <Button
-                    onClick={handleCreateIssue}
-                    disabled={!issueForm.projectKey || !issueForm.summary || createIssueMutation.isPending}
-                  >
-                    {createIssueMutation.isPending ? 'Creating...' : 'Create Issue'}
-                  </Button>
-                )}
-              </div>
+              )}
             </DialogFooter>
           </div>
         )}
