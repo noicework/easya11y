@@ -163,6 +163,37 @@ class AccessibilityService {
       return false
     }
   }
+
+  async getHistoricalTrends(pagePath?: string, days: number = 30): Promise<any> {
+    const url = new URL(`${this.apiBase}/easya11y/results/trends`)
+    if (pagePath) {
+      url.searchParams.append('pagePath', pagePath)
+    }
+    url.searchParams.append('days', days.toString())
+    
+    const response = await fetch(url.toString())
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch trends: ${response.status}`)
+    }
+    
+    return response.json()
+  }
+
+  async createJiraIssue(issueData: any): Promise<any> {
+    const response = await fetch(`${this.apiBase}/easya11y/jira/create-issue`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(issueData)
+    })
+    
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(error || 'Failed to create JIRA issue')
+    }
+    
+    return response.json()
+  }
 }
 
 export const accessibilityService = new AccessibilityService()

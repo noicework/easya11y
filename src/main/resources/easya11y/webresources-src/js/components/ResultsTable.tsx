@@ -10,7 +10,8 @@ import {
 import { Button } from '@components/ui/button'
 import { Badge } from '@components/ui/badge'
 import { ScoreIndicator } from '@components/ScoreIndicator'
-import { ArrowUpDown, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
+import { ArrowUpDown, ChevronLeft, ChevronRight, ExternalLink, History, Star } from 'lucide-react'
+import { usePinnedPages } from '@hooks/usePinnedPages'
 import type { ScanResult, SortOrder } from '@types'
 
 interface ResultsTableProps {
@@ -29,6 +30,7 @@ export function ResultsTable({
   onResultClick,
 }: ResultsTableProps) {
   const [currentPage, setCurrentPage] = useState(1)
+  const { isPinned, togglePin } = usePinnedPages()
 
   const totalPages = Math.ceil(results.length / ITEMS_PER_PAGE)
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
@@ -126,7 +128,12 @@ export function ResultsTable({
               >
                 <TableCell>
                   <div className="space-y-1">
-                    <div className="font-medium">{result.pageTitle}</div>
+                    <div className="flex items-center gap-1">
+                      <span className="font-medium">{result.pageTitle}</span>
+                      {isPinned(result.pagePath) && (
+                        <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                      )}
+                    </div>
                     <div className="text-xs text-muted-foreground truncate max-w-[250px]">
                       {result.pagePath}
                     </div>
@@ -148,16 +155,51 @@ export function ResultsTable({
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      window.open(result.pageUrl, '_blank')
-                    }}
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center justify-end gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        togglePin(result.pagePath)
+                      }}
+                      title={isPinned(result.pagePath) ? "Unpin page" : "Pin page"}
+                    >
+                      <Star 
+                        className={`h-4 w-4 ${
+                          isPinned(result.pagePath) 
+                            ? "fill-yellow-500 text-yellow-500" 
+                            : "text-muted-foreground"
+                        }`}
+                      />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        // Navigate to history tab with this page selected
+                        const event = new CustomEvent('navigate-to-history', { 
+                          detail: { pagePath: result.pagePath } 
+                        })
+                        window.dispatchEvent(event)
+                      }}
+                      title="View scan history"
+                    >
+                      <History className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        window.open(result.pageUrl, '_blank')
+                      }}
+                      title="Open page in new tab"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

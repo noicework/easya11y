@@ -13,7 +13,8 @@ import { Button } from '@components/ui/button'
 import { ScoreIndicator } from '@components/ScoreIndicator'
 import { ViolationCard } from '@components/ViolationCard'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui/card'
-import { ExternalLink, CheckCircle2, Loader2 } from 'lucide-react'
+import { JiraIntegration } from '@components/JiraIntegration'
+import { ExternalLink, CheckCircle2, Loader2, Download, Share2 } from 'lucide-react'
 import { accessibilityService } from '@services/accessibility.service'
 import type { ScanResult } from '@types'
 
@@ -27,6 +28,7 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
   const [detailedResult, setDetailedResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showJiraExport, setShowJiraExport] = useState(false)
 
   useEffect(() => {
     if (isOpen && result?.pagePath) {
@@ -75,30 +77,57 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
   const handleClose = () => {
     setDetailedResult(null)
     setError(null)
+    setShowJiraExport(false)
     onClose()
   }
 
+  const handleExportCSV = async () => {
+    const exportUrl = await accessibilityService.exportResults('csv', result.pagePath)
+    window.open(exportUrl, '_blank')
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <div className="flex items-start justify-between">
-            <div className="space-y-1.5">
-              <DialogTitle>{result.pageTitle}</DialogTitle>
-              <DialogDescription className="flex items-center gap-2">
-                <span className="truncate max-w-md">{result.pagePath}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => window.open(result.pageUrl, '_blank')}
-                >
-                  <ExternalLink className="h-3 w-3" />
-                </Button>
-              </DialogDescription>
+    <>
+      <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <div className="flex items-start justify-between">
+              <div className="space-y-1.5">
+                <DialogTitle>{result.pageTitle}</DialogTitle>
+                <DialogDescription className="flex items-center gap-2">
+                  <span className="truncate max-w-md">{result.pagePath}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => window.open(result.pageUrl, '_blank')}
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                </DialogDescription>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleExportCSV}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    CSV
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowJiraExport(true)}
+                  >
+                    <Share2 className="h-4 w-4 mr-2" />
+                    JIRA
+                  </Button>
+                </div>
+                <ScoreIndicator score={result.score || 0} size="lg" />
+              </div>
             </div>
-            <ScoreIndicator score={result.score || 0} size="lg" />
-          </div>
-        </DialogHeader>
+          </DialogHeader>
 
         <div className="flex-1 overflow-hidden">
           <Tabs defaultValue="violations" className="h-full flex flex-col">
@@ -299,5 +328,14 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
         </div>
       </DialogContent>
     </Dialog>
+    
+    {showJiraExport && result && (
+      <JiraIntegration
+        scanResult={result}
+        isOpen={showJiraExport}
+        onClose={() => setShowJiraExport(false)}
+      />
+    )}
+    </>
   )
 }

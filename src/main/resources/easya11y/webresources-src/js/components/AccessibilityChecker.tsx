@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs'
 import { StatsOverview } from '@components/StatsOverview'
 import { ScanControls } from '@components/ScanControls'
 import { ResultsTable } from '@components/ResultsTable'
@@ -8,8 +9,9 @@ import { FilterPanel } from '@components/FilterPanel'
 import { ScanProgressDialog } from '@components/ScanProgressDialog'
 import { ScanResultsModal } from '@components/ScanResultsModal'
 import { NoResultsEmptyState } from '@components/EmptyState'
+import { HistoricalView } from '@components/HistoricalView'
 import { Button } from '@components/ui/button'
-import { Download, Filter } from 'lucide-react'
+import { Download, Filter, History, Scan } from 'lucide-react'
 import { usePages } from '@hooks/usePages'
 import { useScanResults } from '@hooks/useScanResults'
 import { useScanner } from '@hooks/useScanner'
@@ -28,6 +30,8 @@ export function AccessibilityChecker() {
   const [showProgressDialog, setShowProgressDialog] = useState(false)
   const [showResultsModal, setShowResultsModal] = useState(false)
   const [modalResult, setModalResult] = useState<ScanResult | null>(null)
+  const [activeTab, setActiveTab] = useState<string>('scan')
+  const [historyPagePath, setHistoryPagePath] = useState<string>('')
 
   // Queries
   const { data: pages = [], isLoading: pagesLoading } = usePages()
@@ -35,6 +39,19 @@ export function AccessibilityChecker() {
   
   // Scanner
   const { scanPage, scanAllPages, isScanning, scanProgress } = useScanner()
+
+  // Listen for navigation events
+  useEffect(() => {
+    const handleNavigateToHistory = (event: CustomEvent) => {
+      setHistoryPagePath(event.detail.pagePath)
+      setActiveTab('history')
+    }
+
+    window.addEventListener('navigate-to-history', handleNavigateToHistory as EventListener)
+    return () => {
+      window.removeEventListener('navigate-to-history', handleNavigateToHistory as EventListener)
+    }
+  }, [])
 
   // Calculate stats
   const stats = useMemo(() => {
@@ -167,85 +184,107 @@ export function AccessibilityChecker() {
       {/* Stats Overview */}
       <StatsOverview stats={stats} />
 
-      {/* Scan Controls */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Accessibility Audit</CardTitle>
-          <CardDescription>
-            {stats.scannedPages} of {stats.totalPages} pages scanned ({Math.round((stats.scannedPages / stats.totalPages) * 100) || 0}%)
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ScanControls
-            pages={pages}
-            selectedPage={selectedPage}
-            wcagLevel={wcagLevel}
-            isLoading={pagesLoading}
-            isScanning={isScanning}
-            onPageSelect={setSelectedPage}
-            onWcagLevelChange={setWcagLevel}
-            onScan={handleScan}
-            onBulkScan={handleBulkScan}
-          />
-        </CardContent>
-      </Card>
+      {/* Main Content Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="scan" className="flex items-center gap-2">
+            <Scan className="h-4 w-4" />
+            Scan & Results
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <History className="h-4 w-4" />
+            Historical Trends
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Results Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Scan Results</CardTitle>
-            <div className="flex gap-2">
-              <SearchBar 
-                value={searchTerm}
-                onChange={setSearchTerm}
-                placeholder="Search pages or issues..."
+        {/* Scan Tab */}
+        <TabsContent value="scan" className="space-y-6">
+          {/* Scan Controls */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Accessibility Audit</CardTitle>
+              <CardDescription>
+                {stats.scannedPages} of {stats.totalPages} pages scanned ({Math.round((stats.scannedPages / stats.totalPages) * 100) || 0}%)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ScanControls
+                pages={pages}
+                selectedPage={selectedPage}
+                wcagLevel={wcagLevel}
+                isLoading={pagesLoading}
+                isScanning={isScanning}
+                onPageSelect={setSelectedPage}
+                onWcagLevelChange={setWcagLevel}
+                onScan={handleScan}
+                onBulkScan={handleBulkScan}
               />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <Filter className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleExport}
-                disabled={filteredResults.length === 0}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Export
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {showFilters && (
-            <FilterPanel
-              filters={filters}
-              onFiltersChange={setFilters}
-            />
-          )}
-          
-          {resultsLoading ? (
-            <div className="flex justify-center py-8">
-              <div className="text-muted-foreground">Loading results...</div>
-            </div>
-          ) : filteredResults.length === 0 ? (
-            <NoResultsEmptyState />
-          ) : (
-            <ResultsTable
-              results={filteredResults}
-              sortOrder={sortOrder}
-              onSortChange={setSortOrder}
-              onResultClick={(result) => {
-                setModalResult(result)
-                setShowResultsModal(true)
-              }}
-            />
-          )}
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+
+          {/* Results Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Scan Results</CardTitle>
+                <div className="flex gap-2">
+                  <SearchBar 
+                    value={searchTerm}
+                    onChange={setSearchTerm}
+                    placeholder="Search pages or issues..."
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setShowFilters(!showFilters)}
+                  >
+                    <Filter className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleExport}
+                    disabled={filteredResults.length === 0}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Export
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {showFilters && (
+                <FilterPanel
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                />
+              )}
+              
+              {resultsLoading ? (
+                <div className="flex justify-center py-8">
+                  <div className="text-muted-foreground">Loading results...</div>
+                </div>
+              ) : filteredResults.length === 0 ? (
+                <NoResultsEmptyState />
+              ) : (
+                <ResultsTable
+                  results={filteredResults}
+                  sortOrder={sortOrder}
+                  onSortChange={setSortOrder}
+                  onResultClick={(result) => {
+                    setModalResult(result)
+                    setShowResultsModal(true)
+                  }}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* History Tab */}
+        <TabsContent value="history">
+          <HistoricalView pages={pages} initialPagePath={historyPagePath} />
+        </TabsContent>
+      </Tabs>
 
       {/* Modals */}
       <ScanProgressDialog

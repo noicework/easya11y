@@ -109,4 +109,31 @@ export interface Configuration {
   serverSideScan?: boolean
   scanPaths?: string
   excludePaths?: string
+  pinnedPages?: string[]
+  jiraEnabled?: boolean
+  jiraUrl?: string
+  jiraProjectKey?: string
+  jiraApiToken?: string
+  jiraEmail?: string
+}
+
+export interface HistoricalTrend {
+  date: string
+  averageScore: number
+  minScore: number
+  maxScore: number
+  totalScans: number
+  criticalCount: number
+  seriousCount: number
+  moderateCount: number
+  minorCount: number
+}
+
+export interface TrendsResponse {
+  trends: HistoricalTrend[]
+  summary: {
+    totalScans: number
+    averageScore: number
+    improvementRate: number
+  }
 }
