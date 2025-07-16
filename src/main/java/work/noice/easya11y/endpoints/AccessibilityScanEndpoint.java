@@ -1,18 +1,17 @@
 package work.noice.easya11y.endpoints;
 
 import info.magnolia.context.MgnlContext;
-import info.magnolia.jcr.util.NodeUtil;
 import info.magnolia.jcr.util.PropertyUtil;
 import info.magnolia.rest.AbstractEndpoint;
 import info.magnolia.rest.EndpointDefinition;
 import work.noice.easya11y.models.AccessibilityScanResult;
 import work.noice.easya11y.services.ServerSideAccessibilityScanner;
+import work.noice.easya11y.storage.StorageService;
+import work.noice.easya11y.storage.StorageServiceFactory;
 import info.magnolia.objectfactory.Components;
 
 import javax.inject.Inject;
 import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -45,9 +44,12 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
     // Temporary storage for scan parameters
     private static final Map<String, String> scanWcagLevels = new HashMap<>();
     
+    private final StorageServiceFactory storageServiceFactory;
+    
     @Inject
-    public AccessibilityScanEndpoint(EndpointDefinition definition) {
+    public AccessibilityScanEndpoint(EndpointDefinition definition, StorageServiceFactory storageServiceFactory) {
         super(definition);
+        this.storageServiceFactory = storageServiceFactory;
     }
 
     /**
@@ -208,43 +210,9 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
             // Set the frontend-calculated score
             result.setScore(frontendScore);
             
-            // Store in JCR
-            Session scanSession = MgnlContext.getJCRSession(SCAN_RESULTS_WORKSPACE);
-            String scanResultPath = "/scanResults" + pagePath;
-            
-            // Create parent nodes if needed
-            ensureParentNodes(scanSession, scanResultPath);
-            
-            // Create or update scan result node
-            Node scanNode;
-            if (scanSession.nodeExists(scanResultPath)) {
-                scanNode = scanSession.getNode(scanResultPath);
-            } else {
-                Node parentNode = scanSession.getNode(scanResultPath.substring(0, scanResultPath.lastIndexOf('/')));
-                scanNode = parentNode.addNode(scanResultPath.substring(scanResultPath.lastIndexOf('/') + 1), "mgnl:content");
-            }
-            
-            // Store scan data
-            scanNode.setProperty("scanId", scanId);
-            scanNode.setProperty("pageUrl", pageUrl);
-            scanNode.setProperty("pageTitle", pageTitle);
-            scanNode.setProperty("scanDate", new Date().getTime());
-            scanNode.setProperty("wcagLevel", wcagLevel);
-            scanNode.setProperty("score", result.getScore());
-            scanNode.setProperty("violationCount", result.getViolations().size());
-            scanNode.setProperty("passCount", result.getPasses().size());
-            scanNode.setProperty("totalElements", result.getTotalElements());
-            scanNode.setProperty("elementsWithIssues", result.getElementsWithIssues());
-            
-            // Store violations summary
-            for (Map.Entry<String, Integer> entry : result.getViolationsByImpact().entrySet()) {
-                scanNode.setProperty("violations_" + entry.getKey(), entry.getValue());
-            }
-            
-            // Store detailed results as JSON
-            scanNode.setProperty("fullResults", objectMapper.writeValueAsString(result));
-            
-            scanSession.save();
+            // Store using storage service
+            StorageService storageService = storageServiceFactory.getStorageService();
+            String storedScanId = storageService.storeScanResult(result, pagePath);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -332,18 +300,6 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
     /**
      * Ensure parent nodes exist for a given path.
      */
-    private void ensureParentNodes(Session session, String path) throws RepositoryException {
-        String[] parts = path.split("/");
-        String currentPath = "";
-        
-        for (int i = 1; i < parts.length - 1; i++) {
-            currentPath += "/" + parts[i];
-            if (!session.nodeExists(currentPath)) {
-                Node parentNode = session.getNode(currentPath.substring(0, currentPath.lastIndexOf('/')));
-                parentNode.addNode(parts[i], "mgnl:folder");
-            }
-        }
-    }
     
     /**
      * Server-side scan for a specific page.

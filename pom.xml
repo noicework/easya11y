@@ -3,9 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>work.noice</groupId>
   <artifactId>easya11y</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
   <packaging>jar</packaging>
-  <name>easya11y Magnolia Module</name>
+  <name>Easy Accessibility Magnolia Module</name>
   <description>Accessibility testing module for Magnolia CMS</description>
   <url>https://github.com/noicework/easya11y</url>
   
@@ -117,10 +117,54 @@
       <artifactId>jackson-databind</artifactId>
     </dependency>
     
+    <!-- Jackson YAML support -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+      <version>2.15.3</version>
+    </dependency>
+    
     <!-- Magnolia Scheduler Module -->
     <dependency>
       <groupId>info.magnolia.scheduler</groupId>
       <artifactId>magnolia-module-scheduler</artifactId>
+    </dependency>
+    
+    <!-- Database Dependencies -->
+    <!-- PostgreSQL Driver -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.7.1</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <!-- MySQL Driver -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>8.0.33</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <!-- HikariCP Connection Pool -->
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+      <version>5.0.1</version>
+      <scope>compile</scope>
+    </dependency>
+    
+    <!-- Flyway for Database Migrations -->
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+      <version>10.22.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-mysql</artifactId>
+      <version>10.22.0</version>
     </dependency>
   </dependencies>
 
@@ -180,6 +224,44 @@
             <phase>generate-resources</phase>
             <configuration>
               <arguments>run build</arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- Maven Shade Plugin to bundle dependencies -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.4.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <artifactSet>
+                <includes>
+                  <include>com.zaxxer:HikariCP</include>
+                  <include>org.flywaydb:flyway-core</include>
+                  <include>org.flywaydb:flyway-mysql</include>
+                  <include>org.flywaydb:flyway-database-mysql</include>
+                  <include>com.fasterxml.jackson.dataformat:jackson-dataformat-yaml</include>
+                  <include>org.yaml:snakeyaml</include>
+                </includes>
+              </artifactSet>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
             </configuration>
           </execution>
         </executions>

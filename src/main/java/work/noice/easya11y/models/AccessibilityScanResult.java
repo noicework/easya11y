@@ -18,6 +18,8 @@ public class AccessibilityScanResult {
     private Date scanDate;
     private String scannerVersion;
     private String wcagLevel;
+    private String wcagVersion;
+    private String scanType;
     private double score;
     
     // Scan results
@@ -109,6 +111,8 @@ public class AccessibilityScanResult {
         private String id;
         private String description;
         private String help;
+        private String helpUrl;
+        private String impact;
         private int nodeCount;
         
         // Getters and setters
@@ -121,6 +125,12 @@ public class AccessibilityScanResult {
         public String getHelp() { return help; }
         public void setHelp(String help) { this.help = help; }
         
+        public String getHelpUrl() { return helpUrl; }
+        public void setHelpUrl(String helpUrl) { this.helpUrl = helpUrl; }
+        
+        public String getImpact() { return impact; }
+        public void setImpact(String impact) { this.impact = impact; }
+        
         public int getNodeCount() { return nodeCount; }
         public void setNodeCount(int nodeCount) { this.nodeCount = nodeCount; }
     }
@@ -132,6 +142,8 @@ public class AccessibilityScanResult {
         private String id;
         private String description;
         private String help;
+        private String helpUrl;
+        private String impact;
         private List<Node> nodes;
         
         public Incomplete() {
@@ -147,6 +159,12 @@ public class AccessibilityScanResult {
         
         public String getHelp() { return help; }
         public void setHelp(String help) { this.help = help; }
+        
+        public String getHelpUrl() { return helpUrl; }
+        public void setHelpUrl(String helpUrl) { this.helpUrl = helpUrl; }
+        
+        public String getImpact() { return impact; }
+        public void setImpact(String impact) { this.impact = impact; }
         
         public List<Node> getNodes() { return nodes; }
         public void setNodes(List<Node> nodes) { this.nodes = nodes; }
@@ -255,6 +273,12 @@ public class AccessibilityScanResult {
     
     public String getWcagLevel() { return wcagLevel; }
     public void setWcagLevel(String wcagLevel) { this.wcagLevel = wcagLevel; }
+    
+    public String getWcagVersion() { return wcagVersion; }
+    public void setWcagVersion(String wcagVersion) { this.wcagVersion = wcagVersion; }
+    
+    public String getScanType() { return scanType; }
+    public void setScanType(String scanType) { this.scanType = scanType; }
     
     public double getScore() { return score; }
     public void setScore(double score) { this.score = score; }

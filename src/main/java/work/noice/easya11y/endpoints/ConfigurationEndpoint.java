@@ -1,18 +1,12 @@
 package work.noice.easya11y.endpoints;
 
-import info.magnolia.context.MgnlContext;
-import info.magnolia.jcr.util.NodeTypes;
-import info.magnolia.jcr.util.NodeUtil;
-import info.magnolia.jcr.util.PropertyUtil;
 import info.magnolia.rest.AbstractEndpoint;
 import info.magnolia.rest.EndpointDefinition;
+import work.noice.easya11y.storage.StorageService;
+import work.noice.easya11y.storage.StorageServiceFactory;
+import work.noice.easya11y.config.DatabaseConfig;
 
 import javax.inject.Inject;
-import javax.jcr.Node;
-import javax.jcr.Property;
-import javax.jcr.PropertyIterator;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -37,9 +31,16 @@ public class ConfigurationEndpoint extends AbstractEndpoint<EndpointDefinition> 
     private static final String easya11y_WORKSPACE = "easya11y";
     private static final String CONFIG_NODE_PATH = "/configuration";
     
+    private final StorageServiceFactory storageServiceFactory;
+    private final DatabaseConfig databaseConfig;
+    
     @Inject
-    public ConfigurationEndpoint(EndpointDefinition definition) {
+    public ConfigurationEndpoint(EndpointDefinition definition, 
+                               StorageServiceFactory storageServiceFactory,
+                               DatabaseConfig databaseConfig) {
         super(definition);
+        this.storageServiceFactory = storageServiceFactory;
+        this.databaseConfig = databaseConfig;
     }
 
     /**
@@ -51,33 +52,22 @@ public class ConfigurationEndpoint extends AbstractEndpoint<EndpointDefinition> 
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConfiguration() {
         try {
-            Session session = MgnlContext.getJCRSession(easya11y_WORKSPACE);
+            StorageService storageService = storageServiceFactory.getStorageService();
             Map<String, Object> result = new HashMap<>();
-            Map<String, String> configuration = new HashMap<>();
             
-            // Check if configuration node exists
-            if (session.nodeExists(CONFIG_NODE_PATH)) {
-                Node configNode = session.getNode(CONFIG_NODE_PATH);
-                
-                // Read all properties from the configuration node
-                PropertyIterator properties = configNode.getProperties();
-                while (properties.hasNext()) {
-                    Property property = properties.nextProperty();
-                    String propertyName = property.getName();
-                    
-                    // Skip JCR system properties
-                    if (!propertyName.startsWith("jcr:") && !propertyName.startsWith("mgnl:")) {
-                        configuration.put(propertyName, property.getString());
-                    }
-                }
-            }
+            // Get configuration from storage service
+            Map<String, String> configuration = storageService.getAllConfiguration();
+            
+            // Add storage type info
+            configuration.put("storageType", storageService.getStorageType());
+            configuration.put("databaseEnabled", String.valueOf(databaseConfig.isDatabaseStorageEnabled()));
             
             result.put("success", true);
             result.put("configuration", configuration);
             
             return Response.ok(result).build();
             
-        } catch (RepositoryException e) {
+        } catch (Exception e) {
             log.error("Error retrieving configuration", e);
             return buildErrorResponse("Error retrieving configuration: " + e.getMessage(), 
                 Response.Status.INTERNAL_SERVER_ERROR);
@@ -95,44 +85,29 @@ public class ConfigurationEndpoint extends AbstractEndpoint<EndpointDefinition> 
     @Produces(MediaType.APPLICATION_JSON)
     public Response saveConfiguration(Map<String, Object> configuration) {
         try {
-            Session session = MgnlContext.getJCRSession(easya11y_WORKSPACE);
-            Node configNode;
+            StorageService storageService = storageServiceFactory.getStorageService();
             
-            // Create or get configuration node
-            if (!session.nodeExists(CONFIG_NODE_PATH)) {
-                Node rootNode = session.getRootNode();
-                configNode = rootNode.addNode("configuration", NodeTypes.ContentNode.NAME);
-            } else {
-                configNode = session.getNode(CONFIG_NODE_PATH);
-            }
-            
-            // Update properties
+            // Update properties in storage
             for (Map.Entry<String, Object> entry : configuration.entrySet()) {
                 String key = entry.getKey();
                 Object value = entry.getValue();
                 
-                // Skip null values
-                if (value == null) {
-                    // Remove property if it exists
-                    if (configNode.hasProperty(key)) {
-                        configNode.getProperty(key).remove();
-                    }
+                // Skip read-only properties
+                if ("storageType".equals(key) || "databaseEnabled".equals(key)) {
                     continue;
                 }
                 
-                // Set property value
-                if (value instanceof Boolean) {
-                    PropertyUtil.setProperty(configNode, key, (Boolean) value);
-                } else {
-                    PropertyUtil.setProperty(configNode, key, value.toString());
+                // Skip null values
+                if (value == null) {
+                    continue;
                 }
+                
+                // Store property value
+                storageService.storeConfiguration(key, value.toString());
             }
             
             // Also set system properties for immediate use
             updateSystemProperties(configuration);
-            
-            // Save changes
-            session.save();
             
             Map<String, Object> result = new HashMap<>();
             result.put("success", true);
@@ -140,9 +115,45 @@ public class ConfigurationEndpoint extends AbstractEndpoint<EndpointDefinition> 
             
             return Response.ok(result).build();
             
-        } catch (RepositoryException e) {
+        } catch (Exception e) {
             log.error("Error saving configuration", e);
             return buildErrorResponse("Error saving configuration: " + e.getMessage(), 
+                Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    /**
+     * Test database connection.
+     *
+     * @return HTTP response with connection test result
+     */
+    @GET
+    @Path("/test-connection")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response testDatabaseConnection() {
+        try {
+            Map<String, Object> result = new HashMap<>();
+            
+            if (!databaseConfig.isDatabaseStorageEnabled()) {
+                result.put("success", false);
+                result.put("message", "Database storage is not configured");
+                return Response.ok(result).build();
+            }
+            
+            StorageService storageService = storageServiceFactory.getStorageService();
+            boolean connectionSuccess = storageService.testConnection();
+            
+            result.put("success", connectionSuccess);
+            result.put("storageType", storageService.getStorageType());
+            result.put("message", connectionSuccess ? 
+                "Database connection successful" : 
+                "Database connection failed");
+            
+            return Response.ok(result).build();
+            
+        } catch (Exception e) {
+            log.error("Error testing database connection", e);
+            return buildErrorResponse("Error testing connection: " + e.getMessage(), 
                 Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
