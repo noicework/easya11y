@@ -1,17 +1,14 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs'
 import { StatsOverview } from '@components/StatsOverview'
-import { ScanControls } from '@components/ScanControls'
-import { ResultsTable } from '@components/ResultsTable'
-import { SearchBar } from '@components/SearchBar'
-import { FilterPanel } from '@components/FilterPanel'
+import { QuickAuditPanel } from '@components/QuickAuditPanel'
+import { RecentScansPanel } from '@components/RecentScansPanel'
+import { HistoricalTrendsPanel } from '@components/HistoricalTrendsPanel'
 import { ScanProgressDialog } from '@components/ScanProgressDialog'
 import { ScanResultsModal } from '@components/ScanResultsModal'
-import { NoResultsEmptyState } from '@components/EmptyState'
 import { HistoricalView } from '@components/HistoricalView'
 import { Button } from '@components/ui/button'
-import { Download, Filter, History, Scan } from 'lucide-react'
+import { History } from 'lucide-react'
 import { usePages } from '@hooks/usePages'
 import { useScanResults } from '@hooks/useScanResults'
 import { useScanner } from '@hooks/useScanner'
@@ -25,11 +22,12 @@ export function AccessibilityChecker() {
   const [wcagLevel, setWcagLevel] = useState<WCAGLevel>('AA')
   const [searchTerm, setSearchTerm] = useState('')
   const [filters, setFilters] = useState<FilterState>({})
-  const [sortOrder, setSortOrder] = useState<SortOrder>('date-desc')
+  const [sortOrder] = useState<SortOrder>('date-desc')
   const [showFilters, setShowFilters] = useState(false)
   const [showProgressDialog, setShowProgressDialog] = useState(false)
   const [showResultsModal, setShowResultsModal] = useState(false)
   const [modalResult, setModalResult] = useState<ScanResult | null>(null)
+  const [scanSubpages, setScanSubpages] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<string>('scan')
   const [historyPagePath, setHistoryPagePath] = useState<string>('')
 
@@ -173,9 +171,9 @@ export function AccessibilityChecker() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-2">
         <div>
-          <p className="text-muted-foreground">
+          <p className="text-lg text-muted-foreground">
             Scan and monitor accessibility compliance across your website
           </p>
         </div>
@@ -184,107 +182,77 @@ export function AccessibilityChecker() {
       {/* Stats Overview */}
       <StatsOverview stats={stats} />
 
-      {/* Main Content Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="scan" className="flex items-center gap-2">
-            <Scan className="h-4 w-4" />
-            Scan & Results
-          </TabsTrigger>
-          <TabsTrigger value="history" className="flex items-center gap-2">
-            <History className="h-4 w-4" />
-            Historical Trends
-          </TabsTrigger>
-        </TabsList>
+      {/* Top Section - Quick Audit and Historical Trends */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* Left Section - Quick Audit */}
+        <QuickAuditPanel
+          pages={pages}
+          selectedPage={selectedPage}
+          wcagLevel={wcagLevel}
+          isLoading={pagesLoading}
+          isScanning={isScanning}
+          onPageSelect={setSelectedPage}
+          onWcagLevelChange={setWcagLevel}
+          onScan={handleScan}
+          onBulkScan={handleBulkScan}
+          scanSubpages={scanSubpages}
+          onScanSubpagesChange={setScanSubpages}
+        />
 
-        {/* Scan Tab */}
-        <TabsContent value="scan" className="space-y-6">
-          {/* Scan Controls */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Accessibility Audit</CardTitle>
-              <CardDescription>
-                {stats.scannedPages} of {stats.totalPages} pages scanned ({Math.round((stats.scannedPages / stats.totalPages) * 100) || 0}%)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ScanControls
-                pages={pages}
-                selectedPage={selectedPage}
-                wcagLevel={wcagLevel}
-                isLoading={pagesLoading}
-                isScanning={isScanning}
-                onPageSelect={setSelectedPage}
-                onWcagLevelChange={setWcagLevel}
-                onScan={handleScan}
-                onBulkScan={handleBulkScan}
-              />
-            </CardContent>
-          </Card>
+        {/* Right Section - Historical Trends */}
+        <HistoricalTrendsPanel
+          pages={pages}
+          selectedPage={selectedPage}
+        />
+      </div>
 
-          {/* Results Section */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Scan Results</CardTitle>
-                <div className="flex gap-2">
-                  <SearchBar 
-                    value={searchTerm}
-                    onChange={setSearchTerm}
-                    placeholder="Search pages or issues..."
-                  />
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setShowFilters(!showFilters)}
-                  >
-                    <Filter className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={handleExport}
-                    disabled={filteredResults.length === 0}
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Export
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {showFilters && (
-                <FilterPanel
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                />
-              )}
-              
-              {resultsLoading ? (
-                <div className="flex justify-center py-8">
-                  <div className="text-muted-foreground">Loading results...</div>
-                </div>
-              ) : filteredResults.length === 0 ? (
-                <NoResultsEmptyState />
-              ) : (
-                <ResultsTable
-                  results={filteredResults}
-                  sortOrder={sortOrder}
-                  onSortChange={setSortOrder}
-                  onResultClick={(result) => {
-                    setModalResult(result)
-                    setShowResultsModal(true)
-                  }}
-                />
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+      {/* Bottom Section - Recent Scans (Full Width) */}
+      <RecentScansPanel
+        results={scanResults}
+        filteredResults={filteredResults}
+        searchTerm={searchTerm}
+        filters={filters}
+        showFilters={showFilters}
+        onSearchChange={setSearchTerm}
+        onFiltersChange={setFilters}
+        onToggleFilters={() => setShowFilters(!showFilters)}
+        onResultClick={(result) => {
+          setModalResult(result)
+          setShowResultsModal(true)
+        }}
+        onExport={handleExport}
+        isLoading={resultsLoading}
+      />
 
-        {/* History Tab */}
-        <TabsContent value="history">
-          <HistoricalView pages={pages} initialPagePath={historyPagePath} />
-        </TabsContent>
-      </Tabs>
+      {/* Historical Trends - Full Width Below */}
+      {activeTab === 'history' && (
+        <Card className="mt-6">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <History className="h-5 w-5 text-purple-600" />
+              <CardTitle>Historical Trends</CardTitle>
+            </div>
+            <CardDescription>
+              Analyze accessibility compliance trends over time
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <HistoricalView pages={pages} initialPagePath={historyPagePath} />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Toggle Historical View Button */}
+      <div className="flex justify-center mt-6">
+        <Button
+          variant="outline"
+          onClick={() => setActiveTab(activeTab === 'history' ? 'scan' : 'history')}
+          className="flex items-center gap-2"
+        >
+          <History className="h-4 w-4" />
+          {activeTab === 'history' ? 'Hide Historical Trends' : 'Show Historical Trends'}
+        </Button>
+      </div>
 
       {/* Modals */}
       <ScanProgressDialog

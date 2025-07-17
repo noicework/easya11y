@@ -19,6 +19,10 @@ public class easya11yVersionHandler extends DefaultModuleVersionHandler {
             .addTask(new RegisterCommandTask())
             .addTask(new RegisterScheduledScanJobTask())
         );
+        
+        register(DeltaBuilder.update("1.2.1", "Added JIRA integration configuration")
+            .addTask(new InitializeJiraConfigurationTask())
+        );
     }
     
     @Override
@@ -26,6 +30,7 @@ public class easya11yVersionHandler extends DefaultModuleVersionHandler {
         List<info.magnolia.module.delta.Task> tasks = new ArrayList<>();
         tasks.add(new RegisterCommandTask());
         tasks.add(new RegisterScheduledScanJobTask());
+        tasks.add(new InitializeJiraConfigurationTask());
         return tasks;
     }
     
@@ -63,6 +68,34 @@ public class easya11yVersionHandler extends DefaultModuleVersionHandler {
             commandNode.setProperty("enabled", true);
             
             ctx.info("Registered server-side scan command");
+        }
+    }
+    
+    /**
+     * Task to initialize JIRA configuration in the easya11y workspace.
+     */
+    private static class InitializeJiraConfigurationTask extends info.magnolia.module.delta.AbstractRepositoryTask {
+        public InitializeJiraConfigurationTask() {
+            super("Initialize JIRA configuration", 
+                  "Creates JIRA configuration entries in the easya11y workspace");
+        }
+        
+        @Override
+        protected void doExecute(InstallContext ctx) throws javax.jcr.RepositoryException, info.magnolia.module.delta.TaskExecutionException {
+            // Note: The actual configuration storage is handled by the StorageService
+            // This task ensures the workspace exists and the application is aware of the need for configuration
+            javax.jcr.Session session = ctx.getConfigJCRSession();
+            
+            // Create parent nodes if needed
+            javax.jcr.Node root = session.getRootNode();
+            javax.jcr.Node modules = root.hasNode("modules") ? 
+                root.getNode("modules") : root.addNode("modules");
+            javax.jcr.Node moduleNode = modules.hasNode("easya11y") ? 
+                modules.getNode("easya11y") : modules.addNode("easya11y");
+            
+            // Note: The actual JIRA configuration values (jiraUrl, jiraApiToken, jiraEmail)
+            // should be set through the Configuration UI or REST endpoint, not here
+            ctx.info("JIRA configuration initialization completed. Configure values via the Configuration UI.");
         }
     }
 }

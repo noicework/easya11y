@@ -1,6 +1,5 @@
 package work.noice.easya11y.endpoints;
 
-import info.magnolia.context.MgnlContext;
 import info.magnolia.rest.AbstractEndpoint;
 import info.magnolia.rest.EndpointDefinition;
 import org.apache.commons.lang3.StringUtils;
@@ -13,10 +12,10 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import work.noice.easya11y.storage.StorageService;
+import work.noice.easya11y.storage.StorageServiceFactory;
 
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -28,10 +27,12 @@ import java.util.*;
 public class JiraIntegrationEndpoint extends AbstractEndpoint<EndpointDefinition> {
     
     private static final Logger log = LoggerFactory.getLogger(JiraIntegrationEndpoint.class);
-    private static final String CONFIG_PATH = "/modules/easya11y/config";
+    private final StorageServiceFactory storageServiceFactory;
     
-    public JiraIntegrationEndpoint(EndpointDefinition endpointDefinition) {
+    @Inject
+    public JiraIntegrationEndpoint(EndpointDefinition endpointDefinition, StorageServiceFactory storageServiceFactory) {
         super(endpointDefinition);
+        this.storageServiceFactory = storageServiceFactory;
     }
     
     @POST
@@ -40,17 +41,19 @@ public class JiraIntegrationEndpoint extends AbstractEndpoint<EndpointDefinition
     @Produces(MediaType.APPLICATION_JSON)
     public Response createJiraIssue(Map<String, Object> requestData) {
         try {
-            // Get configuration
-            Session session = getCurrentSession();
-            Node configNode = session.getNode(CONFIG_PATH);
+            // Get configuration from StorageService
+            StorageService storageService = storageServiceFactory.getStorageService();
             
-            String jiraUrl = getProperty(configNode, "jiraUrl");
-            String jiraApiToken = getProperty(configNode, "jiraApiToken");
-            String jiraEmail = getProperty(configNode, "jiraEmail");
+            String jiraUrl = storageService.getConfiguration("jiraUrl").orElse("");
+            String jiraApiToken = storageService.getConfiguration("jiraApiToken").orElse("");
+            String jiraEmail = storageService.getConfiguration("jiraEmail").orElse("");
             
-            if (StringUtils.isBlank(jiraUrl) || StringUtils.isBlank(jiraApiToken)) {
+            log.debug("JIRA Configuration - URL: {}, Email: {}, Token length: {}", 
+                jiraUrl, jiraEmail, jiraApiToken.length());
+            
+            if (StringUtils.isBlank(jiraUrl) || StringUtils.isBlank(jiraApiToken) || StringUtils.isBlank(jiraEmail)) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(createErrorResponse("JIRA integration not configured"))
+                    .entity(createErrorResponse("JIRA integration not configured. Please configure jiraUrl, jiraApiToken, and jiraEmail."))
                     .build();
             }
             
@@ -107,19 +110,27 @@ public class JiraIntegrationEndpoint extends AbstractEndpoint<EndpointDefinition
     }
     
     private String createIssueInJira(String jiraUrl, String email, String apiToken, Map<String, Object> issueData) throws IOException {
+        // Remove trailing slash if present
+        if (jiraUrl.endsWith("/")) {
+            jiraUrl = jiraUrl.substring(0, jiraUrl.length() - 1);
+        }
         String apiUrl = jiraUrl + "/rest/api/2/issue";
         
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(apiUrl);
             
             // Set headers
-            String auth = Base64.getEncoder().encodeToString((email + ":" + apiToken).getBytes(StandardCharsets.UTF_8));
+            String authString = email + ":" + apiToken;
+            String auth = Base64.getEncoder().encodeToString(authString.getBytes(StandardCharsets.UTF_8));
+            log.debug("Auth string length: {}, Base64 auth length: {}", authString.length(), auth.length());
             post.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + auth);
             post.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
             post.setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
             
             // Set body
             String jsonBody = convertToJson(issueData);
+            log.debug("Sending to JIRA API: {}", apiUrl);
+            log.debug("Request body: {}", jsonBody);
             post.setEntity(new StringEntity(jsonBody, StandardCharsets.UTF_8));
             
             // Execute request
@@ -137,21 +148,6 @@ public class JiraIntegrationEndpoint extends AbstractEndpoint<EndpointDefinition
                 }
             }
         }
-    }
-    
-    private Session getCurrentSession() throws RepositoryException {
-        return MgnlContext.getJCRSession("config");
-    }
-    
-    private String getProperty(Node node, String propertyName) {
-        try {
-            if (node.hasProperty(propertyName)) {
-                return node.getProperty(propertyName).getString();
-            }
-        } catch (RepositoryException e) {
-            log.error("Error reading property: " + propertyName, e);
-        }
-        return null;
     }
     
     private Map<String, Object> createErrorResponse(String message) {
