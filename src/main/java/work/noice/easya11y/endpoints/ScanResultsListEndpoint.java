@@ -19,7 +19,6 @@ import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import work.noice.easya11y.license.LicenseValidator;
 
 /**
  * REST endpoint for listing and filtering accessibility scan results.
@@ -187,13 +186,6 @@ public class ScanResultsListEndpoint extends AbstractEndpoint<EndpointDefinition
 
         try {
             StorageService storageService = storageServiceFactory.getStorageService();
-
-            // License check for historical analysis
-            LicenseValidator.getInstance().setStorageService(storageService);
-            if (!LicenseValidator.getInstance().isFeatureEnabled(LicenseValidator.FEATURE_HISTORICAL)) {
-                return buildErrorResponse("Historical analysis requires a valid license. Please activate your license in Settings.",
-                                        Response.Status.FORBIDDEN);
-            }
 
             // Check if database storage is enabled
             if ("jcr".equals(storageService.getStorageType())) {

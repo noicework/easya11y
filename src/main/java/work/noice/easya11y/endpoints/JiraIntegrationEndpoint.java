@@ -12,7 +12,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import work.noice.easya11y.license.LicenseValidator;
 import work.noice.easya11y.storage.StorageService;
 import work.noice.easya11y.storage.StorageServiceFactory;
 
@@ -45,14 +44,6 @@ public class JiraIntegrationEndpoint extends AbstractEndpoint<EndpointDefinition
             // Get configuration from StorageService
             StorageService storageService = storageServiceFactory.getStorageService();
 
-            // License check
-            LicenseValidator.getInstance().setStorageService(storageService);
-            if (!LicenseValidator.getInstance().isFeatureEnabled(LicenseValidator.FEATURE_JIRA)) {
-                return Response.status(Response.Status.FORBIDDEN)
-                    .entity(createErrorResponse("JIRA integration requires a valid license. Please activate your license in Settings."))
-                    .build();
-            }
-            
             String jiraUrl = storageService.getConfiguration("jiraUrl").orElse("");
             String jiraApiToken = storageService.getConfiguration("jiraApiToken").orElse("");
             String jiraEmail = storageService.getConfiguration("jiraEmail").orElse("");
