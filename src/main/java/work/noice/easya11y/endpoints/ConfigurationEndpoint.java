@@ -6,14 +6,14 @@ import work.noice.easya11y.storage.StorageService;
 import work.noice.easya11y.storage.StorageServiceFactory;
 import work.noice.easya11y.config.DatabaseConfig;
 
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,7 +56,7 @@ public class ConfigurationEndpoint extends AbstractEndpoint<EndpointDefinition> 
             Map<String, Object> result = new HashMap<>();
             
             // Get configuration from storage service
-            Map<String, String> configuration = storageService.getAllConfiguration();
+            Map<String, String> configuration = new HashMap<>(storageService.getAllConfiguration());
             
             // Add storage type info
             configuration.put("storageType", storageService.getStorageType());

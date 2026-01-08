@@ -1,30 +1,5 @@
-# Example configuration for easya11y database storage
+# Example configuration for Easy Accessibility (Community edition)
 # Place this file in: <light-module-name>/decorations/easya11y/config.yaml
 
-# Storage type: jcr (default) or database
-storageType: database
-
-# Database connection configuration
-datasource:
-  # PostgreSQL example
-  username: easya11y_user
-  password: your_password_here
-  url: jdbc:postgresql://localhost:5432/easya11y_db
-  driver: org.postgresql.Driver
-  
-  # MySQL example (comment out PostgreSQL and uncomment these)
-  # username: easya11y_user
-  # password: your_password_here
-  # url: jdbc:mysql://localhost:3306/easya11y_db
-  # driver: com.mysql.cj.jdbc.Driver
-  
-  # Migration settings
-  migration:
-    # Path to migration scripts (optional - auto-detected if not specified)
-    # path: db/migration/postgresql
-    
-    # Run migrations on startup
-    run: true
-
-# Note: When using database storage, include the appropriate driver dependency
-# in your project. The drivers are marked as 'provided' in easya11y's pom.xml
+# Storage type for this repository
+storageType: jcr

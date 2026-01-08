@@ -137,3 +137,15 @@ export interface TrendsResponse {
     improvementRate: number
   }
 }
+
+export type LicenseFeature = 'jira' | 'historical'
+
+export interface LicenseInfo {
+  isValid: boolean
+  email?: string
+  expirationDate?: string
+  issuedDate?: string
+  daysRemaining?: number
+  features?: LicenseFeature[]
+  errorMessage?: string
+}

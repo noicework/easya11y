@@ -16,7 +16,7 @@ import {
   AlertDescription,
   AlertTitle,
 } from '@components/ui/alert'
-import { ExternalLink, AlertCircle, CheckCircle } from 'lucide-react'
+import { ExternalLink, AlertCircle, CheckCircle, Key } from 'lucide-react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { accessibilityService } from '@services/accessibility.service'
 import type { ScanResult } from '@types'
@@ -51,6 +51,14 @@ export function JiraIntegration({ scanResult, isOpen, onClose }: JiraIntegration
     queryKey: ['configuration'],
     queryFn: () => accessibilityService.getConfiguration(),
   })
+
+  // Check license
+  const { data: license } = useQuery({
+    queryKey: ['license'],
+    queryFn: () => accessibilityService.getLicenseInfo(),
+  })
+
+  const isLicensed = license?.isValid && license?.features?.includes('jira')
 
   // Update form when config loads
   useEffect(() => {
@@ -128,7 +136,31 @@ ${index + 1}. *${violation.help}* (${violation.impact})
           </DialogDescription>
         </DialogHeader>
 
-        {!isConfigured ? (
+        {!isLicensed ? (
+          <div className="space-y-4">
+            <Alert className="border-amber-300 bg-amber-50">
+              <Key className="h-4 w-4 text-amber-600" />
+              <AlertTitle>License Required</AlertTitle>
+              <AlertDescription>
+                JIRA integration requires a valid Easy Accessibility license. Please activate your license in the Configuration page to use this feature.
+              </AlertDescription>
+            </Alert>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  window.open('/easya11y/configuration', '_blank')
+                  onClose()
+                }}
+              >
+                Go to Settings
+              </Button>
+            </DialogFooter>
+          </div>
+        ) : !isConfigured ? (
           <div className="space-y-4">
             <Alert>
               <AlertCircle className="h-4 w-4" />

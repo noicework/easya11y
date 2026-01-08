@@ -13,10 +13,9 @@ import { Button } from '@components/ui/button'
 import { ScoreIndicator } from '@components/ScoreIndicator'
 import { ViolationCard } from '@components/ViolationCard'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui/card'
-import { JiraIntegration } from '@components/JiraIntegration'
-import { ExternalLink, CheckCircle2, Loader2, Download, Share2 } from 'lucide-react'
+import { ExternalLink, CheckCircle2, Loader2, Download } from 'lucide-react'
 import { accessibilityService } from '@services/accessibility.service'
-import type { ScanResult, Configuration } from '@types'
+import type { ScanResult } from '@types'
 
 interface ScanResultsModalProps {
   isOpen: boolean
@@ -28,13 +27,10 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
   const [detailedResult, setDetailedResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showJiraExport, setShowJiraExport] = useState(false)
-  const [configuration, setConfiguration] = useState<Configuration | null>(null)
 
   useEffect(() => {
     if (isOpen && result?.pagePath) {
       loadDetailedResult()
-      loadConfiguration()
     }
   }, [isOpen, result?.pagePath])
 
@@ -52,15 +48,6 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
       console.error('Error loading scan details:', err)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const loadConfiguration = async () => {
-    try {
-      const config = await accessibilityService.getConfiguration()
-      setConfiguration(config)
-    } catch (err) {
-      console.error('Error loading configuration:', err)
     }
   }
 
@@ -88,8 +75,6 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
   const handleClose = () => {
     setDetailedResult(null)
     setError(null)
-    setShowJiraExport(false)
-    setConfiguration(null)
     onClose()
   }
 
@@ -97,11 +82,6 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
     const exportUrl = await accessibilityService.exportResults('csv', result.pagePath)
     window.open(exportUrl, '_blank')
   }
-
-  const isJiraConfigured = configuration?.jiraEnabled && 
-    configuration?.jiraUrl && 
-    configuration?.jiraApiToken && 
-    configuration?.jiraEmail
 
   return (
     <>
@@ -132,16 +112,6 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
                     <Download className="h-4 w-4 mr-2" />
                     CSV
                   </Button>
-                  {isJiraConfigured && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowJiraExport(true)}
-                    >
-                      <Share2 className="h-4 w-4 mr-2" />
-                      JIRA
-                    </Button>
-                  )}
                 </div>
                 <ScoreIndicator score={result.score || 0} size="lg" />
               </div>
@@ -347,14 +317,6 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
         </div>
       </DialogContent>
     </Dialog>
-    
-    {showJiraExport && result && (
-      <JiraIntegration
-        scanResult={result}
-        isOpen={showJiraExport}
-        onClose={() => setShowJiraExport(false)}
-      />
-    )}
     </>
   )
 }

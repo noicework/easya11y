@@ -20,7 +20,7 @@ public class easya11yVersionHandler extends DefaultModuleVersionHandler {
             .addTask(new RegisterScheduledScanJobTask())
         );
         
-        register(DeltaBuilder.update("1.2.1", "Added JIRA integration configuration")
+        register(DeltaBuilder.update("1.2.1", "Added database storage, historical analytics, licensing, and JIRA integration")
             .addTask(new InitializeJiraConfigurationTask())
         );
     }

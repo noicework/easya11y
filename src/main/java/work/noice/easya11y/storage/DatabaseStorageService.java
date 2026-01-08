@@ -3,8 +3,8 @@ package work.noice.easya11y.storage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import work.noice.easya11y.models.AccessibilityScanResult;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;

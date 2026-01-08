@@ -11,7 +11,7 @@ import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * SubApp for the Accessibility Checker.

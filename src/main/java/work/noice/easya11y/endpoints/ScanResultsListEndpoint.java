@@ -6,19 +6,20 @@ import work.noice.easya11y.models.AccessibilityScanResult;
 import work.noice.easya11y.storage.StorageService;
 import work.noice.easya11y.storage.StorageServiceFactory;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import work.noice.easya11y.license.LicenseValidator;
 
 /**
  * REST endpoint for listing and filtering accessibility scan results.
@@ -183,13 +184,20 @@ public class ScanResultsListEndpoint extends AbstractEndpoint<EndpointDefinition
     public Response getHistoricalTrends(
             @QueryParam("pagePath") String pagePath,
             @QueryParam("days") Integer days) {
-        
+
         try {
             StorageService storageService = storageServiceFactory.getStorageService();
-            
+
+            // License check for historical analysis
+            LicenseValidator.getInstance().setStorageService(storageService);
+            if (!LicenseValidator.getInstance().isFeatureEnabled(LicenseValidator.FEATURE_HISTORICAL)) {
+                return buildErrorResponse("Historical analysis requires a valid license. Please activate your license in Settings.",
+                                        Response.Status.FORBIDDEN);
+            }
+
             // Check if database storage is enabled
             if ("jcr".equals(storageService.getStorageType())) {
-                return buildErrorResponse("Historical trends are only available with database storage", 
+                return buildErrorResponse("Historical trends are only available with database storage",
                                         Response.Status.NOT_IMPLEMENTED);
             }
             

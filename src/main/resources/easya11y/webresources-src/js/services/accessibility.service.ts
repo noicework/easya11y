@@ -1,4 +1,4 @@
-import type { Page, ScanInit, ScanResult, DetailedResult, WCAGLevel, Configuration } from '@types'
+import type { Page, ScanInit, ScanResult, DetailedResult, WCAGLevel, Configuration, LicenseInfo } from '@types'
 
 class AccessibilityService {
   private apiBase: string
@@ -186,13 +186,56 @@ class AccessibilityService {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(issueData)
     })
-    
+
     if (!response.ok) {
       const error = await response.text()
       throw new Error(error || 'Failed to create JIRA issue')
     }
-    
+
     return response.json()
+  }
+
+  async getLicenseInfo(): Promise<LicenseInfo> {
+    const response = await fetch(`${this.apiBase}/easya11y/license`)
+
+    if (!response.ok) {
+      throw new Error(`Failed to get license info: ${response.status}`)
+    }
+
+    return response.json()
+  }
+
+  async saveLicense(licenseKey: string): Promise<LicenseInfo> {
+    const response = await fetch(`${this.apiBase}/easya11y/license`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ licenseKey })
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to save license: ${response.status}`)
+    }
+
+    return response.json()
+  }
+
+  async removeLicense(): Promise<void> {
+    const response = await fetch(`${this.apiBase}/easya11y/license`, {
+      method: 'DELETE'
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to remove license: ${response.status}`)
+    }
+  }
+
+  async isFeatureLicensed(feature: 'jira' | 'historical'): Promise<boolean> {
+    try {
+      const license = await this.getLicenseInfo()
+      return license.isValid && license.features?.includes(feature) || false
+    } catch {
+      return false
+    }
   }
 }
 

@@ -6,7 +6,7 @@ import info.magnolia.jcr.util.NodeUtil;
 import info.magnolia.jcr.util.PropertyUtil;
 import work.noice.easya11y.models.AccessibilityScanResult;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import javax.jcr.*;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
@@ -34,7 +34,7 @@ public class JcrStorageService implements StorageService {
     public String storeScanResult(AccessibilityScanResult scanResult, String pagePath) {
         try {
             Session session = MgnlContext.getJCRSession(SCAN_RESULTS_WORKSPACE);
-            String scanResultPath = SCAN_RESULTS_PATH + pagePath;
+            String scanResultPath = buildScanResultPath(pagePath);
             
             // Create parent nodes if needed
             ensureParentNodes(session, scanResultPath);
@@ -44,8 +44,13 @@ public class JcrStorageService implements StorageService {
             if (session.nodeExists(scanResultPath)) {
                 scanNode = session.getNode(scanResultPath);
             } else {
-                Node parentNode = session.getNode(scanResultPath.substring(0, scanResultPath.lastIndexOf('/')));
-                scanNode = parentNode.addNode(scanResultPath.substring(scanResultPath.lastIndexOf('/') + 1), "mgnl:content");
+                int lastSlash = scanResultPath.lastIndexOf('/');
+                Node parentNode = lastSlash <= 0 ? session.getRootNode() : session.getNode(scanResultPath.substring(0, lastSlash));
+                String nodeName = scanResultPath.substring(lastSlash + 1);
+                if (nodeName.isEmpty()) {
+                    throw new RepositoryException("Invalid scan result path (missing node name): " + scanResultPath);
+                }
+                scanNode = parentNode.addNode(nodeName, "mgnl:content");
             }
             
             // Store scan data
@@ -81,7 +86,7 @@ public class JcrStorageService implements StorageService {
     public List<AccessibilityScanResult> getScanResultsForPage(String pagePath, int limit) {
         try {
             Session session = MgnlContext.getJCRSession(SCAN_RESULTS_WORKSPACE);
-            String scanResultPath = SCAN_RESULTS_PATH + pagePath;
+            String scanResultPath = buildScanResultPath(pagePath);
             
             if (!session.nodeExists(scanResultPath)) {
                 return Collections.emptyList();
@@ -326,15 +331,41 @@ public class JcrStorageService implements StorageService {
     }
     
     private void ensureParentNodes(Session session, String path) throws RepositoryException {
-        String[] parts = path.split("/");
-        String currentPath = "";
+        if (path == null || path.isBlank() || "/".equals(path)) {
+            throw new RepositoryException("Invalid JCR path: " + path);
+        }
         
+        String[] parts = path.split("/");
+        Node currentNode = session.getRootNode();
+        
+        // Create all intermediate nodes (exclude last segment, which is the scan result node itself)
         for (int i = 1; i < parts.length - 1; i++) {
-            currentPath += "/" + parts[i];
-            if (!session.nodeExists(currentPath)) {
-                Node parentNode = session.getNode(currentPath.substring(0, currentPath.lastIndexOf('/')));
-                parentNode.addNode(parts[i], "mgnl:content");
+            String segment = parts[i];
+            if (segment.isEmpty()) {
+                continue;
+            }
+            
+            if (currentNode.hasNode(segment)) {
+                currentNode = currentNode.getNode(segment);
+            } else {
+                currentNode = currentNode.addNode(segment, "mgnl:content");
             }
         }
+    }
+    
+    private String buildScanResultPath(String pagePath) {
+        String normalized = pagePath == null ? "" : pagePath.trim();
+        if (normalized.isEmpty() || "/".equals(normalized)) {
+            normalized = "/_root";
+        } else if (!normalized.startsWith("/")) {
+            normalized = "/" + normalized;
+        }
+        
+        // Avoid trailing slash creating an empty node name
+        if (normalized.endsWith("/") && normalized.length() > 1) {
+            normalized = normalized.substring(0, normalized.length() - 1);
+        }
+        
+        return SCAN_RESULTS_PATH + normalized;
     }
 }

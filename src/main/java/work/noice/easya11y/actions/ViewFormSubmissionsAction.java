@@ -7,7 +7,7 @@ import info.magnolia.ui.api.location.Location;
 import info.magnolia.ui.api.location.LocationController;
 import info.magnolia.ui.contentapp.action.OpenDetailSubappActionDefinition;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.jcr.Node;
 
 /**

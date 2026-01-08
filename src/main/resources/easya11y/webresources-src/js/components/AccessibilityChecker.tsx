@@ -1,14 +1,9 @@
-import { useState, useMemo, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui/card'
+import { useState, useMemo } from 'react'
 import { StatsOverview } from '@components/StatsOverview'
 import { QuickAuditPanel } from '@components/QuickAuditPanel'
 import { RecentScansPanel } from '@components/RecentScansPanel'
-import { HistoricalTrendsPanel } from '@components/HistoricalTrendsPanel'
 import { ScanProgressDialog } from '@components/ScanProgressDialog'
 import { ScanResultsModal } from '@components/ScanResultsModal'
-import { HistoricalView } from '@components/HistoricalView'
-import { Button } from '@components/ui/button'
-import { History } from 'lucide-react'
 import { usePages } from '@hooks/usePages'
 import { useScanResults } from '@hooks/useScanResults'
 import { useScanner } from '@hooks/useScanner'
@@ -28,8 +23,6 @@ export function AccessibilityChecker() {
   const [showResultsModal, setShowResultsModal] = useState(false)
   const [modalResult, setModalResult] = useState<ScanResult | null>(null)
   const [scanSubpages, setScanSubpages] = useState<boolean>(false)
-  const [activeTab, setActiveTab] = useState<string>('scan')
-  const [historyPagePath, setHistoryPagePath] = useState<string>('')
 
   // Queries
   const { data: pages = [], isLoading: pagesLoading } = usePages()
@@ -37,19 +30,6 @@ export function AccessibilityChecker() {
   
   // Scanner
   const { scanPage, scanAllPages, isScanning, scanProgress } = useScanner()
-
-  // Listen for navigation events
-  useEffect(() => {
-    const handleNavigateToHistory = (event: CustomEvent) => {
-      setHistoryPagePath(event.detail.pagePath)
-      setActiveTab('history')
-    }
-
-    window.addEventListener('navigate-to-history', handleNavigateToHistory as EventListener)
-    return () => {
-      window.removeEventListener('navigate-to-history', handleNavigateToHistory as EventListener)
-    }
-  }, [])
 
   // Calculate stats
   const stats = useMemo(() => {
@@ -182,9 +162,8 @@ export function AccessibilityChecker() {
       {/* Stats Overview */}
       <StatsOverview stats={stats} />
 
-      {/* Top Section - Quick Audit and Historical Trends */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* Left Section - Quick Audit */}
+      {/* Top Section - Quick Audit */}
+      <div className="grid grid-cols-1 gap-6">
         <QuickAuditPanel
           pages={pages}
           selectedPage={selectedPage}
@@ -197,12 +176,6 @@ export function AccessibilityChecker() {
           onBulkScan={handleBulkScan}
           scanSubpages={scanSubpages}
           onScanSubpagesChange={setScanSubpages}
-        />
-
-        {/* Right Section - Historical Trends */}
-        <HistoricalTrendsPanel
-          pages={pages}
-          selectedPage={selectedPage}
         />
       </div>
 
@@ -223,36 +196,6 @@ export function AccessibilityChecker() {
         onExport={handleExport}
         isLoading={resultsLoading}
       />
-
-      {/* Historical Trends - Full Width Below */}
-      {activeTab === 'history' && (
-        <Card className="mt-6">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <History className="h-5 w-5 text-purple-600" />
-              <CardTitle>Historical Trends</CardTitle>
-            </div>
-            <CardDescription>
-              Analyze accessibility compliance trends over time
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <HistoricalView pages={pages} initialPagePath={historyPagePath} />
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Toggle Historical View Button */}
-      <div className="flex justify-center mt-6">
-        <Button
-          variant="outline"
-          onClick={() => setActiveTab(activeTab === 'history' ? 'scan' : 'history')}
-          className="flex items-center gap-2"
-        >
-          <History className="h-4 w-4" />
-          {activeTab === 'history' ? 'Hide Historical Trends' : 'Show Historical Trends'}
-        </Button>
-      </div>
 
       {/* Modals */}
       <ScanProgressDialog

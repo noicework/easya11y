@@ -10,7 +10,7 @@ import {
 import { Button } from '@components/ui/button'
 import { Badge } from '@components/ui/badge'
 import { ScoreIndicator } from '@components/ScoreIndicator'
-import { ArrowUpDown, ChevronLeft, ChevronRight, ExternalLink, History, Star } from 'lucide-react'
+import { ArrowUpDown, ChevronLeft, ChevronRight, ExternalLink, Star } from 'lucide-react'
 import { usePinnedPages } from '@hooks/usePinnedPages'
 import type { ScanResult, SortOrder } from '@types'
 
@@ -172,21 +172,6 @@ export function ResultsTable({
                             : "text-muted-foreground"
                         }`}
                       />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        // Navigate to history tab with this page selected
-                        const event = new CustomEvent('navigate-to-history', { 
-                          detail: { pagePath: result.pagePath } 
-                        })
-                        window.dispatchEvent(event)
-                      }}
-                      title="View scan history"
-                    >
-                      <History className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"

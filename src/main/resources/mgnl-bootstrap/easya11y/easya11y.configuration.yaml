@@ -1,0 +1,4 @@
+# Bootstrap configuration for easya11y workspace
+# This creates the /configuration node in the easya11y workspace
+'configuration':
+  'jcr:primaryType': 'mgnl:content'

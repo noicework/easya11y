@@ -1,0 +1,4 @@
+# Bootstrap configuration for easya11y workspace
+# This creates the /scanResults node in the easya11y workspace
+'scanResults':
+  'jcr:primaryType': 'mgnl:content'

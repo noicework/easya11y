@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from '@components/ui/alert'
 import { Input } from '@components/ui/input'
 import { Textarea } from '@components/ui/textarea'
 import { Switch } from '@components/ui/switch'
-import { Loader2, Save, RotateCcw, CheckCircle2, XCircle, Mail, Calendar, ExternalLink } from 'lucide-react'
+import { Loader2, Save, RotateCcw, CheckCircle2, XCircle, Mail, Calendar } from 'lucide-react'
 import { accessibilityService } from '@services/accessibility.service'
 import type { Configuration, WCAGLevel, WCAGVersion, ScheduleFrequency } from '@types'
 
@@ -384,100 +384,6 @@ export function ConfigurationApp() {
                   />
                   <p className="text-sm text-muted-foreground">
                     Comma-separated list of paths to exclude from scanning.
-                  </p>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ExternalLink className="h-5 w-5" />
-              JIRA Integration
-            </CardTitle>
-            <CardDescription>
-              Configure JIRA integration for exporting accessibility issues
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="jiraEnabled"
-                checked={configuration.jiraEnabled}
-                onCheckedChange={(checked: boolean) => setConfiguration({ ...configuration, jiraEnabled: checked })}
-                disabled={isSaving}
-              />
-              <Label htmlFor="jiraEnabled">Enable JIRA integration</Label>
-            </div>
-
-            {configuration.jiraEnabled && (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="jiraUrl">JIRA Instance URL</Label>
-                  <Input
-                    id="jiraUrl"
-                    placeholder="https://your-domain.atlassian.net"
-                    value={configuration.jiraUrl}
-                    onChange={(e) => setConfiguration({ ...configuration, jiraUrl: e.target.value })}
-                    disabled={isSaving}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Your JIRA or Atlassian instance URL
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="jiraProjectKey">Default Project Key</Label>
-                  <Input
-                    id="jiraProjectKey"
-                    placeholder="PROJ"
-                    value={configuration.jiraProjectKey}
-                    onChange={(e) => setConfiguration({ ...configuration, jiraProjectKey: e.target.value })}
-                    disabled={isSaving}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    The project key where issues will be created by default
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="jiraEmail">JIRA Email</Label>
-                  <Input
-                    id="jiraEmail"
-                    type="email"
-                    placeholder="your-email@example.com"
-                    value={configuration.jiraEmail}
-                    onChange={(e) => setConfiguration({ ...configuration, jiraEmail: e.target.value })}
-                    disabled={isSaving}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Email address associated with your JIRA account
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="jiraApiToken">API Token</Label>
-                  <Input
-                    id="jiraApiToken"
-                    type="password"
-                    placeholder="Your JIRA API token"
-                    value={configuration.jiraApiToken}
-                    onChange={(e) => setConfiguration({ ...configuration, jiraApiToken: e.target.value })}
-                    disabled={isSaving}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Generate an API token from your{' '}
-                    <a
-                      href="https://id.atlassian.com/manage-profile/security/api-tokens"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      Atlassian account settings
-                      <ExternalLink className="inline h-3 w-3 ml-1" />
-                    </a>
                   </p>
                 </div>
               </>

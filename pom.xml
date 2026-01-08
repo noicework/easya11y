@@ -3,16 +3,16 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>work.noice</groupId>
   <artifactId>easya11y</artifactId>
-  <version>1.2.1</version>
+  <version>1.3.0</version>
   <packaging>jar</packaging>
-  <name>Easy Accessibility Magnolia Module</name>
+  <name>Easy Accessibility (Magnolia Module)</name>
   <description>Accessibility testing module for Magnolia CMS</description>
   <url>https://github.com/noicework/easya11y</url>
   
   <licenses>
     <license>
-      <name>MIT License</name>
-      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <name>Mozilla Public License 2.0</name>
+      <url>https://www.mozilla.org/MPL/2.0/</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -20,7 +20,7 @@
   <developers>
     <developer>
       <name>Jake Tracey</name>
-      <email>jake.tracey@noice.work</email>
+      <email>jake.tracey@noice.net.au</email>
       <organization>Noice</organization>
       <organizationUrl>https://noice.work</organizationUrl>
     </developer>
@@ -33,8 +33,8 @@
   </scm>
   
   <properties>
-    <magnoliaBundleVersion>6.3.10</magnoliaBundleVersion>
-    <javaVersion>1.8</javaVersion>
+    <magnoliaBundleVersion>6.4.0</magnoliaBundleVersion>
+    <javaVersion>17</javaVersion>
   </properties>
 
   <dependencyManagement>
@@ -65,9 +65,8 @@
       <artifactId>magnolia-rest-services</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
-      <version>2.0.1</version>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
 
     <!-- TEST -->
@@ -77,11 +76,10 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- Magnolia Page Editor Module Apps -->
+    <!-- Magnolia Pages App -->
     <dependency>
-      <groupId>info.magnolia.editor</groupId>
-      <artifactId>magnolia-page-editor-apps</artifactId>
-      <version>2.0.0</version>
+      <groupId>info.magnolia.pages</groupId>
+      <artifactId>magnolia-pages-app</artifactId>
     </dependency>
     
     <!-- Magnolia Mail Module -->
@@ -141,8 +139,8 @@
     
     <!-- MySQL Driver -->
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
       <version>8.0.33</version>
       <scope>provided</scope>
     </dependency>
@@ -173,10 +171,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.7.0</version>
+        <version>3.11.0</version>
         <configuration>
-          <source>${javaVersion}</source>
-          <target>${javaVersion}</target>
+          <release>${javaVersion}</release>
         </configuration>
       </plugin>
       

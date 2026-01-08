@@ -5,7 +5,7 @@ import info.magnolia.ui.api.app.SubAppContext;
 import info.magnolia.ui.api.location.Location;
 import info.magnolia.ui.api.view.View;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;

@@ -10,12 +10,12 @@ import work.noice.easya11y.storage.StorageService;
 import work.noice.easya11y.storage.StorageServiceFactory;
 import info.magnolia.objectfactory.Components;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.jcr.Node;
 import javax.jcr.Session;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;

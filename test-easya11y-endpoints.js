@@ -7,7 +7,7 @@ const auth = {
 };
 
 async function testEndpoints() {
-    console.log('Testing EasyA11y Endpoints...\n');
+    console.log('Testing Easy Accessibility Endpoints...\n');
     
     try {
         // Test 1: List pages

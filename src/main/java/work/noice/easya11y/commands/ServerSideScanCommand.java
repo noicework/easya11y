@@ -9,7 +9,7 @@ import info.magnolia.objectfactory.Components;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.jcr.Node;
 import javax.jcr.Session;
 import java.util.*;
