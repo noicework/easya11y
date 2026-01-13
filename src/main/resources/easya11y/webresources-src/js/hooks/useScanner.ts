@@ -83,9 +83,31 @@ export function useScanner() {
     [scanMultiplePagesMutation]
   )
 
+  const scanPageWithSubpages = useCallback(
+    async (pagePath: string, allPages: Page[], wcagLevel: WCAGLevel = 'AA') => {
+      // Filter pages that are the selected page or its children
+      const pagesToScan = allPages.filter(page =>
+        page.path === pagePath || page.path.startsWith(pagePath + '/')
+      )
+
+      if (pagesToScan.length === 0) {
+        throw new Error('No pages found to scan')
+      }
+
+      // Use existing multi-page scan logic
+      return scanMultiplePagesMutation.mutateAsync({
+        pages: pagesToScan,
+        wcagLevel,
+        concurrentBatchSize: 3
+      })
+    },
+    [scanMultiplePagesMutation]
+  )
+
   return {
     scanPage,
     scanAllPages,
+    scanPageWithSubpages,
     isScanning,
     scanProgress,
     error: scanPageMutation.error || scanMultiplePagesMutation.error,

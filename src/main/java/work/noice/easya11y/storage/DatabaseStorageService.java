@@ -49,11 +49,11 @@ public class DatabaseStorageService implements StorageService {
             log.error("Error checking for duplicate scan ID", e);
         }
         
-        String sql = "INSERT INTO audit_scans (scan_id, page_url, page_title, page_path, scan_date, " +
+        String sql = "INSERT INTO audit_scans (scan_id, page_url, page_title, page_path, page_uuid, scan_date, " +
                     "wcag_version, wcag_level, score, violation_count, pass_count, incomplete_count, " +
                     "inapplicable_count, total_elements, elements_with_issues, violations_critical, " +
                     "violations_serious, violations_moderate, violations_minor, scan_type, browser_info) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = connectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -62,22 +62,23 @@ public class DatabaseStorageService implements StorageService {
             ps.setString(2, scanResult.getPageUrl());
             ps.setString(3, scanResult.getPageTitle());
             ps.setString(4, pagePath);
-            ps.setTimestamp(5, new Timestamp(new Date().getTime()));
-            ps.setString(6, scanResult.getWcagVersion());
-            ps.setString(7, scanResult.getWcagLevel());
-            ps.setDouble(8, scanResult.getScore());
-            ps.setInt(9, scanResult.getViolations().size());
-            ps.setInt(10, scanResult.getPasses().size());
-            ps.setInt(11, scanResult.getIncomplete() != null ? scanResult.getIncomplete().size() : 0);
-            ps.setInt(12, scanResult.getInapplicable() != null ? scanResult.getInapplicable().size() : 0);
-            ps.setInt(13, scanResult.getTotalElements());
-            ps.setInt(14, scanResult.getElementsWithIssues());
-            ps.setInt(15, scanResult.getViolationsByImpact().getOrDefault("critical", 0));
-            ps.setInt(16, scanResult.getViolationsByImpact().getOrDefault("serious", 0));
-            ps.setInt(17, scanResult.getViolationsByImpact().getOrDefault("moderate", 0));
-            ps.setInt(18, scanResult.getViolationsByImpact().getOrDefault("minor", 0));
-            ps.setString(19, scanResult.getScanType());
-            ps.setString(20, scanResult.getScannerVersion());
+            ps.setString(5, scanResult.getPageUuid());
+            ps.setTimestamp(6, new Timestamp(new Date().getTime()));
+            ps.setString(7, scanResult.getWcagVersion());
+            ps.setString(8, scanResult.getWcagLevel());
+            ps.setDouble(9, scanResult.getScore());
+            ps.setInt(10, scanResult.getViolations().size());
+            ps.setInt(11, scanResult.getPasses().size());
+            ps.setInt(12, scanResult.getIncomplete() != null ? scanResult.getIncomplete().size() : 0);
+            ps.setInt(13, scanResult.getInapplicable() != null ? scanResult.getInapplicable().size() : 0);
+            ps.setInt(14, scanResult.getTotalElements());
+            ps.setInt(15, scanResult.getElementsWithIssues());
+            ps.setInt(16, scanResult.getViolationsByImpact().getOrDefault("critical", 0));
+            ps.setInt(17, scanResult.getViolationsByImpact().getOrDefault("serious", 0));
+            ps.setInt(18, scanResult.getViolationsByImpact().getOrDefault("moderate", 0));
+            ps.setInt(19, scanResult.getViolationsByImpact().getOrDefault("minor", 0));
+            ps.setString(20, scanResult.getScanType());
+            ps.setString(21, scanResult.getScannerVersion());
             
             ps.executeUpdate();
             
@@ -484,8 +485,9 @@ public class DatabaseStorageService implements StorageService {
             rs.getString("page_path"),
             rs.getString("page_url")
         );
-        
+
         result.setId(scanId);
+        result.setPageUuid(rs.getString("page_uuid"));
         result.setPageTitle(rs.getString("page_title"));
         result.setWcagLevel(rs.getString("wcag_level"));
         result.setWcagVersion(rs.getString("wcag_version"));
@@ -591,11 +593,11 @@ public class DatabaseStorageService implements StorageService {
     private List<AccessibilityScanResult.Incomplete> loadIncomplete(Connection conn, String scanId) throws SQLException {
         String sql = "SELECT * FROM audit_incomplete WHERE scan_id = ?";
         List<AccessibilityScanResult.Incomplete> incompletes = new ArrayList<>();
-        
+
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, scanId);
             ResultSet rs = ps.executeQuery();
-            
+
             while (rs.next()) {
                 AccessibilityScanResult.Incomplete incomplete = new AccessibilityScanResult.Incomplete();
                 incomplete.setId(rs.getString("incomplete_id"));
@@ -606,7 +608,149 @@ public class DatabaseStorageService implements StorageService {
                 incompletes.add(incomplete);
             }
         }
-        
+
         return incompletes;
+    }
+
+    @Override
+    public List<AccessibilityScanResult> getScanResultsByPageUuid(String pageUuid, int limit) {
+        String sql = "SELECT * FROM audit_scans WHERE page_uuid = ? ORDER BY scan_date DESC LIMIT ?";
+
+        try (Connection conn = connectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, pageUuid);
+            ps.setInt(2, limit > 0 ? limit : 10);
+
+            ResultSet rs = ps.executeQuery();
+            List<AccessibilityScanResult> results = new ArrayList<>();
+
+            while (rs.next()) {
+                results.add(mapResultSetToScanResult(rs, conn));
+            }
+
+            return results;
+
+        } catch (SQLException e) {
+            log.error("Error retrieving scan results for page UUID: " + pageUuid, e);
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public void registerPage(String pageUuid, String currentPath) {
+        // Check if entry exists
+        String checkSql = "SELECT id, current_path, original_path FROM audit_page_registry WHERE page_uuid = ?";
+
+        try (Connection conn = connectionManager.getConnection();
+             PreparedStatement checkPs = conn.prepareStatement(checkSql)) {
+
+            checkPs.setString(1, pageUuid);
+            ResultSet rs = checkPs.executeQuery();
+
+            if (rs.next()) {
+                // Entry exists - check if path has changed
+                String existingPath = rs.getString("current_path");
+                if (!currentPath.equals(existingPath)) {
+                    // Path has changed - handle the move
+                    handlePageMove(pageUuid, existingPath, currentPath);
+                }
+            } else {
+                // New entry - insert
+                String insertSql = "INSERT INTO audit_page_registry (page_uuid, current_path, original_path) VALUES (?, ?, ?)";
+                try (PreparedStatement insertPs = conn.prepareStatement(insertSql)) {
+                    insertPs.setString(1, pageUuid);
+                    insertPs.setString(2, currentPath);
+                    insertPs.setString(3, currentPath); // Original path is the same as current on first registration
+                    insertPs.executeUpdate();
+                }
+            }
+
+        } catch (SQLException e) {
+            log.error("Error registering page: " + pageUuid + " at path: " + currentPath, e);
+        }
+    }
+
+    @Override
+    public Optional<String> getPagePathByUuid(String pageUuid) {
+        String sql = "SELECT current_path FROM audit_page_registry WHERE page_uuid = ?";
+
+        try (Connection conn = connectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, pageUuid);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return Optional.of(rs.getString("current_path"));
+            }
+
+            return Optional.empty();
+
+        } catch (SQLException e) {
+            log.error("Error getting path for page UUID: " + pageUuid, e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<String> getPageUuidByPath(String pagePath) {
+        String sql = "SELECT page_uuid FROM audit_page_registry WHERE current_path = ?";
+
+        try (Connection conn = connectionManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, pagePath);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return Optional.of(rs.getString("page_uuid"));
+            }
+
+            return Optional.empty();
+
+        } catch (SQLException e) {
+            log.error("Error getting UUID for page path: " + pagePath, e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public void handlePageMove(String pageUuid, String oldPath, String newPath) {
+        try (Connection conn = connectionManager.getConnection()) {
+            // Start transaction
+            conn.setAutoCommit(false);
+
+            try {
+                // Update the registry with new path
+                String updateSql = "UPDATE audit_page_registry SET current_path = ? WHERE page_uuid = ?";
+                try (PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
+                    updatePs.setString(1, newPath);
+                    updatePs.setString(2, pageUuid);
+                    updatePs.executeUpdate();
+                }
+
+                // Log the move in history
+                String historySql = "INSERT INTO audit_page_path_history (page_uuid, old_path, new_path) VALUES (?, ?, ?)";
+                try (PreparedStatement historyPs = conn.prepareStatement(historySql)) {
+                    historyPs.setString(1, pageUuid);
+                    historyPs.setString(2, oldPath);
+                    historyPs.setString(3, newPath);
+                    historyPs.executeUpdate();
+                }
+
+                conn.commit();
+                log.info("Page move recorded: UUID={}, from={} to={}", pageUuid, oldPath, newPath);
+
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+
+        } catch (SQLException e) {
+            log.error("Error handling page move for UUID: " + pageUuid, e);
+        }
     }
 }

@@ -92,25 +92,25 @@ export function QuickAuditPanel({
             onValueChange={(value) => onWcagLevelChange(value as WCAGLevel)}
             disabled={isScanning}
           >
-            <SelectTrigger>
+            <SelectTrigger className="text-left">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="A">
-                <div className="flex flex-col">
-                  <span>Level A</span>
+              <SelectItem value="A" className="text-left">
+                <div className="flex flex-col items-start">
+                  <span className="font-medium">Level A</span>
                   <span className="text-xs text-muted-foreground">Basic compliance</span>
                 </div>
               </SelectItem>
-              <SelectItem value="AA">
-                <div className="flex flex-col">
-                  <span>Level AA</span>
+              <SelectItem value="AA" className="text-left">
+                <div className="flex flex-col items-start">
+                  <span className="font-medium">Level AA</span>
                   <span className="text-xs text-muted-foreground">Recommended standard</span>
                 </div>
               </SelectItem>
-              <SelectItem value="AAA">
-                <div className="flex flex-col">
-                  <span>Level AAA</span>
+              <SelectItem value="AAA" className="text-left">
+                <div className="flex flex-col items-start">
+                  <span className="font-medium">Level AAA</span>
                   <span className="text-xs text-muted-foreground">Highest compliance</span>
                 </div>
               </SelectItem>
@@ -119,34 +119,27 @@ export function QuickAuditPanel({
         </div>
 
         {/* Scan Actions */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Play className="h-4 w-4 text-muted-foreground" />
-            <label className="text-sm font-medium">Scan Actions</label>
-          </div>
-          
-          <div className="space-y-2">
-            <Button
-              onClick={onScan}
-              disabled={!canScan}
-              className="w-full"
-              size="lg"
-            >
-              <Play className="mr-2 h-4 w-4" />
-              {isScanning ? 'Scanning...' : 'Scan Selected Page'}
-            </Button>
+        <div className="space-y-2">
+          <Button
+            onClick={onScan}
+            disabled={!canScan}
+            className="w-full"
+            size="lg"
+          >
+            <Play className="mr-2 h-4 w-4" />
+            {isScanning ? 'Scanning...' : 'Scan Selected Page'}
+          </Button>
 
-            <Button
-              variant="outline"
-              onClick={onBulkScan}
-              disabled={!canBulkScan}
-              className="w-full"
-              size="lg"
-            >
-              <PlayCircle className="mr-2 h-4 w-4" />
-              {isScanning ? 'Scanning...' : `Scan All Pages (${pages.length})`}
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            onClick={onBulkScan}
+            disabled={!canBulkScan}
+            className="w-full"
+            size="lg"
+          >
+            <PlayCircle className="mr-2 h-4 w-4" />
+            {isScanning ? 'Scanning...' : `Scan All Pages (${pages.length})`}
+          </Button>
         </div>
 
         {/* Quick Info */}

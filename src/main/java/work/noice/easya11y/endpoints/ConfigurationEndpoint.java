@@ -123,6 +123,58 @@ public class ConfigurationEndpoint extends AbstractEndpoint<EndpointDefinition> 
     }
     
     /**
+     * Get the system configuration (YAML-based, read-only).
+     * This shows the database configuration and other system settings.
+     *
+     * @return HTTP response with system configuration data
+     */
+    @GET
+    @Path("/system")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getSystemConfiguration() {
+        try {
+            Map<String, Object> result = new HashMap<>();
+            Map<String, Object> systemConfig = new HashMap<>();
+
+            // Storage type
+            systemConfig.put("storageType", databaseConfig.getConfig().getStorageType());
+            systemConfig.put("databaseEnabled", databaseConfig.isDatabaseStorageEnabled());
+
+            // Database configuration (if enabled)
+            if (databaseConfig.isDatabaseStorageEnabled()) {
+                DatabaseConfig.DataSourceConfig dsConfig = databaseConfig.getConfig().getDatasource();
+                Map<String, Object> dbConfig = new HashMap<>();
+
+                // Don't expose password
+                dbConfig.put("url", dsConfig.getUrl());
+                dbConfig.put("username", dsConfig.getUsername());
+                dbConfig.put("driver", dsConfig.getDriver());
+                dbConfig.put("passwordConfigured", dsConfig.getPassword() != null && !dsConfig.getPassword().isEmpty());
+
+                // Migration config
+                if (dsConfig.getMigration() != null) {
+                    Map<String, Object> migrationConfig = new HashMap<>();
+                    migrationConfig.put("path", dsConfig.getMigration().getPath());
+                    migrationConfig.put("runOnStartup", dsConfig.getMigration().isRun());
+                    dbConfig.put("migration", migrationConfig);
+                }
+
+                systemConfig.put("datasource", dbConfig);
+            }
+
+            result.put("success", true);
+            result.put("systemConfiguration", systemConfig);
+
+            return Response.ok(result).build();
+
+        } catch (Exception e) {
+            log.error("Error retrieving system configuration", e);
+            return buildErrorResponse("Error retrieving system configuration: " + e.getMessage(),
+                Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
      * Test database connection.
      *
      * @return HTTP response with connection test result

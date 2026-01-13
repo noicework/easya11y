@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui/select'
 import { Button } from '@components/ui/button'
-import { Calendar as CalendarIcon, Download, Key } from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from '@components/ui/alert'
+import { Calendar as CalendarIcon, Download } from 'lucide-react'
 import { format, subDays, startOfDay, endOfDay } from 'date-fns'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
@@ -50,14 +49,6 @@ export function HistoricalView({ pages, initialPagePath }: HistoricalViewProps) 
     new Date()
   ])
   const [timeframe, setTimeframe] = useState<'7d' | '30d' | '90d' | 'custom'>('30d')
-
-  // Check license
-  const { data: license } = useQuery({
-    queryKey: ['license'],
-    queryFn: () => accessibilityService.getLicenseInfo(),
-  })
-
-  const isLicensed = license?.isValid && license?.features?.includes('historical')
 
   // Update selected page when prop changes
   useEffect(() => {
@@ -132,31 +123,6 @@ export function HistoricalView({ pages, initialPagePath }: HistoricalViewProps) 
       )
     }
     return null
-  }
-
-  // Show license required message if not licensed
-  if (!isLicensed) {
-    return (
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Historical Analysis</CardTitle>
-            <CardDescription>
-              Track accessibility improvements and trends over time
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Alert className="border-amber-300 bg-amber-50">
-              <Key className="h-4 w-4 text-amber-600" />
-            <AlertTitle>License Required</AlertTitle>
-            <AlertDescription>
-                Historical analysis requires a valid Easy Accessibility license. Please activate your license in the Configuration page to use this feature.
-              </AlertDescription>
-            </Alert>
-          </CardContent>
-        </Card>
-      </div>
-    )
   }
 
   return (

@@ -6,6 +6,56 @@ The format is based on Keep a Changelog, and this project aims to follow Semanti
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-01-13
+
+### Highlights
+
+- Full database storage support with PostgreSQL and MySQL for persistent scan history
+- Historical trends and analytics for tracking accessibility improvements over time
+- Improved settings organization and system configuration visibility
+
+### Added
+
+- **Database Storage**: Full support for PostgreSQL and MySQL databases via Flyway migrations
+  - Automatic schema migrations on startup
+  - Page UUID tracking for consistent historical data across page moves
+  - Configurable via `config.yaml` in light module decorations
+- **Historical Trends**: New "View History" feature to track accessibility scores over time
+  - Score trend charts showing improvement or regression
+  - Violation breakdown by severity over time
+  - Filter by page path and date range
+- **System Configuration Panel**: New read-only panel in settings showing:
+  - Current storage type (JCR or database)
+  - Database connection details
+  - Test Connection button for verifying database connectivity
+- **Quick Audit Modal**: Streamlined interface for running single page or bulk scans
+
+### Changed
+
+- **Settings Reorganization**:
+  - Server-side scanning toggle moved to System Configuration card
+  - System Configuration card moved to bottom of settings page
+  - Scheduled Scanning only visible when server-side scanning is enabled
+- **View History Button**: Now conditionally enabled based on database storage configuration
+- **Improved UI Components**:
+  - New Historical Modal and Quick Audit Modal components
+  - Better separation of concerns in scan controls
+
+### Removed
+
+- **JIRA Integration**: Removed JIRA ticket creation feature
+- **License Validation**: Removed license checks from all endpoints for simpler deployment
+
+### Fixed
+
+- Flyway PostgreSQL 15+ compatibility with proper service file merging in shaded JAR
+- Database enabled flag now correctly handles string "true" values from API responses
+
+### Upgrade Notes
+
+- **Database Setup**: To enable historical features, configure database storage in your light module's `decorations/easya11y/config.yaml`. See `example-config.yaml` for reference.
+- **Migration**: Flyway will automatically run migrations on first startup with database storage enabled.
+
 ## [1.3.0] - 2026-01-09
 
 ### Changed

@@ -1,5 +1,7 @@
 import { PageSelector } from '@components/PageSelector'
 import { Button } from '@components/ui/button'
+import { Checkbox } from '@components/ui/checkbox'
+import { Label } from '@components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui/select'
 import { Play, PlayCircle, AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@components/ui/alert'
@@ -11,8 +13,10 @@ interface ScanControlsProps {
   wcagLevel: WCAGLevel
   isLoading: boolean
   isScanning: boolean
+  includeSubpages: boolean
   onPageSelect: (page: Page | null) => void
   onWcagLevelChange: (level: WCAGLevel) => void
+  onIncludeSubpagesChange: (include: boolean) => void
   onScan: () => void
   onBulkScan: () => void
 }
@@ -23,8 +27,10 @@ export function ScanControls({
   wcagLevel,
   isLoading,
   isScanning,
+  includeSubpages,
   onPageSelect,
   onWcagLevelChange,
+  onIncludeSubpagesChange,
   onScan,
   onBulkScan,
 }: ScanControlsProps) {
@@ -66,6 +72,18 @@ export function ScanControls({
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      <div className="flex items-center space-x-2 mt-2">
+        <Checkbox
+          id="includeSubpages"
+          checked={includeSubpages}
+          onCheckedChange={(checked) => onIncludeSubpagesChange(checked === true)}
+          disabled={!selectedPage || isScanning}
+        />
+        <Label htmlFor="includeSubpages" className="text-sm cursor-pointer">
+          Include all subpages
+        </Label>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">

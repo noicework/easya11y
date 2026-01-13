@@ -94,25 +94,36 @@ export function ViolationCard({ violation, expanded: initialExpanded = false }: 
 
       {expanded && (
         <CardContent className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="font-mono text-xs">
-              {violation.id}
-            </Badge>
-            {violation.tags?.map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs">
-                {tag}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <Badge variant="outline" className="font-mono text-xs shrink-0">
+                {violation.id}
               </Badge>
-            ))}
-            {violation.helpUrl && (
-              <Button
-                variant="link"
-                size="sm"
-                className="ml-auto"
-                onClick={() => window.open(violation.helpUrl, '_blank')}
-              >
-                Learn More
-                <ExternalLink className="ml-1 h-3 w-3" />
-              </Button>
+              {violation.helpUrl && (
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="shrink-0"
+                  onClick={() => window.open(violation.helpUrl, '_blank')}
+                >
+                  Learn More
+                  <ExternalLink className="ml-1 h-3 w-3" />
+                </Button>
+              )}
+            </div>
+            {violation.tags && violation.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {violation.tags.slice(0, 6).map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+                {violation.tags.length > 6 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{violation.tags.length - 6} more
+                  </Badge>
+                )}
+              </div>
             )}
           </div>
 

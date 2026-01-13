@@ -88,24 +88,27 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
                            MgnlContext.getWebContext().getRequest().getServerPort() +
                            contextPath + pagePath + ".html";
             
-            // Try to get page title from JCR if available, otherwise use page name from path
+            // Try to get page title and UUID from JCR if available
             String pageTitle = pagePath.substring(pagePath.lastIndexOf('/') + 1);
+            String pageUuid = null;
             try {
                 Session websiteSession = MgnlContext.getJCRSession(WEBSITE_WORKSPACE);
                 if (websiteSession.nodeExists(pagePath)) {
                     Node pageNode = websiteSession.getNode(pagePath);
                     pageTitle = PropertyUtil.getString(pageNode, "title", pageTitle);
+                    pageUuid = pageNode.getIdentifier();
                 }
             } catch (Exception e) {
-                log.warn("Could not get page title from JCR for path: {}, using default: {}", pagePath, pageTitle);
+                log.warn("Could not get page info from JCR for path: {}, using defaults", pagePath);
             }
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("scanId", scanId);
             response.put("pagePath", pagePath);
             response.put("pageUrl", pageUrl);
             response.put("pageTitle", pageTitle);
+            response.put("pageUuid", pageUuid);
             response.put("wcagLevel", wcagLevel);
             response.put("message", "Scan initiated. Use the URL to scan the page with axe-core.");
             
@@ -134,6 +137,8 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
             String pagePath = scanResults.get("pagePath").asText();
             String pageUrl = scanResults.get("pageUrl").asText();
             String pageTitle = scanResults.get("pageTitle").asText();
+            String pageUuid = scanResults.has("pageUuid") && !scanResults.get("pageUuid").isNull()
+                ? scanResults.get("pageUuid").asText() : null;
             
             // Get WCAG level from request or use stored value from scan initiation
             String wcagLevel = scanResults.has("wcagLevel") ? 
@@ -163,6 +168,7 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
             // Create scan result model
             AccessibilityScanResult result = new AccessibilityScanResult(pagePath, pageUrl);
             result.setId(scanId);
+            result.setPageUuid(pageUuid);
             result.setPageTitle(pageTitle);
             result.setWcagLevel(wcagLevel);
             // Get scanner version safely
@@ -213,7 +219,12 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
             // Store using storage service
             StorageService storageService = storageServiceFactory.getStorageService();
             String storedScanId = storageService.storeScanResult(result, pagePath);
-            
+
+            // Register page UUID-to-path mapping
+            if (pageUuid != null) {
+                storageService.registerPage(pageUuid, pagePath);
+            }
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("scanId", scanId);
@@ -346,24 +357,27 @@ public class AccessibilityScanEndpoint extends AbstractEndpoint<EndpointDefiniti
             // Calculate score
             double score = calculateScore(axeResults);
             
-            // Get page title
+            // Get page title and UUID
             String pageTitle = pagePath.substring(pagePath.lastIndexOf('/') + 1);
+            String pageUuid = null;
             try {
                 Session websiteSession = MgnlContext.getJCRSession(WEBSITE_WORKSPACE);
                 if (websiteSession.nodeExists(pagePath)) {
                     Node pageNode = websiteSession.getNode(pagePath);
                     pageTitle = PropertyUtil.getString(pageNode, "title", pageTitle);
+                    pageUuid = pageNode.getIdentifier();
                 }
             } catch (Exception e) {
-                log.warn("Could not get page title for: {}", pagePath);
+                log.warn("Could not get page info for: {}", pagePath);
             }
-            
+
             // Prepare and store scan results
             Map<String, Object> scanData = new HashMap<>();
             scanData.put("scanId", UUID.randomUUID().toString());
             scanData.put("pagePath", pagePath);
             scanData.put("pageUrl", pageUrl);
             scanData.put("pageTitle", pageTitle);
+            scanData.put("pageUuid", pageUuid);
             scanData.put("wcagLevel", wcagLevel);
             scanData.put("score", score);
             scanData.put("axeResults", axeResults);

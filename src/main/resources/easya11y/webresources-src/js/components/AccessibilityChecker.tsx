@@ -1,15 +1,15 @@
-import { useState, useMemo } from 'react'
-import { StatsOverview } from '@components/StatsOverview'
-import { QuickAuditPanel } from '@components/QuickAuditPanel'
+import { useState, useMemo, useEffect } from 'react'
 import { RecentScansPanel } from '@components/RecentScansPanel'
 import { ScanProgressDialog } from '@components/ScanProgressDialog'
 import { ScanResultsModal } from '@components/ScanResultsModal'
+import { QuickAuditModal } from '@components/QuickAuditModal'
+import { HistoricalModal } from '@components/HistoricalModal'
 import { usePages } from '@hooks/usePages'
 import { useScanResults } from '@hooks/useScanResults'
 import { useScanner } from '@hooks/useScanner'
 import { accessibilityService } from '@services/accessibility.service'
 import { calculateScore } from '@lib/utils'
-import type { Page, ScanResult, FilterState, SortOrder, WCAGLevel } from '@types'
+import type { Page, ScanResult, FilterState, SortOrder, WCAGLevel, Configuration } from '@types'
 
 export function AccessibilityChecker() {
   // State
@@ -23,31 +23,41 @@ export function AccessibilityChecker() {
   const [showResultsModal, setShowResultsModal] = useState(false)
   const [modalResult, setModalResult] = useState<ScanResult | null>(null)
   const [scanSubpages, setScanSubpages] = useState<boolean>(false)
+  const [showQuickAuditModal, setShowQuickAuditModal] = useState(false)
+  const [showHistoricalModal, setShowHistoricalModal] = useState(false)
+  const [historyPagePath, setHistoryPagePath] = useState<string>('')
+  const [configuration, setConfiguration] = useState<Configuration | null>(null)
 
   // Queries
   const { data: pages = [], isLoading: pagesLoading } = usePages()
   const { data: scanResults = [], isLoading: resultsLoading, refetch: refetchResults } = useScanResults()
-  
-  // Scanner
-  const { scanPage, scanAllPages, isScanning, scanProgress } = useScanner()
 
-  // Calculate stats
-  const stats = useMemo(() => {
-    const scannedPages = scanResults.length
-    const averageScore = scannedPages > 0
-      ? scanResults.reduce((sum, r) => sum + (r.score || 0), 0) / scannedPages
-      : 0
-    const criticalIssues = scanResults.reduce((sum, r) => 
-      sum + (r.criticalCount || r.violations_critical || 0), 0
-    )
-
-    return {
-      totalPages: pages.length,
-      scannedPages,
-      averageScore,
-      criticalIssues,
+  // Handle navigation events for history view
+  useEffect(() => {
+    const handleViewHistory = (event: CustomEvent<{ pagePath: string }>) => {
+      setHistoryPagePath(event.detail.pagePath)
+      setShowHistoricalModal(true)
     }
-  }, [pages, scanResults])
+
+    window.addEventListener('viewPageHistory', handleViewHistory as EventListener)
+    return () => {
+      window.removeEventListener('viewPageHistory', handleViewHistory as EventListener)
+    }
+  }, [])
+
+  // Load configuration to check storage type
+  useEffect(() => {
+    accessibilityService.getConfiguration()
+      .then(setConfiguration)
+      .catch(console.error)
+  }, [])
+
+  // Scanner
+  const { scanPage, scanAllPages, scanPageWithSubpages, isScanning, scanProgress } = useScanner()
+
+  // History is only available with database storage (not JCR)
+  const historyAvailable = configuration?.storageType !== 'jcr' &&
+    (configuration?.databaseEnabled === true || String(configuration?.databaseEnabled) === 'true')
 
   // Filter and sort results
   const filteredResults = useMemo(() => {
@@ -103,9 +113,23 @@ export function AccessibilityChecker() {
     if (!selectedPage) return
 
     try {
+      // If scanning with subpages, use the multi-page scan with progress dialog
+      if (scanSubpages) {
+        setShowQuickAuditModal(false)
+        setShowProgressDialog(true)
+        try {
+          await scanPageWithSubpages(selectedPage.path, pages, wcagLevel)
+          await refetchResults()
+        } finally {
+          setShowProgressDialog(false)
+        }
+        return
+      }
+
+      // Single page scan
       const result = await scanPage(selectedPage.path, wcagLevel)
       await refetchResults()
-      
+
       // Show results modal if scan succeeded
       if (result && !result.errorMessage) {
         const score = result.score ?? calculateScore(result)
@@ -134,6 +158,7 @@ export function AccessibilityChecker() {
   }
 
   const handleBulkScan = async () => {
+    setShowQuickAuditModal(false)
     setShowProgressDialog(true)
     try {
       await scanAllPages(pages, wcagLevel)
@@ -151,41 +176,20 @@ export function AccessibilityChecker() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-2">
-        <div>
-          <p className="text-lg text-muted-foreground">
-            Scan and monitor accessibility compliance across your website
-          </p>
-        </div>
+      <div className="mb-2">
+        <p className="text-lg text-muted-foreground">
+          Scan and monitor accessibility compliance across your website
+        </p>
       </div>
 
-      {/* Stats Overview */}
-      <StatsOverview stats={stats} />
-
-      {/* Top Section - Quick Audit */}
-      <div className="grid grid-cols-1 gap-6">
-        <QuickAuditPanel
-          pages={pages}
-          selectedPage={selectedPage}
-          wcagLevel={wcagLevel}
-          isLoading={pagesLoading}
-          isScanning={isScanning}
-          onPageSelect={setSelectedPage}
-          onWcagLevelChange={setWcagLevel}
-          onScan={handleScan}
-          onBulkScan={handleBulkScan}
-          scanSubpages={scanSubpages}
-          onScanSubpagesChange={setScanSubpages}
-        />
-      </div>
-
-      {/* Bottom Section - Recent Scans (Full Width) */}
+      {/* Recent Scans (Full Width) */}
       <RecentScansPanel
         results={scanResults}
         filteredResults={filteredResults}
         searchTerm={searchTerm}
         filters={filters}
         showFilters={showFilters}
+        totalPages={pages.length}
         onSearchChange={setSearchTerm}
         onFiltersChange={setFilters}
         onToggleFilters={() => setShowFilters(!showFilters)}
@@ -195,15 +199,44 @@ export function AccessibilityChecker() {
         }}
         onExport={handleExport}
         isLoading={resultsLoading}
+        onQuickAudit={() => setShowQuickAuditModal(true)}
+        onViewHistory={() => {
+          setHistoryPagePath('')
+          setShowHistoricalModal(true)
+        }}
+        historyAvailable={historyAvailable}
       />
 
       {/* Modals */}
+      <QuickAuditModal
+        isOpen={showQuickAuditModal}
+        onClose={() => setShowQuickAuditModal(false)}
+        pages={pages}
+        selectedPage={selectedPage}
+        wcagLevel={wcagLevel}
+        isLoading={pagesLoading}
+        isScanning={isScanning}
+        onPageSelect={setSelectedPage}
+        onWcagLevelChange={setWcagLevel}
+        onScan={handleScan}
+        onBulkScan={handleBulkScan}
+        scanSubpages={scanSubpages}
+        onScanSubpagesChange={setScanSubpages}
+      />
+
+      <HistoricalModal
+        isOpen={showHistoricalModal}
+        onClose={() => setShowHistoricalModal(false)}
+        pages={pages}
+        initialPagePath={historyPagePath}
+      />
+
       <ScanProgressDialog
         isOpen={showProgressDialog}
         progress={scanProgress}
         onCancel={() => setShowProgressDialog(false)}
       />
-      
+
       <ScanResultsModal
         isOpen={showResultsModal}
         result={modalResult}

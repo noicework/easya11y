@@ -71,7 +71,23 @@ public class PageListEndpoint extends AbstractEndpoint<EndpointDefinition> {
             
             if (websiteSession.nodeExists(nodePath)) {
                 Node rootNode = websiteSession.getNode(nodePath);
-                collectPages(rootNode, results, scanSession);
+
+                // Special handling for root path to ensure first-level pages are collected
+                if ("/".equals(nodePath)) {
+                    // For root, iterate direct children and collect pages from each
+                    NodeIterator children = rootNode.getNodes();
+                    while (children.hasNext()) {
+                        Node child = children.nextNode();
+                        String childName = child.getName();
+                        // Skip system nodes
+                        if (!childName.startsWith("jcr:") && !childName.startsWith("mgnl:")) {
+                            collectPages(child, results, scanSession);
+                        }
+                    }
+                } else {
+                    // For non-root paths, use existing behavior
+                    collectPages(rootNode, results, scanSession);
+                }
             } else {
                 log.warn("Path not found: {}", nodePath);
                 Map<String, Object> errorInfo = new HashMap<>();
@@ -94,6 +110,38 @@ public class PageListEndpoint extends AbstractEndpoint<EndpointDefinition> {
     }
     
     /**
+     * Check if a page is a headless page (serves API/JSON responses instead of HTML).
+     */
+    private boolean isHeadlessPage(Node pageNode) {
+        try {
+            if (!pageNode.hasProperty("mgnl:template")) {
+                return false;
+            }
+            String templateId = PropertyUtil.getString(pageNode, "mgnl:template");
+            DefinitionProvider<TemplateDefinition> provider = templateRegistry.getProvider(templateId);
+            if (provider != null && provider.get() != null) {
+                TemplateDefinition template = provider.get();
+                String subtype = template.getSubtype();
+                if (subtype != null) {
+                    String subtypeLower = subtype.toLowerCase();
+                    if (subtypeLower.contains("headless") || subtypeLower.contains("json") ||
+                        subtypeLower.contains("api") || subtypeLower.contains("rest")) {
+                        return true;
+                    }
+                }
+                // Also check render type
+                String renderType = template.getRenderType();
+                if (renderType != null && renderType.toLowerCase().contains("json")) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            log.debug("Could not determine if page is headless: {}", pageNode, e);
+        }
+        return false;
+    }
+
+    /**
      * Recursively collect page nodes.
      *
      * @param node The starting node
@@ -102,12 +150,15 @@ public class PageListEndpoint extends AbstractEndpoint<EndpointDefinition> {
      * @throws RepositoryException if there's an error accessing the repository
      */
     private void collectPages(Node node, List<Map<String, Object>> results, Session scanSession) throws RepositoryException {
+        log.debug("Collecting pages from node: {} (type: {})", node.getPath(), node.getPrimaryNodeType().getName());
+
         // Check if this node is a page
         if (NodeUtil.isNodeType(node, "mgnl:page")) {
             Map<String, Object> pageInfo = new HashMap<>();
-            
+
             pageInfo.put("name", node.getName());
             pageInfo.put("path", node.getPath());
+            pageInfo.put("uuid", node.getIdentifier());
             pageInfo.put("type", node.getPrimaryNodeType().getName());
             
             // Get page title
@@ -130,16 +181,24 @@ public class PageListEndpoint extends AbstractEndpoint<EndpointDefinition> {
                     log.debug("Template not found: {}", templateId);
                 }
             }
-            
+
             // Get modification date
             if (node.hasProperty("mgnl:lastModified")) {
                 pageInfo.put("lastModified", PropertyUtil.getDate(node, "mgnl:lastModified").getTime());
             }
-            
+
+            // Check if this is a headless page
+            boolean isHeadless = isHeadlessPage(node);
+            pageInfo.put("isHeadless", isHeadless);
+
             // Construct page URL
             String contextPath = MgnlContext.getContextPath();
             String pagePath = node.getPath();
-            pageInfo.put("url", contextPath + pagePath + ".html");
+            if (isHeadless) {
+                pageInfo.put("url", contextPath + pagePath);  // No .html for headless
+            } else {
+                pageInfo.put("url", contextPath + pagePath + ".html");
+            }
             
             // Check scan status if requested
             if (scanSession != null) {

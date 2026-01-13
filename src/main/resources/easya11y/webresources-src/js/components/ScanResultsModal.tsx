@@ -86,33 +86,34 @@ export function ScanResultsModal({ isOpen, result, onClose }: ScanResultsModalPr
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+        <DialogContent className="w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
           <DialogHeader>
-            <div className="flex items-start justify-between">
-              <div className="space-y-1.5">
-                <DialogTitle>{result.pageTitle}</DialogTitle>
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <div className="space-y-1.5 min-w-0 flex-1">
+                <DialogTitle className="truncate">{result.pageTitle}</DialogTitle>
                 <DialogDescription className="flex items-center gap-2">
-                  <span className="truncate max-w-md">{result.pagePath}</span>
+                  <span className="truncate">{result.pagePath}</span>
                   <Button
                     variant="ghost"
                     size="sm"
+                    className="shrink-0"
                     onClick={() => window.open(result.pageUrl, '_blank')}
+                    disabled={result.isHeadless}
+                    title={result.isHeadless ? "Headless page cannot be opened in browser" : "Open page in new tab"}
                   >
-                    <ExternalLink className="h-3 w-3" />
+                    <ExternalLink className={`h-3 w-3 ${result.isHeadless ? 'opacity-50' : ''}`} />
                   </Button>
                 </DialogDescription>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleExportCSV}
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    CSV
-                  </Button>
-                </div>
+              <div className="flex items-center gap-3 shrink-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportCSV}
+                >
+                  <Download className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">CSV</span>
+                </Button>
                 <ScoreIndicator score={result.score || 0} size="lg" />
               </div>
             </div>

@@ -12,6 +12,7 @@ import java.util.HashMap;
 public class AccessibilityScanResult {
     
     private String id;
+    private String pageUuid;
     private String pagePath;
     private String pageUrl;
     private String pageTitle;
@@ -255,7 +256,10 @@ public class AccessibilityScanResult {
     // Main class getters and setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
-    
+
+    public String getPageUuid() { return pageUuid; }
+    public void setPageUuid(String pageUuid) { this.pageUuid = pageUuid; }
+
     public String getPagePath() { return pagePath; }
     public void setPagePath(String pagePath) { this.pagePath = pagePath; }
     

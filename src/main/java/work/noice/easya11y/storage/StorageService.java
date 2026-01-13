@@ -90,10 +90,47 @@ public interface StorageService {
      * @return true if connection is successful
      */
     boolean testConnection();
-    
+
     /**
      * Get the storage type
      * @return Storage type identifier (e.g., "jcr", "mysql", "postgresql")
      */
     String getStorageType();
+
+    /**
+     * Get scan results for a page by its UUID.
+     * @param pageUuid The page UUID
+     * @param limit Maximum number of results to return
+     * @return List of scan results for the page
+     */
+    List<AccessibilityScanResult> getScanResultsByPageUuid(String pageUuid, int limit);
+
+    /**
+     * Register or update a page's UUID-to-path mapping.
+     * @param pageUuid The page UUID
+     * @param currentPath The current path of the page
+     */
+    void registerPage(String pageUuid, String currentPath);
+
+    /**
+     * Get the current path for a page UUID.
+     * @param pageUuid The page UUID
+     * @return Optional containing the current path if found
+     */
+    Optional<String> getPagePathByUuid(String pageUuid);
+
+    /**
+     * Get the UUID for a page path.
+     * @param pagePath The page path
+     * @return Optional containing the UUID if found
+     */
+    Optional<String> getPageUuidByPath(String pagePath);
+
+    /**
+     * Handle page move: update registry and log history.
+     * @param pageUuid The page UUID
+     * @param oldPath The old path before the move
+     * @param newPath The new path after the move
+     */
+    void handlePageMove(String pageUuid, String oldPath, String newPath);
 }

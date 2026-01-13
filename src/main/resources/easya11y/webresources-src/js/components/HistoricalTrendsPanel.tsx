@@ -3,8 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@comp
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui/select'
 import { Button } from '@components/ui/button'
-import { TrendingUp, BarChart3, Activity, Calendar, Download, Key } from 'lucide-react'
-import { Alert, AlertDescription, AlertTitle } from '@components/ui/alert'
+import { TrendingUp, BarChart3, Activity, Calendar, Download } from 'lucide-react'
 import { format } from 'date-fns'
 import {
   LineChart,
@@ -42,14 +41,6 @@ interface HistoricalTrendsPanelProps {
 export function HistoricalTrendsPanel({ pages, selectedPage }: HistoricalTrendsPanelProps) {
   const [selectedPagePath, setSelectedPagePath] = useState<string>(selectedPage?.path || '')
   const [activeTab, setActiveTab] = useState<'7d' | '30d' | '90d'>('30d')
-
-  // Check license
-  const { data: license } = useQuery({
-    queryKey: ['license'],
-    queryFn: () => accessibilityService.getLicenseInfo(),
-  })
-
-  const isLicensed = license?.isValid && license?.features?.includes('historical')
 
   // Calculate date range based on active tab
   const getDaysForTab = (tab: string) => {
@@ -103,35 +94,9 @@ export function HistoricalTrendsPanel({ pages, selectedPage }: HistoricalTrendsP
   // Calculate summary stats
   const latestData = chartData[chartData.length - 1]
   const previousData = chartData[chartData.length - 2]
-  const scoreChange = latestData && previousData 
-    ? latestData.averageScore - previousData.averageScore 
+  const scoreChange = latestData && previousData
+    ? latestData.averageScore - previousData.averageScore
     : 0
-
-  // Show license required message if not licensed
-  if (!isLicensed) {
-    return (
-      <Card className="h-fit">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-purple-600" />
-            <CardTitle>Historical Trends</CardTitle>
-          </div>
-          <CardDescription>
-            Analyze accessibility compliance trends over time
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Alert className="border-amber-300 bg-amber-50">
-            <Key className="h-4 w-4 text-amber-600" />
-          <AlertTitle>License Required</AlertTitle>
-          <AlertDescription>
-              Historical analysis requires a valid Easy Accessibility license. Please activate your license in the Configuration page.
-          </AlertDescription>
-        </Alert>
-        </CardContent>
-      </Card>
-    )
-  }
 
   return (
     <Card className="h-fit">

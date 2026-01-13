@@ -5,15 +5,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ScoreIndicator } from '@components/ScoreIndicator'
 import { SearchBar } from '@components/SearchBar'
 import { FilterPanel } from '@components/FilterPanel'
-import { 
-  Clock, 
-  TrendingUp, 
-  Filter, 
-  Download, 
+import {
+  Clock,
+  TrendingUp,
+  Filter,
+  Download,
   ExternalLink,
   AlertTriangle,
   CheckCircle2,
-  Activity
+  Activity,
+  Zap,
+  History
 } from 'lucide-react'
 import {
   LineChart,
@@ -30,12 +32,16 @@ interface RecentScansPanelProps {
   searchTerm: string
   filters: FilterState
   showFilters: boolean
+  totalPages: number
   onSearchChange: (term: string) => void
   onFiltersChange: (filters: FilterState) => void
   onToggleFilters: () => void
   onResultClick: (result: ScanResult) => void
   onExport: () => void
   isLoading: boolean
+  onQuickAudit: () => void
+  onViewHistory: () => void
+  historyAvailable?: boolean
 }
 
 export function RecentScansPanel({
@@ -44,12 +50,16 @@ export function RecentScansPanel({
   searchTerm,
   filters,
   showFilters,
+  totalPages,
   onSearchChange,
   onFiltersChange,
   onToggleFilters,
   onResultClick,
   onExport,
-  isLoading
+  isLoading,
+  onQuickAudit,
+  onViewHistory,
+  historyAvailable = false
 }: RecentScansPanelProps) {
 
   // Calculate trend data for mini charts
@@ -100,9 +110,27 @@ export function RecentScansPanel({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center gap-2">
-          <Activity className="h-5 w-5 text-green-600" />
-          <CardTitle>Recent Scans</CardTitle>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Activity className="h-5 w-5 text-green-600" />
+            <CardTitle>Recent Scans</CardTitle>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={onQuickAudit} size="sm">
+              <Zap className="h-4 w-4 mr-2" />
+              Quick Audit
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onViewHistory}
+              size="sm"
+              disabled={!historyAvailable}
+              title={!historyAvailable ? 'Historical data requires database storage configuration' : 'View historical scan data'}
+            >
+              <History className="h-4 w-4 mr-2" />
+              View History
+            </Button>
+          </div>
         </div>
         <CardDescription>
           Monitor your accessibility compliance progress and trends
@@ -229,10 +257,24 @@ export function RecentScansPanel({
             <div className="flex justify-center py-8">
               <div className="text-muted-foreground">Loading results...</div>
             </div>
+          ) : results.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <Zap className="h-8 w-8 text-blue-600" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">No scans yet</h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                Start scanning your {totalPages > 0 ? `${totalPages} pages` : 'website'} to identify accessibility issues and ensure WCAG compliance.
+              </p>
+              <Button onClick={onQuickAudit} size="lg">
+                <Zap className="mr-2 h-5 w-5" />
+                Run Your First Scan
+              </Button>
+            </div>
           ) : filteredResults.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No scans found. Run your first scan to see results here.</p>
+              <p>No scans match your current filters.</p>
             </div>
           ) : (
             <div className="rounded-md border">

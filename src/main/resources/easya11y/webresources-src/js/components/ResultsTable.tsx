@@ -180,9 +180,10 @@ export function ResultsTable({
                         e.stopPropagation()
                         window.open(result.pageUrl, '_blank')
                       }}
-                      title="Open page in new tab"
+                      disabled={result.isHeadless}
+                      title={result.isHeadless ? "Headless page cannot be opened in browser" : "Open page in new tab"}
                     >
-                      <ExternalLink className="h-4 w-4" />
+                      <ExternalLink className={`h-4 w-4 ${result.isHeadless ? 'opacity-50' : ''}`} />
                     </Button>
                   </div>
                 </TableCell>

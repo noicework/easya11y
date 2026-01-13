@@ -10,21 +10,26 @@ mvn clean package
 echo "Copying Selenium dependencies..."
 mvn dependency:copy-dependencies -DincludeGroupIds=org.seleniumhq.selenium,io.github.bonigarcia -DoutputDirectory=target/selenium-deps
 
+MAGNOLIA_HOME=~/Projects/vccmhw/magnolia-6.4
+MAGNOLIA_LIB=$MAGNOLIA_HOME/webapps/magnoliaAuthor/WEB-INF/lib
+
+echo "Removing old easya11y JARs..."
+rm -f $MAGNOLIA_LIB/easya11y-*.jar
+
 echo "Copying JAR to Magnolia Author instance..."
-cp target/easya11y-1.2.1.jar ~/Projects/mmp/apache-tomcat/webapps/magnoliaAuthor/WEB-INF/lib
+cp target/easya11y-1.4.0.jar $MAGNOLIA_LIB/
 
 echo "Copying Selenium JARs to Magnolia Author instance..."
-cp target/selenium-deps/*.jar ~/Projects/mmp/apache-tomcat/webapps/magnoliaAuthor/WEB-INF/lib/
+cp target/selenium-deps/*.jar $MAGNOLIA_LIB/
 
 echo "Shutting down Tomcat..."
-~/Projects/mmp/apache-tomcat/bin/shutdown.sh
+$MAGNOLIA_HOME/bin/shutdown.sh
 
-echo "Waiting 15 seconds for Tomcat to shut down completely..."
-sleep 15
+echo "Waiting 20 seconds for Tomcat to shut down completely..."
+sleep 20
 
 echo "Starting Tomcat..."
-~/Projects/mmp/apache-tomcat/bin/startup.sh
+$MAGNOLIA_HOME/bin/startup.sh
 
 echo "Deployment complete. Magnolia is starting up..."
-sleep 15
 

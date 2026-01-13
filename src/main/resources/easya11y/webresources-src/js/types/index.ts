@@ -6,11 +6,13 @@ export type SortOrder = 'date-desc' | 'score-asc' | 'score-desc' | 'violations-d
 
 export interface Page {
   path: string
+  uuid?: string
   title?: string
   name?: string
   url?: string
   lastScanned?: string
   score?: number
+  isHeadless?: boolean
 }
 
 export interface Violation {
@@ -49,6 +51,7 @@ export interface ScanResult {
   violations_serious?: number
   violations_moderate?: number
   violations_minor?: number
+  isHeadless?: boolean
 }
 
 export interface ScanInit {
@@ -106,15 +109,13 @@ export interface Configuration {
   scanScheduleEnabled?: boolean
   scanScheduleCron?: string
   scheduleFrequency?: ScheduleFrequency
+  scheduleTime?: string
   serverSideScan?: boolean
   scanPaths?: string
   excludePaths?: string
   pinnedPages?: string[]
-  jiraEnabled?: boolean
-  jiraUrl?: string
-  jiraProjectKey?: string
-  jiraApiToken?: string
-  jiraEmail?: string
+  storageType?: string
+  databaseEnabled?: boolean
 }
 
 export interface HistoricalTrend {
@@ -138,14 +139,3 @@ export interface TrendsResponse {
   }
 }
 
-export type LicenseFeature = 'jira' | 'historical'
-
-export interface LicenseInfo {
-  isValid: boolean
-  email?: string
-  expirationDate?: string
-  issuedDate?: string
-  daysRemaining?: number
-  features?: LicenseFeature[]
-  errorMessage?: string
-}

@@ -187,26 +187,26 @@ public class ScanResultsListEndpoint extends AbstractEndpoint<EndpointDefinition
         try {
             StorageService storageService = storageServiceFactory.getStorageService();
 
-            // Check if database storage is enabled
-            if ("jcr".equals(storageService.getStorageType())) {
-                return buildErrorResponse("Historical trends are only available with database storage",
-                                        Response.Status.NOT_IMPLEMENTED);
-            }
-            
             int daysToRetrieve = days != null && days > 0 ? days : 30;
             List<Map<String, Object>> trends = storageService.getHistoricalTrends(pagePath, daysToRetrieve);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("pagePath", pagePath);
             response.put("days", daysToRetrieve);
             response.put("trends", trends);
-            
+            response.put("storageType", storageService.getStorageType());
+
+            // Note if using JCR storage (which has limited historical support)
+            if ("jcr".equals(storageService.getStorageType())) {
+                response.put("message", "Historical trends have limited support with JCR storage. Configure database storage for full historical analytics.");
+            }
+
             return Response.ok(response).build();
-            
+
         } catch (Exception e) {
             log.error("Error getting historical trends", e);
-            return buildErrorResponse("Error getting historical trends: " + e.getMessage(), 
+            return buildErrorResponse("Error getting historical trends: " + e.getMessage(),
                                     Response.Status.INTERNAL_SERVER_ERROR);
         }
     }

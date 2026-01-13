@@ -1,4 +1,4 @@
-import type { Page, ScanInit, ScanResult, DetailedResult, WCAGLevel, Configuration, LicenseInfo } from '@types'
+import type { Page, ScanInit, ScanResult, DetailedResult, WCAGLevel, Configuration } from '@types'
 
 class AccessibilityService {
   private apiBase: string
@@ -180,61 +180,44 @@ class AccessibilityService {
     return response.json()
   }
 
-  async createJiraIssue(issueData: any): Promise<any> {
-    const response = await fetch(`${this.apiBase}/easya11y/jira/create-issue`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(issueData)
-    })
+  async getSystemConfiguration(): Promise<SystemConfiguration> {
+    const response = await fetch(`${this.apiBase}/easya11y/configuration/system`)
 
     if (!response.ok) {
-      const error = await response.text()
-      throw new Error(error || 'Failed to create JIRA issue')
+      throw new Error(`Failed to load system configuration: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (data.success && data.systemConfiguration) {
+      return data.systemConfiguration
+    }
+
+    return {} as SystemConfiguration
+  }
+
+  async testDatabaseConnection(): Promise<{ success: boolean; message: string; storageType?: string }> {
+    const response = await fetch(`${this.apiBase}/easya11y/configuration/test-connection`)
+
+    if (!response.ok) {
+      throw new Error(`Failed to test database connection: ${response.status}`)
     }
 
     return response.json()
   }
+}
 
-  async getLicenseInfo(): Promise<LicenseInfo> {
-    const response = await fetch(`${this.apiBase}/easya11y/license`)
-
-    if (!response.ok) {
-      throw new Error(`Failed to get license info: ${response.status}`)
-    }
-
-    return response.json()
-  }
-
-  async saveLicense(licenseKey: string): Promise<LicenseInfo> {
-    const response = await fetch(`${this.apiBase}/easya11y/license`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ licenseKey })
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to save license: ${response.status}`)
-    }
-
-    return response.json()
-  }
-
-  async removeLicense(): Promise<void> {
-    const response = await fetch(`${this.apiBase}/easya11y/license`, {
-      method: 'DELETE'
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to remove license: ${response.status}`)
-    }
-  }
-
-  async isFeatureLicensed(feature: 'jira' | 'historical'): Promise<boolean> {
-    try {
-      const license = await this.getLicenseInfo()
-      return license.isValid && license.features?.includes(feature) || false
-    } catch {
-      return false
+export interface SystemConfiguration {
+  storageType: string
+  databaseEnabled: boolean
+  datasource?: {
+    url: string
+    username: string
+    driver: string
+    passwordConfigured: boolean
+    migration?: {
+      path: string
+      runOnStartup: boolean
     }
   }
 }

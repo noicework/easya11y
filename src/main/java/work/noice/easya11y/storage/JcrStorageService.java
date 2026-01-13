@@ -329,7 +329,55 @@ public class JcrStorageService implements StorageService {
     public String getStorageType() {
         return "jcr";
     }
-    
+
+    @Override
+    public List<AccessibilityScanResult> getScanResultsByPageUuid(String pageUuid, int limit) {
+        // JCR implementation: JCR nodes have natural UUIDs, so we can query by identifier
+        // For now, return empty list as UUID-based storage is primarily for database storage
+        log.debug("getScanResultsByPageUuid not optimized for JCR storage, pageUuid: {}", pageUuid);
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void registerPage(String pageUuid, String currentPath) {
+        // JCR nodes already have stable UUIDs, no separate registry needed
+        log.debug("registerPage not needed for JCR storage, pageUuid: {}, path: {}", pageUuid, currentPath);
+    }
+
+    @Override
+    public Optional<String> getPagePathByUuid(String pageUuid) {
+        // JCR can look up nodes by UUID directly
+        try {
+            Session session = MgnlContext.getJCRSession("website");
+            Node node = session.getNodeByIdentifier(pageUuid);
+            return Optional.of(node.getPath());
+        } catch (Exception e) {
+            log.debug("Could not find page by UUID: {}", pageUuid);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<String> getPageUuidByPath(String pagePath) {
+        try {
+            Session session = MgnlContext.getJCRSession("website");
+            if (session.nodeExists(pagePath)) {
+                Node node = session.getNode(pagePath);
+                return Optional.of(node.getIdentifier());
+            }
+            return Optional.empty();
+        } catch (Exception e) {
+            log.debug("Could not find page at path: {}", pagePath);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public void handlePageMove(String pageUuid, String oldPath, String newPath) {
+        // JCR handles page moves automatically through its event system
+        log.info("Page move detected - UUID: {}, from: {} to: {}", pageUuid, oldPath, newPath);
+    }
+
     private void ensureParentNodes(Session session, String path) throws RepositoryException {
         if (path == null || path.isBlank() || "/".equals(path)) {
             throw new RepositoryException("Invalid JCR path: " + path);
