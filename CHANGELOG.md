@@ -6,6 +6,37 @@ The format is based on Keep a Changelog, and this project aims to follow Semanti
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-01-22
+
+### Highlights
+
+- Universal context path support - works with any Magnolia deployment path out of the box
+- Headless deployment support - can now connect to remote Magnolia instances
+- Streamlined module - removed unused form builder components
+
+### Changed
+
+- **Dynamic Context Path Detection**: Removed hardcoded `/magnoliaAuthor` path. The module now automatically detects the Magnolia context path from:
+  1. URL parameter passed by the Magnolia SubApp
+  2. The `/.resources/` pattern in the URL
+  - Works with any context path: `/author`, `/cms`, `/magnoliaPublic`, or custom paths
+
+- **Headless Support**: Added support for headless deployments where the React app runs on a different domain
+  - Set `window.MGNL_CONTEXT_PATH` to the full Magnolia URL (e.g., `https://cms.example.com/author`) before loading the app
+  - The service automatically detects full URLs and uses them directly
+
+### Removed
+
+- **Form Builder Components**: Removed unused form builder dialogs, templates, and includes:
+  - Dialogs: button, conditional, container, form-embed, hidden, options, row, text, form page
+  - Templates: button, conditional, container, form-embed, hidden, options, row, text, form page
+  - Includes: btnOutline, btnSize, btnText, btnType, btnVariant, class, css, link
+
+### Upgrade Notes
+
+- **No Breaking Changes**: This release is backwards compatible. Existing deployments will continue to work without changes.
+- **Headless Deployments**: To connect to a remote Magnolia instance, set `window.MGNL_CONTEXT_PATH = 'https://your-magnolia-url/context'` before the app loads.
+
 ## [1.4.0] - 2026-01-13
 
 ### Highlights

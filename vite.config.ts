@@ -39,6 +39,9 @@ const dynamicLoadingPlugin = () => {
                 }
             }
             
+            // Expose context path to the app
+            window.MGNL_CONTEXT_PATH = contextPath;
+
             // Load resources with correct paths
             var resourceBase = contextPath + '/.resources/easya11y/webresources/';
             

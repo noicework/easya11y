@@ -7,10 +7,39 @@ class AccessibilityService {
   private readonly CONFIG_CACHE_TTL = 60000 // 1 minute cache
 
   constructor() {
-    const baseUrl = window.location.origin
-    const pathParts = window.location.pathname.split('/')
-    const contextPath = pathParts[1] === 'magnoliaAuthor' ? '/magnoliaAuthor' : ''
-    this.apiBase = `${baseUrl}${contextPath}/.rest`
+    this.apiBase = this.resolveApiBase()
+  }
+
+  private resolveApiBase(): string {
+    const magnoliaPath = (window as any).MGNL_CONTEXT_PATH
+
+    // If full URL provided (headless setup), use it directly
+    if (magnoliaPath?.startsWith('http')) {
+      return magnoliaPath.endsWith('/.rest') ? magnoliaPath : `${magnoliaPath}/.rest`
+    }
+
+    // Otherwise combine context path with current origin
+    const contextPath = magnoliaPath ?? this.detectContextPath()
+    return `${window.location.origin}${contextPath}/.rest`
+  }
+
+  private detectContextPath(): string {
+    // Try URL parameter first (passed by Magnolia SubApp)
+    const urlParams = new URLSearchParams(window.location.search)
+    const paramContext = urlParams.get('contextPath')
+    if (paramContext) {
+      return paramContext
+    }
+
+    // Extract from /.resources/ path pattern
+    const pathname = window.location.pathname
+    const resourcesIndex = pathname.indexOf('/.resources/')
+    if (resourcesIndex > 0) {
+      return pathname.substring(0, resourcesIndex)
+    }
+
+    // No context path detected
+    return ''
   }
 
   async getPages(includeStatus = true): Promise<Page[]> {
