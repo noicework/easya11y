@@ -6,6 +6,14 @@ The format is based on Keep a Changelog, and this project aims to follow Semanti
 
 ## [Unreleased]
 
+## [1.5.1] - 2026-07-27
+
+### Fixed
+
+- Removed invalid `$type` discriminators from the Pages app decoration, eliminating repeated Magnolia startup warnings while retaining the default configured action and JCR node-type availability behavior.
+- Corrected the scheduled accessibility scan job to use Magnolia's `catalog` property and removed invalid or redundant legacy properties. Existing installations are migrated on upgrade.
+- Thanks to Tobias at Magnolia for reporting and diagnosing the startup warning noise on Magnolia 6.4.8 (DX Core).
+
 ## [1.5.0] - 2026-01-22
 
 ### Highlights

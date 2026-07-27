@@ -3,6 +3,7 @@ package work.noice.setup;
 import info.magnolia.module.DefaultModuleVersionHandler;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.DeltaBuilder;
+import work.noice.easya11y.setup.MigrateScheduledScanJobPropertiesTask;
 import work.noice.easya11y.setup.RegisterScheduledScanJobTask;
 
 import java.util.ArrayList;
@@ -21,6 +22,10 @@ public class easya11yVersionHandler extends DefaultModuleVersionHandler {
         );
         
         register(DeltaBuilder.update("1.2.1", "Added database storage, historical analytics, and licensing")
+        );
+
+        register(DeltaBuilder.update("1.5.1", "Removed invalid scheduler job properties")
+            .addTask(new MigrateScheduledScanJobPropertiesTask())
         );
     }
     
