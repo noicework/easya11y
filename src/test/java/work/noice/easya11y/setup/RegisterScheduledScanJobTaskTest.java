@@ -1,5 +1,6 @@
 package work.noice.easya11y.setup;
 
+import info.magnolia.commands.chain.Command;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.scheduler.JobDefinition;
 import org.junit.Test;
@@ -39,8 +40,8 @@ public class RegisterScheduledScanJobTaskTest {
             Map.of(
                 "name", "Accessibility Scan",
                 "description", "Automated accessibility scan for all pages",
-                "catalog", "default",
-                "command", "easya11y-serverSideScan",
+                "catalog", RegisterServerSideScanCommandTask.CATALOG_NAME,
+                "command", RegisterServerSideScanCommandTask.COMMAND_NAME,
                 "cron", "0 0 9 ? * MON",
                 "enabled", false
             ),
@@ -82,6 +83,29 @@ public class RegisterScheduledScanJobTaskTest {
     }
 
     @Test
+    public void jobCommandMatchesTheRegisteredCatalogAndCommandNode() throws Exception {
+        JcrFixture fixture = new JcrFixture();
+
+        new RegisterServerSideScanCommandTask().doExecute(fixture.installContext());
+        new RegisterScheduledScanJobTask().doExecute(fixture.installContext());
+
+        NodeState commands = fixture.node("/modules/easya11y/commands");
+        assertNotNull(commands);
+        assertEquals(1, commands.children.size());
+
+        NodeState catalog = commands.children.values().iterator().next();
+        assertEquals(1, catalog.children.size());
+
+        NodeState command = catalog.children.values().iterator().next();
+        NodeState job = fixture.node(RegisterScheduledScanJobTask.JOB_PATH);
+        assertEquals(catalog.name, job.properties.get("catalog"));
+        assertEquals(command.name, job.properties.get("command"));
+
+        Class<?> commandClass = Class.forName((String) command.properties.get("class"));
+        assertTrue(Command.class.isAssignableFrom(commandClass));
+    }
+
+    @Test
     public void migrationReplacesLegacyPropertiesWithoutResettingCustomSettings() throws Exception {
         JcrFixture fixture = new JcrFixture();
         NodeState job = fixture.createPath(RegisterScheduledScanJobTask.JOB_PATH);
@@ -113,11 +137,14 @@ public class RegisterScheduledScanJobTaskTest {
         job.properties.put("catalogName", "legacyCatalog");
         job.properties.put("enabled", false);
         job.properties.put("active", true);
+        job.properties.put("command", MigrateScheduledScanJobPropertiesTask.LEGACY_COMMAND_VALUE);
 
         new MigrateScheduledScanJobPropertiesTask().doExecute(fixture.installContext());
 
         assertEquals("supportedCatalog", job.properties.get("catalog"));
         assertEquals(false, job.properties.get("enabled"));
+        assertEquals(RegisterServerSideScanCommandTask.COMMAND_NAME,
+            job.properties.get("command"));
         assertFalse(job.properties.containsKey("catalogName"));
         assertFalse(job.properties.containsKey("active"));
     }

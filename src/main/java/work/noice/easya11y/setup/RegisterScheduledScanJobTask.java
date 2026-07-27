@@ -21,8 +21,8 @@ public class RegisterScheduledScanJobTask extends AbstractRepositoryTask {
     static final Map<String, Object> JOB_PROPERTIES = Map.of(
         "name", "Accessibility Scan",
         "description", "Automated accessibility scan for all pages",
-        "catalog", "default",
-        "command", "easya11y-serverSideScan",
+        "catalog", RegisterServerSideScanCommandTask.CATALOG_NAME,
+        "command", RegisterServerSideScanCommandTask.COMMAND_NAME,
         "cron", "0 0 9 ? * MON",
         "enabled", false
     );

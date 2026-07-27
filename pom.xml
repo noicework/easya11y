@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>work.noice</groupId>
   <artifactId>easya11y</artifactId>
-  <version>1.5.1</version>
+  <version>1.5.2</version>
   <packaging>jar</packaging>
   <name>Easy Accessibility (Magnolia Module)</name>
   <description>Accessibility testing module for Magnolia CMS</description>
@@ -73,6 +73,12 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>info.magnolia.types</groupId>
+      <artifactId>magnolia-content-types-jcr</artifactId>
+      <version>3.0.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -230,6 +236,34 @@
           </execution>
         </executions>
       </plugin>
+
+      <!-- Package axe-core from the installed frontend dependency without vendoring it. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>copy-axe-core</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}/easya11y/webresources/vendor</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/node_modules/axe-core</directory>
+                  <includes>
+                    <include>axe.min.js</include>
+                  </includes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       
       <!-- Maven Shade Plugin to bundle dependencies -->
       <plugin>
@@ -269,6 +303,26 @@
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
               </transformers>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <systemPropertyVariables>
+            <packagedArtifact>${project.build.directory}/${project.build.finalName}.jar</packagedArtifact>
+            <axeCoreSource>${project.basedir}/node_modules/axe-core/axe.min.js</axeCoreSource>
+          </systemPropertyVariables>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>

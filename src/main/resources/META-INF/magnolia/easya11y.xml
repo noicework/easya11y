@@ -17,6 +17,7 @@
       <type>work.noice.easya11y.services.ServerSideAccessibilityScanner</type>
       <implementation>work.noice.easya11y.services.ServerSideAccessibilityScanner</implementation>
       <scope>singleton</scope>
+      <lazy>true</lazy>
     </component>
   </components>
 

@@ -3,17 +3,16 @@ package work.noice.easya11y.config;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import info.magnolia.ui.api.action.Action;
 import info.magnolia.ui.api.action.ActionDefinition;
 import info.magnolia.ui.api.action.ConfiguredActionDefinition;
 import info.magnolia.ui.api.availability.ConfiguredAvailabilityDefinition;
 import info.magnolia.ui.availability.JcrAvailabilityChecker;
 import info.magnolia.ui.availability.rule.JcrNodeTypeRuleDefinition;
+import info.magnolia.jcr.node2bean.TypeDescriptor;
+import info.magnolia.transformer.ClassPropertyBasedTypeResolver;
 import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
+import work.noice.easya11y.actions.RunAccessibilityCheckAction;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.InputStream;
@@ -48,13 +47,23 @@ public class PagesAppDecorationTest {
             Map<String, Object> actions = mapValue(subApp, "actions");
             Map<String, Object> action = mapValue(actions, "runAccessibilityCheck");
 
-            assertFalse("The default action definition does not need an explicit class",
-                action.containsKey("class"));
-            assertBeanPropertiesExist(ConfiguredActionDefinition.class, action.keySet());
+            assertFalse("Deprecated action implementationClass must not be configured",
+                action.containsKey("implementationClass"));
 
-            Class<?> implementationClass =
-                Class.forName((String) action.get("implementationClass"));
-            assertTrue(Action.class.isAssignableFrom(implementationClass));
+            TypeDescriptor actionType = new TypeDescriptor();
+            actionType.setType(ActionDefinition.class);
+            Class<?> definitionClass = new ClassPropertyBasedTypeResolver()
+                .resolveType(actionType, action, problem -> {
+                    throw new AssertionError(problem);
+                })
+                .orElseThrow(() -> new AssertionError("Magnolia did not resolve action class"));
+
+            assertTrue(ConfiguredActionDefinition.class.isAssignableFrom(definitionClass));
+            assertBeanPropertiesExist(definitionClass, action.keySet());
+
+            ConfiguredActionDefinition definition =
+                (ConfiguredActionDefinition) definitionClass.getDeclaredConstructor().newInstance();
+            assertEquals(RunAccessibilityCheckAction.class, definition.getImplementationClass());
 
             Map<String, Object> availability = mapValue(action, "availability");
             assertFalse("JCR node type filtering is a built-in availability rule",
@@ -63,16 +72,21 @@ public class PagesAppDecorationTest {
 
             Map<String, Object> nodeTypes = mapValue(availability, "nodeTypes");
             assertEquals(List.of("mgnl:page"), List.copyOf(nodeTypes.values()));
+
+            Map<String, Object> actionbar = mapValue(subApp, "actionbar");
+            Map<String, Object> sections = mapValue(actionbar, "sections");
+            Map<String, Object> pageActions = mapValue(sections, "pageActions");
+            Map<String, Object> groups = mapValue(pageActions, "groups");
+            Map<String, Object> accessibilityGroup = mapValue(groups, "accessibilityGroup");
+            List<Map<String, Object>> items = listValue(accessibilityGroup, "items");
+            assertEquals(List.of("runAccessibilityCheck"), items.stream()
+                .map(item -> (String) item.get("name"))
+                .collect(Collectors.toList()));
         }
     }
 
     @Test
-    public void magnoliaClasspathProvidesTheDefaultsReliedOnByTheDecoration() throws Exception {
-        assertEquals(
-            ConfiguredActionDefinition.class.getName(),
-            configuredImplementationFor(ActionDefinition.class.getName())
-        );
-
+    public void magnoliaClasspathProvidesDefaultNodeTypeAvailability() throws Exception {
         Field defaultRulesField = JcrAvailabilityChecker.class.getDeclaredField("RULE_DEFINITIONS");
         defaultRulesField.setAccessible(true);
         Collection<?> defaultRules = (Collection<?>) defaultRulesField.get(null);
@@ -92,45 +106,6 @@ public class PagesAppDecorationTest {
                 }
             );
         }
-    }
-
-    private String configuredImplementationFor(String typeName) throws Exception {
-        try (InputStream input = getClass().getResourceAsStream(
-            "/META-INF/magnolia/ui-framework-core.xml")) {
-            assertNotNull("Magnolia UI Framework type mappings are not on the test classpath", input);
-
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setFeature(
-                "http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            factory.setFeature(
-                "http://xml.org/sax/features/external-general-entities", false);
-            factory.setFeature(
-                "http://xml.org/sax/features/external-parameter-entities", false);
-            factory.setExpandEntityReferences(false);
-            Document document = factory.newDocumentBuilder().parse(input);
-            NodeList mappings = document.getElementsByTagName("type-mapping");
-
-            for (int i = 0; i < mappings.getLength(); i++) {
-                org.w3c.dom.Node mapping = mappings.item(i);
-                String type = childText(mapping, "type");
-                if (typeName.equals(type)) {
-                    return childText(mapping, "implementation");
-                }
-            }
-        }
-
-        throw new AssertionError("No Magnolia type mapping found for " + typeName);
-    }
-
-    private String childText(org.w3c.dom.Node parent, String childName) {
-        NodeList children = parent.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            org.w3c.dom.Node child = children.item(i);
-            if (childName.equals(child.getNodeName())) {
-                return child.getTextContent().trim();
-            }
-        }
-        return null;
     }
 
     private void assertNoTypeDiscriminators(Object value) {
@@ -169,5 +144,12 @@ public class PagesAppDecorationTest {
         Object value = parent.get(key);
         assertTrue("Expected mapping at " + key + " but found " + value, value instanceof Map);
         return (Map<String, Object>) value;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> listValue(Map<String, Object> parent, String key) {
+        Object value = parent.get(key);
+        assertTrue("Expected list at " + key + " but found " + value, value instanceof List);
+        return (List<Map<String, Object>>) value;
     }
 }

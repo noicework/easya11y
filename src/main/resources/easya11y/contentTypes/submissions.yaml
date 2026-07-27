@@ -1,12 +1,9 @@
 datasource:
   workspace: easya11y
   autoCreate: false
-  
-nodeType:
-  name: mgnl:submission
-  primaryType: nt:base
-  supertypes:
-    - mgnl:content
+
+model:
+  nodeType: mgnl:submission
   properties:
     - name: timestamp
       type: Date

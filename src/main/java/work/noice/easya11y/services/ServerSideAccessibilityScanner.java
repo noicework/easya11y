@@ -30,19 +30,17 @@ public class ServerSideAccessibilityScanner {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final int PAGE_LOAD_TIMEOUT = 30;
     private static final int SCRIPT_TIMEOUT = 30;
+    private static final String AXE_CORE_RESOURCE =
+        "/easya11y/webresources/vendor/axe.min.js";
+    private static final String AXE_CORE_CDN_URL =
+        "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js";
     
     // Default admin credentials - should be externalized in production
     private static final String DEFAULT_USERNAME = "superuser";
     private static final String DEFAULT_PASSWORD = "superuser";
     
+    private volatile boolean initialized;
     private String axeCoreScript;
-    
-    public ServerSideAccessibilityScanner() {
-        // Load axe-core script from resources
-        loadAxeCoreScript();
-        // Setup WebDriverManager
-        WebDriverManager.chromedriver().setup();
-    }
     
     /**
      * Run accessibility scan on a given URL.
@@ -53,6 +51,8 @@ public class ServerSideAccessibilityScanner {
      * @return Scan results as JsonNode
      */
     public JsonNode scanUrl(String url, String wcagLevel) throws Exception {
+        ensureInitialized();
+
         ChromeDriver driver = null;
         try {
             driver = (ChromeDriver) createWebDriver();
@@ -200,7 +200,7 @@ public class ServerSideAccessibilityScanner {
         return results;
     }
     
-    private ChromeDriver createWebDriver() {
+    ChromeDriver createWebDriver() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
         options.addArguments("--no-sandbox");
@@ -216,11 +216,31 @@ public class ServerSideAccessibilityScanner {
         
         return driver;
     }
-    
-    private void loadAxeCoreScript() {
+
+    void ensureInitialized() {
+        if (initialized) {
+            return;
+        }
+
+        synchronized (this) {
+            if (initialized) {
+                return;
+            }
+
+            String script = loadAxeCoreScript();
+            setupChromeDriver();
+            axeCoreScript = script;
+            initialized = true;
+        }
+    }
+
+    void setupChromeDriver() {
+        WebDriverManager.chromedriver().setup();
+    }
+
+    String loadAxeCoreScript() {
         try {
-            // Load axe-core from node_modules or resources
-            InputStream is = getClass().getResourceAsStream("/easya11y/webresources/vendor/axe.min.js");
+            InputStream is = getClass().getResourceAsStream(AXE_CORE_RESOURCE);
             if (is == null) {
                 // Try alternate location
                 is = getClass().getResourceAsStream("/axe.min.js");
@@ -228,18 +248,19 @@ public class ServerSideAccessibilityScanner {
             
             if (is != null) {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                    axeCoreScript = reader.lines().collect(Collectors.joining("\n"));
+                    return reader.lines().collect(Collectors.joining("\n"));
                 }
-            } else {
-                log.warn("Could not load axe-core script from resources, will use CDN");
-                axeCoreScript = "var script = document.createElement('script');" +
-                               "script.src = 'https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js';" +
-                               "script.onload = function() { console.log('axe-core loaded'); };" +
-                               "document.head.appendChild(script);";
             }
+
+            log.warn("Could not load axe-core script from resources, will use CDN");
         } catch (IOException e) {
             log.error("Error loading axe-core script", e);
         }
+
+        return "var script = document.createElement('script');" +
+               "script.src = '" + AXE_CORE_CDN_URL + "';" +
+               "script.onload = function() { console.log('axe-core loaded'); };" +
+               "document.head.appendChild(script);";
     }
     
     private String buildAxeConfig(String wcagLevel) {

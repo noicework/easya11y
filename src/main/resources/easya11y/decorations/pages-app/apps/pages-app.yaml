@@ -2,7 +2,7 @@ subApps:
   browser:
     actions:
       runAccessibilityCheck:
-        implementationClass: work.noice.easya11y.actions.RunAccessibilityCheckAction
+        class: work.noice.easya11y.actions.RunAccessibilityCheckActionDefinition
         label: Run Accessibility Check
         icon: easya11y-icon
         availability:
@@ -19,7 +19,7 @@ subApps:
   detail:
     actions:
       runAccessibilityCheck:
-        implementationClass: work.noice.easya11y.actions.RunAccessibilityCheckAction
+        class: work.noice.easya11y.actions.RunAccessibilityCheckActionDefinition
         label: Run Accessibility Check
         icon: easya11y-icon
         availability:

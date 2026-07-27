@@ -6,6 +6,15 @@ The format is based on Keep a Changelog, and this project aims to follow Semanti
 
 ## [Unreleased]
 
+## [1.5.2] - 2026-07-27
+
+### Fixed
+
+- Packaged the installed axe-core distribution in the module JAR and deferred axe-core loading and Chrome driver setup until the first server-side scan.
+- Corrected the scheduled scan job's command reference and migrated the known broken default on existing installations without overwriting customised command values.
+- Restructured the submissions content type to Magnolia 6.4's `model.nodeType` shape so its properties are materialised.
+- Replaced the deprecated action `implementationClass` configuration with a concrete action-definition class while retaining the existing availability rules and actionbar wiring.
+
 ## [1.5.1] - 2026-07-27
 
 ### Fixed
