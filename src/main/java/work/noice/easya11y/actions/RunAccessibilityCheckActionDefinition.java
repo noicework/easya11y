@@ -1,5 +1,6 @@
 package work.noice.easya11y.actions;
 
+import info.magnolia.ui.api.action.Action;
 import info.magnolia.ui.api.action.ConfiguredActionDefinition;
 
 /**
@@ -7,8 +8,8 @@ import info.magnolia.ui.api.action.ConfiguredActionDefinition;
  */
 public class RunAccessibilityCheckActionDefinition extends ConfiguredActionDefinition {
 
-    @SuppressWarnings("deprecation")
-    public RunAccessibilityCheckActionDefinition() {
-        setImplementationClass(RunAccessibilityCheckAction.class);
+    @Override
+    public Class<? extends Action> getImplementationClass() {
+        return RunAccessibilityCheckAction.class;
     }
 }
